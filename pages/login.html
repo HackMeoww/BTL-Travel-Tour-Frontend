@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Đăng nhập - Travel Tour</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container navbar">
+
+            <div class="logo">
+                Travel Tour
+            </div>
+
+            <nav class="menu">
+                <a href="../index.html">Trang chủ</a>
+                <a href="tours.html">Tour</a>
+                <a href="login.html">Đăng nhập</a>
+                <a href="register.html">Đăng ký</a>
+            </nav>
+
+        </div>
+    </header>
+
+
+    <main>
+
+        <section class="auth-page">
+
+            <div class="auth-container">
+
+                <h1>Đăng nhập</h1>
+
+                <p class="auth-description">
+                    Đăng nhập để đặt tour và quản lý booking
+                </p>
+
+
+                <form id="loginForm">
+
+                    <div class="form-group">
+                        <label for="userName">
+                            Tên đăng nhập
+                        </label>
+
+                        <input
+                            type="text"
+                            id="userName"
+                            placeholder="Nhập tên đăng nhập"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="password">
+                            Mật khẩu
+                        </label>
+
+                        <input
+                            type="password"
+                            id="password"
+                            placeholder="Nhập mật khẩu"
+                            required
+                        >
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="auth-button"
+                    >
+                        Đăng nhập
+                    </button>
+
+                </form>
+
+
+                <p class="auth-footer">
+                    Chưa có tài khoản?
+                    <a href="register.html">
+                        Đăng ký ngay
+                    </a>
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

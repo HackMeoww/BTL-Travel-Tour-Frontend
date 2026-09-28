@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Đăng ký - Travel Tour</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container navbar">
+
+            <div class="logo">
+                Travel Tour
+            </div>
+
+            <nav class="menu">
+                <a href="../index.html">Trang chủ</a>
+                <a href="tours.html">Tour</a>
+                <a href="login.html">Đăng nhập</a>
+                <a href="register.html">Đăng ký</a>
+            </nav>
+
+        </div>
+    </header>
+
+
+    <main>
+
+        <section class="auth-page">
+
+            <div class="auth-container">
+
+                <h1>Đăng ký tài khoản</h1>
+
+                <p class="auth-description">
+                    Tạo tài khoản để đặt tour và quản lý booking
+                </p>
+
+
+                <form id="registerForm">
+
+                    <div class="form-group">
+                        <label for="userName">
+                            Tên đăng nhập
+                        </label>
+
+                        <input
+                            type="text"
+                            id="userName"
+                            placeholder="Nhập tên đăng nhập"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="password">
+                            Mật khẩu
+                        </label>
+
+                        <input
+                            type="password"
+                            id="password"
+                            placeholder="Nhập mật khẩu"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="fullName">
+                            Họ và tên
+                        </label>
+
+                        <input
+                            type="text"
+                            id="fullName"
+                            placeholder="Nhập họ và tên"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="email">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            placeholder="Nhập email"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="phone">
+                            Số điện thoại
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="phone"
+                            placeholder="Nhập số điện thoại"
+                            required
+                        >
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="auth-button"
+                    >
+                        Đăng ký
+                    </button>
+
+                </form>
+
+
+                <p class="auth-footer">
+                    Đã có tài khoản?
+                    <a href="login.html">
+                        Đăng nhập
+                    </a>
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

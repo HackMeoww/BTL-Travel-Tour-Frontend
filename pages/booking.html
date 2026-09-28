@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Đặt Tour - Travel Tour</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container navbar">
+
+            <div class="logo">
+                Travel Tour
+            </div>
+
+            <nav class="menu">
+                <a href="../index.html">Trang chủ</a>
+                <a href="tours.html">Tour</a>
+                <a href="#">Đăng nhập</a>
+                <a href="#">Đăng ký</a>
+            </nav>
+
+        </div>
+    </header>
+
+
+    <!-- Đặt tour -->
+    <main>
+
+        <section class="booking-page">
+
+            <div class="container">
+
+                <div class="section-title">
+                    <h1>Đặt Tour</h1>
+                    <p>Điền thông tin để hoàn tất đặt tour</p>
+                </div>
+
+
+                <div class="booking-layout">
+
+                    <!-- Thông tin khách hàng -->
+                    <div class="booking-form">
+
+                        <h2>Thông tin khách hàng</h2>
+
+                        <div class="form-group">
+                            <label for="fullName">Họ và tên</label>
+                            <input
+                                type="text"
+                                id="fullName"
+                                placeholder="Nhập họ và tên"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Số điện thoại</label>
+                            <input
+                                type="tel"
+                                id="phone"
+                                placeholder="Nhập số điện thoại"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input
+                                type="email"
+                                id="email"
+                                placeholder="Nhập email"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">Địa chỉ</label>
+                            <input
+                                type="text"
+                                id="address"
+                                placeholder="Nhập địa chỉ"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="numberOfPeople">
+                                Số lượng người
+                            </label>
+
+                            <input
+                                type="number"
+                                id="numberOfPeople"
+                                min="1"
+                                value="1"
+                            >
+                        </div>
+
+                        <button class="booking-button">
+                            Tiếp tục thanh toán
+                        </button>
+
+                    </div>
+
+
+                    <!-- Thông tin tour -->
+                    <div class="booking-summary">
+
+                        <h2>Thông tin Tour</h2>
+
+                        <div class="summary-item">
+                            <span>Tour</span>
+                            <strong>
+                                Tour Hạ Long 4 ngày 3 đêm
+                            </strong>
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Địa điểm</span>
+                            <strong>
+                                Quảng Ninh
+                            </strong>
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Thời gian</span>
+                            <strong>
+                                4 ngày 3 đêm
+                            </strong>
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Giá / người</span>
+                            <strong>
+                                3.000.000 VNĐ
+                            </strong>
+                        </div>
+
+                        <hr>
+
+                        <div class="summary-total">
+                            <span>Tổng tiền</span>
+                            <strong>
+                                3.000.000 VNĐ
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Thanh toán - Travel Tour</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container navbar">
+
+            <div class="logo">
+                Travel Tour
+            </div>
+
+            <nav class="menu">
+                <a href="../index.html">Trang chủ</a>
+                <a href="tours.html">Tour</a>
+                <a href="#">Đăng nhập</a>
+                <a href="#">Đăng ký</a>
+            </nav>
+
+        </div>
+    </header>
+
+
+    <!-- Thanh toán -->
+    <main>
+
+        <section class="payment-page">
+
+            <div class="container">
+
+                <div class="section-title">
+                    <h1>Thanh toán</h1>
+                    <p>Kiểm tra thông tin và chọn phương thức thanh toán</p>
+                </div>
+
+
+                <div class="payment-layout">
+
+                    <!-- Phương thức thanh toán -->
+                    <div class="payment-method">
+
+                        <h2>Phương thức thanh toán</h2>
+
+                        <label class="payment-option">
+                            <input
+                                type="radio"
+                                name="paymentMethod"
+                                value="Banking"
+                                checked
+                            >
+
+                            <span>
+                                🏦 Chuyển khoản ngân hàng
+                            </span>
+                        </label>
+
+
+                        <label class="payment-option">
+                            <input
+                                type="radio"
+                                name="paymentMethod"
+                                value="Cash"
+                            >
+
+                            <span>
+                                💵 Thanh toán tiền mặt
+                            </span>
+                        </label>
+
+
+                        <label class="payment-option">
+                            <input
+                                type="radio"
+                                name="paymentMethod"
+                                value="Momo"
+                            >
+
+                            <span>
+                                📱 Ví điện tử
+                            </span>
+                        </label>
+
+
+                        <div class="bank-info">
+
+                            <h3>Thông tin chuyển khoản</h3>
+
+                            <p>
+                                Ngân hàng: Vietcombank
+                            </p>
+
+                            <p>
+                                Số tài khoản: 0123456789
+                            </p>
+
+                            <p>
+                                Chủ tài khoản: TRAVEL TOUR
+                            </p>
+
+                            <p>
+                                Nội dung:
+                                <strong>THANHTOAN TOUR</strong>
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Hóa đơn -->
+                    <div class="payment-summary">
+
+                        <h2>Thông tin thanh toán</h2>
+
+                        <div class="summary-item">
+                            <span>Tour</span>
+
+                            <strong>
+                                Tour Hạ Long 4 ngày 3 đêm
+                            </strong>
+                        </div>
+
+
+                        <div class="summary-item">
+                            <span>Số lượng</span>
+
+                            <strong>
+                                2 người
+                            </strong>
+                        </div>
+
+
+                        <div class="summary-item">
+                            <span>Giá / người</span>
+
+                            <strong>
+                                3.000.000 VNĐ
+                            </strong>
+                        </div>
+
+
+                        <hr>
+
+
+                        <div class="summary-total">
+
+                            <span>
+                                Tổng thanh toán
+                            </span>
+
+                            <strong>
+                                6.000.000 VNĐ
+                            </strong>
+
+                        </div>
+
+
+                        <button class="payment-button">
+                            Xác nhận thanh toán
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>

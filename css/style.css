@@ -1,0 +1,671 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+}
+
+header {
+    background-color: #0077b6;
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+header h1 {
+    margin-bottom: 10px;
+}
+
+main {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header */
+
+.header {
+    background-color: #0077b6;
+    color: white;
+}
+
+.navbar {
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.menu {
+    display: flex;
+    gap: 30px;
+}
+
+.menu a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.menu a:hover {
+    text-decoration: underline;
+}
+
+/* Hero */
+
+.hero {
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    background-color: #eaf6ff;
+}
+
+.hero-content {
+    padding: 60px 20px;
+}
+
+.hero h1 {
+    font-size: 42px;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+
+.hero button {
+    padding: 14px 30px;
+    border: none;
+    border-radius: 6px;
+    background-color: #0077b6;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.hero button:hover {
+    background-color: #005f8f;
+}
+
+/* Tour nổi bật */
+
+.featured-tours {
+    padding: 70px 0;
+    background-color: #ffffff;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.section-title h2 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.section-title p {
+    color: #666;
+    font-size: 17px;
+}
+
+.tour-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.tour-card {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+    transition: transform 0.2s;
+}
+
+.tour-card:hover {
+    transform: translateY(-5px);
+}
+
+.tour-image {
+    height: 180px;
+    background-color: #90dbf4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tour-image span {
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+}
+
+.tour-info {
+    padding: 20px;
+}
+
+.tour-info h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+.tour-info p {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.destination {
+    color: #0077b6;
+    font-weight: bold;
+}
+
+.tour-bottom {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tour-bottom strong {
+    color: #e63946;
+    font-size: 17px;
+}
+
+.tour-bottom button {
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: #0077b6;
+    color: white;
+    cursor: pointer;
+}
+
+.tour-bottom button:hover {
+    background-color: #005f8f;
+}
+
+/* Tìm kiếm tour */
+
+.search-section {
+    padding: 70px 0;
+    background-color: #f5f9fc;
+}
+
+.search-box {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr auto;
+    gap: 20px;
+    align-items: end;
+}
+
+.search-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.search-field label {
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.search-field input {
+    height: 45px;
+    padding: 0 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.search-field input:focus {
+    outline: none;
+    border-color: #0077b6;
+}
+
+.search-button {
+    height: 45px;
+    padding: 0 25px;
+    border: none;
+    border-radius: 5px;
+    background-color: #0077b6;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background-color: #005f8f;
+}
+/* Trang danh sách Tour */
+
+.tour-page {
+    padding: 70px 0;
+    min-height: 600px;
+    background-color: #f5f9fc;
+}
+
+.tour-page .section-title h1 {
+    font-size: 36px;
+}
+/* Trang chi tiết Tour */
+
+.tour-detail {
+    padding: 60px 0;
+    background-color: #f5f9fc;
+    min-height: 700px;
+}
+
+.detail-image {
+    height: 300px;
+    background-color: #90dbf4;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 35px;
+}
+
+.detail-image span {
+    color: white;
+    font-size: 42px;
+    font-weight: bold;
+}
+
+.detail-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 35px;
+}
+
+.detail-main {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+}
+
+.detail-main h1 {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.detail-location {
+    color: #0077b6;
+    font-weight: bold;
+}
+
+.tour-meta {
+    display: flex;
+    gap: 25px;
+    margin: 25px 0;
+    padding: 15px 0;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+.detail-main h2 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.detail-main p {
+    line-height: 1.7;
+}
+
+.itinerary {
+    margin-top: 20px;
+}
+
+.day {
+    border-left: 4px solid #0077b6;
+    padding: 10px 20px;
+    margin-bottom: 15px;
+    background-color: #f5f9fc;
+}
+
+.day h3 {
+    margin-bottom: 8px;
+}
+
+.booking-card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    height: fit-content;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+}
+
+.booking-card h2 {
+    margin-bottom: 25px;
+}
+
+.booking-card p {
+    margin-top: 20px;
+    margin-bottom: 8px;
+    color: #666;
+}
+
+.booking-card strong {
+    display: block;
+    color: #e63946;
+    font-size: 25px;
+    margin-bottom: 20px;
+}
+
+.booking-card span {
+    display: block;
+    margin-bottom: 25px;
+}
+
+.booking-button {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 6px;
+    background-color: #0077b6;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.booking-button:hover {
+    background-color: #005f8f;
+}
+/* Trang đặt Tour */
+
+.booking-page {
+    padding: 70px 0;
+    background-color: #f5f9fc;
+    min-height: 700px;
+}
+
+.booking-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+.booking-form,
+.booking-summary {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.booking-form h2,
+.booking-summary h2 {
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    height: 45px;
+    padding: 0 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #0077b6;
+}
+
+.booking-form .booking-button {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.summary-item {
+    margin-bottom: 22px;
+}
+
+.summary-item span {
+    display: block;
+    color: #666;
+    margin-bottom: 7px;
+}
+
+.summary-item strong {
+    display: block;
+}
+
+.booking-summary hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 25px 0;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.summary-total strong {
+    color: #e63946;
+    font-size: 22px;
+}
+/* Trang thanh toán */
+
+.payment-page {
+    padding: 70px 0;
+    background-color: #f5f9fc;
+    min-height: 700px;
+}
+
+.payment-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+.payment-method,
+.payment-summary {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.payment-method h2,
+.payment-summary h2 {
+    margin-bottom: 25px;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 18px;
+    margin-bottom: 15px;
+
+    border: 1px solid #ddd;
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+.payment-option:hover {
+    border-color: #0077b6;
+}
+
+.payment-option input {
+    width: 18px;
+    height: 18px;
+}
+
+.payment-option span {
+    font-size: 16px;
+}
+
+.bank-info {
+    margin-top: 25px;
+    padding: 20px;
+    background-color: #f5f9fc;
+    border-radius: 6px;
+}
+
+.bank-info h3 {
+    margin-bottom: 15px;
+}
+
+.bank-info p {
+    margin-bottom: 10px;
+}
+
+.payment-summary .summary-item {
+    margin-bottom: 22px;
+}
+
+.payment-summary .summary-item span {
+    display: block;
+    color: #666;
+    margin-bottom: 7px;
+}
+
+.payment-summary .summary-item strong {
+    display: block;
+}
+
+.payment-summary hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 25px 0;
+}
+
+.payment-summary .summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.payment-summary .summary-total strong {
+    color: #e63946;
+    font-size: 23px;
+}
+
+.payment-button {
+    width: 100%;
+    height: 50px;
+
+    margin-top: 30px;
+
+    border: none;
+    border-radius: 6px;
+
+    background-color: #0077b6;
+    color: white;
+
+    font-size: 17px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.payment-button:hover {
+    background-color: #005f8f;
+}
+/* Trang đăng nhập / đăng ký */
+
+.auth-page {
+    min-height: 700px;
+    padding: 70px 0;
+
+    background-color: #f5f9fc;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.auth-container {
+    width: 420px;
+
+    background-color: white;
+
+    padding: 35px;
+
+    border-radius: 10px;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+}
+
+.auth-container h1 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.auth-description {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.auth-button {
+    width: 100%;
+    height: 48px;
+
+    border: none;
+    border-radius: 6px;
+
+    background-color: #0077b6;
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.auth-button:hover {
+    background-color: #005f8f;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.auth-footer a {
+    color: #0077b6;
+    text-decoration: none;
+    font-weight: bold;
+}
