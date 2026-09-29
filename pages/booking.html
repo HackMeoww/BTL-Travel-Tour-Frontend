@@ -21,11 +21,24 @@
             </div>
 
             <nav class="menu">
-                <a href="../index.html">Trang chủ</a>
-                <a href="tours.html">Tour</a>
-                <a href="#">Đăng nhập</a>
-                <a href="#">Đăng ký</a>
-            </nav>
+
+    <a href="../index.html">
+        Trang chủ
+    </a>
+
+    <a href="tours.html">
+        Tour
+    </a>
+
+    <a href="login.html" id="loginLink">
+        Đăng nhập
+    </a>
+
+    <a href="#" id="logoutLink" style="display: none;">
+        Đăng xuất
+    </a>
+
+</nav>
 
         </div>
     </header>
@@ -52,7 +65,10 @@
                         <h2>Thông tin khách hàng</h2>
 
                         <div class="form-group">
-                            <label for="fullName">Họ và tên</label>
+                            <label for="fullName">
+                                Họ và tên
+                            </label>
+
                             <input
                                 type="text"
                                 id="fullName"
@@ -60,8 +76,12 @@
                             >
                         </div>
 
+
                         <div class="form-group">
-                            <label for="phone">Số điện thoại</label>
+                            <label for="phone">
+                                Số điện thoại
+                            </label>
+
                             <input
                                 type="tel"
                                 id="phone"
@@ -69,8 +89,12 @@
                             >
                         </div>
 
+
                         <div class="form-group">
-                            <label for="email">Email</label>
+                            <label for="email">
+                                Email
+                            </label>
+
                             <input
                                 type="email"
                                 id="email"
@@ -78,14 +102,19 @@
                             >
                         </div>
 
+
                         <div class="form-group">
-                            <label for="address">Địa chỉ</label>
+                            <label for="address">
+                                Địa chỉ
+                            </label>
+
                             <input
                                 type="text"
                                 id="address"
                                 placeholder="Nhập địa chỉ"
                             >
                         </div>
+
 
                         <div class="form-group">
                             <label for="numberOfPeople">
@@ -100,8 +129,14 @@
                             >
                         </div>
 
-                        <button class="booking-button">
+
+                        <button
+                            class="booking-button"
+                            type="button"
+                            onclick="continueBooking()">
+
                             Tiếp tục thanh toán
+
                         </button>
 
                     </div>
@@ -112,41 +147,13 @@
 
                         <h2>Thông tin Tour</h2>
 
-                        <div class="summary-item">
-                            <span>Tour</span>
-                            <strong>
-                                Tour Hạ Long 4 ngày 3 đêm
-                            </strong>
-                        </div>
 
-                        <div class="summary-item">
-                            <span>Địa điểm</span>
-                            <strong>
-                                Quảng Ninh
-                            </strong>
-                        </div>
+                        <div id="tourSummary">
 
-                        <div class="summary-item">
-                            <span>Thời gian</span>
-                            <strong>
-                                4 ngày 3 đêm
-                            </strong>
-                        </div>
+                            <p>
+                                Đang tải thông tin tour...
+                            </p>
 
-                        <div class="summary-item">
-                            <span>Giá / người</span>
-                            <strong>
-                                3.000.000 VNĐ
-                            </strong>
-                        </div>
-
-                        <hr>
-
-                        <div class="summary-total">
-                            <span>Tổng tiền</span>
-                            <strong>
-                                3.000.000 VNĐ
-                            </strong>
                         </div>
 
                     </div>
@@ -159,6 +166,654 @@
 
     </main>
 
+
+   <script src="../js/api.js"></script>
+
+<script>
+
+    // =========================
+    // Lấy tourId từ URL
+    // =========================
+
+    const params =
+        new URLSearchParams(window.location.search);
+
+    const tourId =
+        params.get("tourId");
+
+
+    let currentTour = null;
+
+
+    // =========================
+    // Lấy thông tin Tour
+    // =========================
+
+    async function loadTour() {
+
+        const tourSummary =
+            document.getElementById("tourSummary");
+
+
+        if (!tourId) {
+
+            tourSummary.innerHTML = `
+                <p>
+                    Không tìm thấy mã tour.
+                </p>
+            `;
+
+            return;
+        }
+
+
+        try {
+
+            const response = await fetch(
+                `${API_BASE_URL}/Tour/${tourId}`
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Không tìm thấy tour"
+                );
+
+            }
+
+
+            currentTour =
+                await response.json();
+
+
+            tourSummary.innerHTML = `
+
+                <div class="summary-item">
+
+                    <span>
+                        Tour
+                    </span>
+
+                    <strong>
+                        ${currentTour.tourName}
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Địa điểm
+                    </span>
+
+                    <strong>
+                        ${currentTour.destination}
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Thời gian
+                    </span>
+
+                    <strong>
+                        ${currentTour.duration} ngày
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Giá / người
+                    </span>
+
+                    <strong>
+                        ${formatPrice(currentTour.price)}
+                    </strong>
+
+                </div>
+
+
+                <hr>
+
+
+                <div class="summary-total">
+
+                    <span>
+                        Tổng tiền
+                    </span>
+
+                    <strong id="totalPrice">
+                        ${formatPrice(currentTour.price)}
+                    </strong>
+
+                </div>
+
+            `;
+
+
+            document
+                .getElementById("numberOfPeople")
+                .addEventListener(
+                    "input",
+                    calculateTotal
+                );
+
+        }
+        catch (error) {
+
+            console.error(error);
+
+            tourSummary.innerHTML = `
+                <p>
+                    Không thể tải thông tin tour.
+                </p>
+            `;
+
+        }
+
+    }
+
+
+    // =========================
+    // Định dạng tiền
+    // =========================
+
+    function formatPrice(price) {
+
+        return Number(price)
+            .toLocaleString("vi-VN")
+            + " VNĐ";
+
+    }
+
+
+    // =========================
+    // Tính tổng tiền
+    // =========================
+
+    function calculateTotal() {
+
+        if (!currentTour) {
+            return;
+        }
+
+
+        let numberOfPeople =
+            Number(
+                document.getElementById(
+                    "numberOfPeople"
+                ).value
+            );
+
+
+        if (numberOfPeople < 1) {
+
+            numberOfPeople = 1;
+
+        }
+
+
+        const total =
+            currentTour.price *
+            numberOfPeople;
+
+
+        document.getElementById(
+            "totalPrice"
+        ).textContent =
+            formatPrice(total);
+
+    }
+
+
+    // =========================
+    // Tạo Booking
+    // =========================
+
+    async function continueBooking() {
+
+        // Kiểm tra đăng nhập
+
+        const token =
+            localStorage.getItem("token");
+
+
+        if (!token) {
+
+            alert(
+                "Bạn cần đăng nhập trước khi đặt tour."
+            );
+
+            window.location.href =
+                "login.html";
+
+            return;
+
+        }
+
+
+        // Kiểm tra Tour
+
+        if (!currentTour) {
+
+            alert(
+                "Chưa tải được thông tin tour."
+            );
+
+            return;
+
+        }
+
+
+// =========================
+// Lấy thông tin User
+// =========================
+
+const userData =
+    localStorage.getItem("user");
+
+
+if (!userData) {
+
+    alert(
+        "Không tìm thấy thông tin tài khoản. Vui lòng đăng nhập lại."
+    );
+
+    window.location.href =
+        "login.html";
+
+    return;
+
+}
+
+
+const user =
+    JSON.parse(userData);
+
+
+// =========================
+// Lấy Customer theo UserId
+// =========================
+
+let customerId = null;
+
+
+try {
+
+    const customerResponse =
+        await fetch(
+            `${API_BASE_URL}/Customer`
+        );
+
+
+    if (!customerResponse.ok) {
+
+        throw new Error(
+            "Không thể lấy danh sách khách hàng"
+        );
+
+    }
+
+
+    const customers =
+        await customerResponse.json();
+
+
+    const customer =
+        customers.find(
+            c => Number(c.userId) === Number(user.userId)
+        );
+
+
+    if (!customer) {
+
+        alert(
+            "Không tìm thấy thông tin khách hàng tương ứng với tài khoản."
+        );
+
+        return;
+
+    }
+
+
+    // =========================
+    // Lấy CustomerId
+    // =========================
+
+    customerId =
+        customer.customerId;
+
+
+    // =========================
+    // Tự động điền thông tin
+    // =========================
+
+    document.getElementById("fullName").value =
+        customer.fullName;
+
+    document.getElementById("phone").value =
+        customer.phone;
+
+    document.getElementById("email").value =
+        customer.email;
+
+    document.getElementById("address").value =
+        customer.address;
+
+
+    // Lưu CustomerId vào user
+
+    user.customerId =
+        customerId;
+
+    localStorage.setItem(
+        "user",
+        JSON.stringify(user)
+    );
+
+}
+catch (error) {
+
+    console.error(error);
+
+    alert(
+        "Không thể lấy thông tin khách hàng từ Backend."
+    );
+
+    return;
+
+}
+        // Số người
+
+        const numberOfPeople =
+            Number(
+                document.getElementById(
+                    "numberOfPeople"
+                ).value
+            );
+
+
+        if (!numberOfPeople || numberOfPeople < 1) {
+
+            alert(
+                "Số lượng người phải lớn hơn 0."
+            );
+
+            return;
+
+        }
+
+
+        // Tổng tiền
+        // Backend cũng sẽ tự tính lại
+
+        const totalPrice =
+            currentTour.price *
+            numberOfPeople;
+
+
+        try {
+
+            const response = await fetch(
+                `${API_BASE_URL}/Booking`,
+                {
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${token}`
+
+                    },
+
+                    body: JSON.stringify({
+
+                        bookingId: 0,
+
+                        tourId:
+                            Number(tourId),
+
+                        customerId:
+                            Number(customerId),
+
+                        bookingDate:
+                            new Date().toISOString(),
+
+                        numberOfPeople:
+                            numberOfPeople,
+
+                        totalPrice:
+                            totalPrice,
+
+                        status:
+                            "Pending"
+
+                    })
+
+                }
+            );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                alert(
+                    data.message ||
+                    "Đặt tour thất bại."
+                );
+
+                return;
+
+            }
+
+
+            // Lưu Booking vừa tạo
+
+            localStorage.setItem(
+                "booking",
+                JSON.stringify(data)
+            );
+
+
+            alert(
+                "Đặt tour thành công!"
+            );
+
+
+            // Chuyển sang thanh toán
+
+            window.location.href =
+                `payment.html?bookingId=${data.bookingId}`;
+
+        }
+        catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Không thể kết nối đến Backend."
+            );
+
+        }
+
+    }
+// =========================
+// Tự động tải thông tin Customer
+// =========================
+
+async function loadCustomer() {
+
+    const token =
+        localStorage.getItem("token");
+
+    const userData =
+        localStorage.getItem("user");
+
+
+    if (!token || !userData) {
+
+        return;
+
+    }
+
+
+    const user =
+        JSON.parse(userData);
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_BASE_URL}/Customer`,
+                {
+                    headers: {
+                        "Authorization":
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Không lấy được danh sách Customer:",
+                response.status
+            );
+
+            return;
+
+        }
+
+
+        const customers =
+            await response.json();
+
+
+        const customer =
+            customers.find(
+                c =>
+                    Number(c.userId) ===
+                    Number(user.userId)
+            );
+
+
+        if (!customer) {
+
+            console.error(
+                "Không tìm thấy Customer với UserId:",
+                user.userId
+            );
+
+            return;
+
+        }
+
+
+        // Điền thông tin vào form
+
+        document.getElementById("fullName").value =
+            customer.fullName || "";
+
+        document.getElementById("phone").value =
+            customer.phone || "";
+
+        document.getElementById("email").value =
+            customer.email || "";
+
+        document.getElementById("address").value =
+            customer.address || "";
+
+
+        // Lưu CustomerId
+
+        user.customerId =
+            customer.customerId;
+
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(user)
+        );
+
+
+        console.log(
+            "Customer đã tải:",
+            customer
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi tải Customer:",
+            error
+        );
+
+    }
+
+}
+// =========================
+// Chạy khi mở trang
+// =========================
+
+loadTour();
+loadCustomer();
+
+</script>
+<script>
+
+    const token = localStorage.getItem("token");
+
+    const loginLink =
+        document.getElementById("loginLink");
+
+    const logoutLink =
+        document.getElementById("logoutLink");
+
+
+    if (token) {
+
+        loginLink.style.display = "none";
+        logoutLink.style.display = "inline-block";
+
+    }
+    else {
+
+        loginLink.style.display = "inline-block";
+        logoutLink.style.display = "none";
+
+    }
+
+
+    logoutLink.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("booking");
+
+        window.location.href = "../index.html";
+
+    });
+
+</script>
 </body>
 
 </html>

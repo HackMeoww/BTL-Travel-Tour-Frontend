@@ -21,11 +21,24 @@
             </div>
 
             <nav class="menu">
-                <a href="../index.html">Trang chủ</a>
-                <a href="tours.html">Tour</a>
-                <a href="#">Đăng nhập</a>
-                <a href="#">Đăng ký</a>
-            </nav>
+
+    <a href="../index.html">
+        Trang chủ
+    </a>
+
+    <a href="tours.html">
+        Tour
+    </a>
+
+    <a href="login.html" id="loginLink">
+        Đăng nhập
+    </a>
+
+    <a href="#" id="logoutLink" style="display: none;">
+        Đăng xuất
+    </a>
+
+</nav>
 
         </div>
     </header>
@@ -44,117 +57,10 @@
                 </div>
 
 
-                <div class="tour-list">
+                <!-- Tour sẽ được lấy từ Backend -->
+                <div class="tour-list" id="tourList">
 
-                    <!-- Tour 1 -->
-                    <div class="tour-card">
-
-                        <div class="tour-image">
-                            <span>HẠ LONG</span>
-                        </div>
-
-                        <div class="tour-info">
-
-                            <h3>Tour Hạ Long 4 ngày 3 đêm</h3>
-
-                            <p class="destination">
-                                📍 Quảng Ninh
-                            </p>
-
-                            <p>
-                                Khám phá Vịnh Hạ Long và các địa điểm
-                                nổi tiếng.
-                            </p>
-
-                            <div class="tour-bottom">
-
-                                <strong>
-                                    3.000.000 VNĐ
-                                </strong>
-
-                                <button>
-                                    Xem chi tiết
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Tour 2 -->
-                    <div class="tour-card">
-
-                        <div class="tour-image">
-                            <span>ĐÀ NẴNG</span>
-                        </div>
-
-                        <div class="tour-info">
-
-                            <h3>Tour Đà Nẵng 3 ngày 2 đêm</h3>
-
-                            <p class="destination">
-                                📍 Đà Nẵng
-                            </p>
-
-                            <p>
-                                Khám phá biển Mỹ Khê, Bà Nà Hills
-                                và Hội An.
-                            </p>
-
-                            <div class="tour-bottom">
-
-                                <strong>
-                                    2.500.000 VNĐ
-                                </strong>
-
-                                <button>
-                                    Xem chi tiết
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Tour 3 -->
-                    <div class="tour-card">
-
-                        <div class="tour-image">
-                            <span>PHÚ QUỐC</span>
-                        </div>
-
-                        <div class="tour-info">
-
-                            <h3>Tour Phú Quốc 4 ngày 3 đêm</h3>
-
-                            <p class="destination">
-                                📍 Phú Quốc
-                            </p>
-
-                            <p>
-                                Tận hưởng biển xanh và những địa điểm
-                                nổi tiếng.
-                            </p>
-
-                            <div class="tour-bottom">
-
-                                <strong>
-                                    3.500.000 VNĐ
-                                </strong>
-
-                                <button>
-                                    Xem chi tiết
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </div>
+                    <p>Đang tải danh sách tour...</p>
 
                 </div>
 
@@ -164,6 +70,140 @@
 
     </main>
 
+
+    <!-- JavaScript -->
+    <script src="../js/api.js"></script>
+
+    <script>
+
+        async function loadTours() {
+
+            const tourList = document.getElementById("tourList");
+
+            try {
+
+                const tours = await getTours();
+
+                tourList.innerHTML = "";
+
+                if (tours.length === 0) {
+
+                    tourList.innerHTML =
+                        "<p>Hiện chưa có tour nào.</p>";
+
+                    return;
+                }
+
+
+                tours.forEach(tour => {
+
+                    const tourCard = document.createElement("div");
+
+                    tourCard.className = "tour-card";
+
+
+                    tourCard.innerHTML = `
+                        
+                        <div class="tour-image">
+                            <span>${tour.destination}</span>
+                        </div>
+
+                        <div class="tour-info">
+
+                            <h3>${tour.tourName}</h3>
+
+                            <p class="destination">
+                                📍 ${tour.destination}
+                            </p>
+
+                            <p>
+                                ${tour.description}
+                            </p>
+
+                            <div class="tour-bottom">
+
+                                <strong>
+                                    ${Number(tour.price).toLocaleString("vi-VN")} VNĐ
+                                </strong>
+
+                                <button onclick="viewTour(${tour.tourId})">
+                                    Xem chi tiết
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                    tourList.appendChild(tourCard);
+
+                });
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+                tourList.innerHTML = `
+                    <p>
+                        Không thể kết nối đến Backend.
+                    </p>
+                `;
+            }
+        }
+
+
+        function viewTour(tourId) {
+
+            window.location.href =
+                `tour-detail.html?id=${tourId}`;
+
+        }
+
+
+        // Chạy khi mở trang
+        loadTours();
+
+    </script>
+<script>
+
+    const token = localStorage.getItem("token");
+
+    const loginLink =
+        document.getElementById("loginLink");
+
+    const logoutLink =
+        document.getElementById("logoutLink");
+
+
+    if (token) {
+
+        loginLink.style.display = "none";
+        logoutLink.style.display = "inline-block";
+
+    }
+    else {
+
+        loginLink.style.display = "inline-block";
+        logoutLink.style.display = "none";
+
+    }
+
+
+    logoutLink.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("booking");
+
+        window.location.href = "../index.html";
+
+    });
+
+</script>
 </body>
 
 </html>

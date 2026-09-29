@@ -21,11 +21,24 @@
             </div>
 
             <nav class="menu">
-                <a href="../index.html">Trang chủ</a>
-                <a href="tours.html">Tour</a>
-                <a href="#">Đăng nhập</a>
-                <a href="#">Đăng ký</a>
-            </nav>
+
+    <a href="../index.html">
+        Trang chủ
+    </a>
+
+    <a href="tours.html">
+        Tour
+    </a>
+
+    <a href="login.html" id="loginLink">
+        Đăng nhập
+    </a>
+
+    <a href="#" id="logoutLink" style="display: none;">
+        Đăng xuất
+    </a>
+
+</nav>
 
         </div>
     </header>
@@ -38,99 +51,9 @@
 
             <div class="container">
 
-                <div class="detail-image">
-                    <span>HẠ LONG</span>
-                </div>
+                <div id="tourDetail">
 
-
-                <div class="detail-content">
-
-                    <div class="detail-main">
-
-                        <h1>Tour Hạ Long 4 ngày 3 đêm</h1>
-
-                        <p class="detail-location">
-                            📍 Quảng Ninh
-                        </p>
-
-                        <div class="tour-meta">
-                            <span>⏱ 4 ngày 3 đêm</span>
-                            <span>👥 Đặt tour online</span>
-                        </div>
-
-                        <h2>Giới thiệu</h2>
-
-                        <p>
-                            Tour Hạ Long 4 ngày 3 đêm mang đến cho du khách
-                            cơ hội khám phá Vịnh Hạ Long và những địa điểm
-                            nổi tiếng tại Quảng Ninh.
-                        </p>
-
-                        <p>
-                            Du khách sẽ được tham quan các địa điểm nổi bật,
-                            trải nghiệm cảnh đẹp và tận hưởng những dịch vụ
-                            du lịch chất lượng.
-                        </p>
-
-
-                        <h2>Lịch trình</h2>
-
-                        <div class="itinerary">
-
-                            <div class="day">
-                                <h3>Ngày 1</h3>
-                                <p>
-                                    Khởi hành và tham quan các địa điểm
-                                    nổi tiếng tại Hạ Long.
-                                </p>
-                            </div>
-
-                            <div class="day">
-                                <h3>Ngày 2</h3>
-                                <p>
-                                    Tham quan Vịnh Hạ Long và các điểm
-                                    du lịch nổi bật.
-                                </p>
-                            </div>
-
-                            <div class="day">
-                                <h3>Ngày 3</h3>
-                                <p>
-                                    Khám phá thêm các địa điểm du lịch
-                                    tại Quảng Ninh.
-                                </p>
-                            </div>
-
-                            <div class="day">
-                                <h3>Ngày 4</h3>
-                                <p>
-                                    Kết thúc hành trình và trở về.
-                                </p>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Thông tin đặt tour -->
-                    <div class="booking-card">
-
-                        <h2>Thông tin Tour</h2>
-
-                        <p>Giá tour</p>
-
-                        <strong>3.000.000 VNĐ</strong>
-
-                        <p>Thời gian</p>
-
-                        <span>4 ngày 3 đêm</span>
-
-                        <button class="booking-button">
-                            Đặt tour
-                        </button>
-
-                    </div>
+                    <p>Đang tải thông tin tour...</p>
 
                 </div>
 
@@ -140,6 +63,291 @@
 
     </main>
 
+
+    <script src="../js/api.js"></script>
+
+    <script>
+
+        // Lấy tourId từ URL
+        const params = new URLSearchParams(window.location.search);
+        const tourId = params.get("id");
+
+
+        async function loadTourDetail() {
+
+            const tourDetail = document.getElementById("tourDetail");
+
+            if (!tourId) {
+
+                tourDetail.innerHTML = `
+                    <p>Không tìm thấy mã tour.</p>
+                `;
+
+                return;
+            }
+
+
+            try {
+
+                // =========================
+                // 1. Lấy thông tin Tour
+                // =========================
+
+                const tourResponse = await fetch(
+                    `${API_BASE_URL}/Tour/${tourId}`
+                );
+
+
+                if (!tourResponse.ok) {
+
+                    throw new Error("Không tìm thấy tour");
+
+                }
+
+
+                const tour = await tourResponse.json();
+
+
+                // =========================
+                // 2. Lấy lịch trình
+                // =========================
+
+                const itineraryResponse = await fetch(
+                    `${API_BASE_URL}/Itinerary`
+                );
+
+
+                if (!itineraryResponse.ok) {
+
+                    throw new Error("Không thể tải lịch trình");
+
+                }
+
+
+                const itineraries = await itineraryResponse.json();
+
+
+                // Chỉ lấy lịch trình của tour hiện tại
+                const tourItineraries = itineraries
+                    .filter(item => item.tourId == tour.tourId)
+                    .sort((a, b) => a.dayNumber - b.dayNumber);
+
+
+                // =========================
+                // 3. Tạo HTML lịch trình
+                // =========================
+
+                let itineraryHTML = "";
+
+
+                if (tourItineraries.length === 0) {
+
+                    itineraryHTML = `
+                        <p>
+                            Tour chưa có lịch trình.
+                        </p>
+                    `;
+
+                }
+                else {
+
+                    itineraryHTML = tourItineraries.map(item => `
+
+                        <div class="day">
+
+                            <h3>
+                                Ngày ${item.dayNumber}
+                            </h3>
+
+                            <p>
+                                ${item.description}
+                            </p>
+
+                        </div>
+
+                    `).join("");
+
+                }
+
+
+                // =========================
+                // 4. Hiển thị Tour
+                // =========================
+
+                tourDetail.innerHTML = `
+
+                    <div class="detail-image">
+
+                        <span>
+                            ${tour.destination}
+                        </span>
+
+                    </div>
+
+
+                    <div class="detail-content">
+
+                        <div class="detail-main">
+
+                            <h1>
+                                ${tour.tourName}
+                            </h1>
+
+
+                            <p class="detail-location">
+                                📍 ${tour.destination}
+                            </p>
+
+
+                            <div class="tour-meta">
+
+                                <span>
+                                    ⏱ ${tour.duration} ngày
+                                </span>
+
+                                <span>
+                                    👥 Đặt tour online
+                                </span>
+
+                            </div>
+
+
+                            <h2>
+                                Giới thiệu
+                            </h2>
+
+
+                            <p>
+                                ${tour.description}
+                            </p>
+
+
+                            <h2>
+                                Lịch trình
+                            </h2>
+
+
+                            <div class="itinerary">
+
+                                ${itineraryHTML}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Thông tin đặt tour -->
+                        <div class="booking-card">
+
+                            <h2>
+                                Thông tin Tour
+                            </h2>
+
+
+                            <p>
+                                Giá tour
+                            </p>
+
+
+                            <strong>
+                                ${Number(tour.price).toLocaleString("vi-VN")} VNĐ
+                            </strong>
+
+
+                            <p>
+                                Thời gian
+                            </p>
+
+
+                            <span>
+                                ${tour.duration} ngày
+                            </span>
+
+
+                            <button
+                                class="booking-button"
+                                onclick="bookingTour(${tour.tourId})">
+
+                                Đặt tour
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+                tourDetail.innerHTML = `
+                    <p>
+                        Không thể tải thông tin tour hoặc lịch trình.
+                    </p>
+                `;
+
+            }
+
+        }
+
+
+        // =========================
+        // Chuyển sang đặt tour
+        // =========================
+
+        function bookingTour(tourId) {
+
+            window.location.href =
+                `booking.html?tourId=${tourId}`;
+
+        }
+
+
+        // Chạy khi mở trang
+        loadTourDetail();
+
+    </script>
+<script>
+
+    const token = localStorage.getItem("token");
+
+    const loginLink =
+        document.getElementById("loginLink");
+
+    const logoutLink =
+        document.getElementById("logoutLink");
+
+
+    if (token) {
+
+        loginLink.style.display = "none";
+        logoutLink.style.display = "inline-block";
+
+    }
+    else {
+
+        loginLink.style.display = "inline-block";
+        logoutLink.style.display = "none";
+
+    }
+
+
+    logoutLink.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("booking");
+
+        window.location.href = "../index.html";
+
+    });
+
+</script>
 </body>
 
 </html>

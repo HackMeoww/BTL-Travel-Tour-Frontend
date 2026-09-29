@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Thanh toán thành công - Travel Tour</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- Header -->
+
+    <header class="header">
+
+        <div class="container navbar">
+
+            <div class="logo">
+                Travel Tour
+            </div>
+
+
+            <nav class="menu">
+
+                <a href="../index.html">
+                    Trang chủ
+                </a>
+
+
+                <a href="tours.html">
+                    Tour
+                </a>
+
+
+                <a
+                    href="login.html"
+                    id="loginLink"
+                >
+                    Đăng nhập
+                </a>
+
+
+                <a
+                    href="#"
+                    id="logoutLink"
+                    style="display: none;"
+                >
+                    Đăng xuất
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- Nội dung -->
+
+    <main>
+
+        <section class="payment-page">
+
+            <div class="container">
+
+                <div
+                    class="section-title"
+                    style="text-align: center;"
+                >
+
+                    <h1>
+                        Thanh toán thành công!
+                    </h1>
+
+                    <p>
+                        Cảm ơn bạn đã đặt tour tại Travel Tour.
+                    </p>
+
+                </div>
+
+
+
+                <div
+                    class="payment-summary"
+                    id="paymentResult"
+                >
+
+                    <p>
+                        Đang tải thông tin thanh toán...
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <script src="../js/api.js"></script>
+
+
+    <script>
+
+        // =========================
+        // Lấy ID từ URL
+        // =========================
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const bookingId =
+            params.get("bookingId");
+
+
+        const paymentId =
+            params.get("paymentId");
+
+
+        const token =
+            localStorage.getItem("token");
+
+
+
+        // =========================
+        // Hiển thị thông tin
+        // =========================
+
+        async function loadPayment() {
+
+            const result =
+                document.getElementById(
+                    "paymentResult"
+                );
+
+
+            if (!token) {
+
+                result.innerHTML = `
+                    <p>
+                        Bạn chưa đăng nhập.
+                    </p>
+                `;
+
+                return;
+
+            }
+
+
+            if (!bookingId || !paymentId) {
+
+                result.innerHTML = `
+                    <p>
+                        Không tìm thấy thông tin thanh toán.
+                    </p>
+                `;
+
+                return;
+
+            }
+
+
+            try {
+
+                // =========================
+                // Lấy Payment
+                // =========================
+
+                const paymentResponse =
+                    await fetch(
+                        `${API_BASE_URL}/Payment/${paymentId}`,
+                        {
+                            headers: {
+                                "Authorization":
+                                    `Bearer ${token}`
+                            }
+                        }
+                    );
+
+
+                if (!paymentResponse.ok) {
+
+                    throw new Error(
+                        "Không tìm thấy Payment"
+                    );
+
+                }
+
+
+                const payment =
+                    await paymentResponse.json();
+
+
+
+                // =========================
+                // Lấy Booking
+                // =========================
+
+                const bookingResponse =
+                    await fetch(
+                        `${API_BASE_URL}/Booking/${bookingId}`,
+                        {
+                            headers: {
+                                "Authorization":
+                                    `Bearer ${token}`
+                            }
+                        }
+                    );
+
+
+                if (!bookingResponse.ok) {
+
+                    throw new Error(
+                        "Không tìm thấy Booking"
+                    );
+
+                }
+
+
+                const booking =
+                    await bookingResponse.json();
+
+
+
+                // =========================
+                // Hiển thị
+                // =========================
+
+                result.innerHTML = `
+
+                    <div class="summary-item">
+
+                        <span>
+                            Mã Booking
+                        </span>
+
+                        <strong>
+                            #${booking.bookingId}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <span>
+                            Mã thanh toán
+                        </span>
+
+                        <strong>
+                            #${payment.paymentId}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <span>
+                            Số lượng
+                        </span>
+
+                        <strong>
+                            ${booking.numberOfPeople}
+                            người
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <span>
+                            Phương thức thanh toán
+                        </span>
+
+                        <strong>
+                            ${payment.paymentMethod}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <span>
+                            Trạng thái Booking
+                        </span>
+
+                        <strong>
+                            ${booking.status}
+                        </strong>
+
+                    </div>
+
+
+                    <hr>
+
+
+                    <div class="summary-total">
+
+                        <span>
+                            Tổng tiền
+                        </span>
+
+                        <strong>
+                            ${Number(payment.amount)
+                                .toLocaleString("vi-VN")}
+                            VNĐ
+                        </strong>
+
+                    </div>
+
+
+                    <br>
+
+
+                    <div style="text-align: center;">
+
+                        <a
+                            href="../index.html"
+                            class="payment-button"
+                            style="
+                                display: inline-block;
+                                text-decoration: none;
+                            "
+                        >
+                            Về trang chủ
+                        </a>
+
+                    </div>
+
+                `;
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+                result.innerHTML = `
+
+                    <p>
+                        Không thể tải thông tin thanh toán.
+                    </p>
+
+                `;
+
+            }
+
+        }
+
+
+
+        // =========================
+        // Header đăng nhập
+        // =========================
+
+        const loginLink =
+            document.getElementById(
+                "loginLink"
+            );
+
+
+        const logoutLink =
+            document.getElementById(
+                "logoutLink"
+            );
+
+
+        if (token) {
+
+            loginLink.style.display =
+                "none";
+
+            logoutLink.style.display =
+                "inline-block";
+
+        }
+        else {
+
+            loginLink.style.display =
+                "inline-block";
+
+            logoutLink.style.display =
+                "none";
+
+        }
+
+
+        logoutLink.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+                localStorage.removeItem(
+                    "token"
+                );
+
+                localStorage.removeItem(
+                    "user"
+                );
+
+                localStorage.removeItem(
+                    "booking"
+                );
+
+                localStorage.removeItem(
+                    "payment"
+                );
+
+                window.location.href =
+                    "../index.html";
+
+            }
+        );
+
+
+
+        // =========================
+        // Chạy
+        // =========================
+
+        loadPayment();
+
+    </script>
+
+
+</body>
+
+</html>

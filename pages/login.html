@@ -20,11 +20,24 @@
             </div>
 
             <nav class="menu">
-                <a href="../index.html">Trang chủ</a>
-                <a href="tours.html">Tour</a>
-                <a href="login.html">Đăng nhập</a>
-                <a href="register.html">Đăng ký</a>
-            </nav>
+
+    <a href="../index.html">
+        Trang chủ
+    </a>
+
+    <a href="tours.html">
+        Tour
+    </a>
+
+    <a href="login.html" id="loginLink">
+        Đăng nhập
+    </a>
+
+    <a href="#" id="logoutLink" style="display: none;">
+        Đăng xuất
+    </a>
+
+</nav>
 
         </div>
     </header>
@@ -46,6 +59,7 @@
                 <form id="loginForm">
 
                     <div class="form-group">
+
                         <label for="userName">
                             Tên đăng nhập
                         </label>
@@ -56,10 +70,12 @@
                             placeholder="Nhập tên đăng nhập"
                             required
                         >
+
                     </div>
 
 
                     <div class="form-group">
+
                         <label for="password">
                             Mật khẩu
                         </label>
@@ -70,24 +86,29 @@
                             placeholder="Nhập mật khẩu"
                             required
                         >
+
                     </div>
 
 
                     <button
                         type="submit"
-                        class="auth-button"
-                    >
+                        class="auth-button">
+
                         Đăng nhập
+
                     </button>
 
                 </form>
 
 
                 <p class="auth-footer">
+
                     Chưa có tài khoản?
+
                     <a href="register.html">
                         Đăng ký ngay
                     </a>
+
                 </p>
 
             </div>
@@ -96,6 +117,214 @@
 
     </main>
 
+
+    <!-- API -->
+    <script src="../js/api.js"></script>
+
+
+    <script>
+
+    const loginForm =
+        document.getElementById("loginForm");
+
+
+    loginForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            const userName =
+                document.getElementById("userName")
+                    .value
+                    .trim();
+
+
+            const password =
+                document.getElementById("password")
+                    .value;
+
+
+            try {
+
+                const response = await fetch(
+                    `${API_BASE_URL}/Auth/login`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            userName: userName,
+                            passWord: password
+                        })
+                    }
+                );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    alert(
+                        data.message ||
+                        "Đăng nhập thất bại."
+                    );
+
+                    return;
+
+                }
+
+
+                // =========================
+                // Lưu JWT
+                // =========================
+
+                localStorage.setItem(
+                    "token",
+                    data.token
+                );
+
+
+                // =========================
+                // Đọc thông tin User từ JWT
+                // =========================
+
+                const payload =
+                    JSON.parse(
+                        atob(
+                            data.token
+                                .split(".")[1]
+                                .replace(/-/g, "+")
+                                .replace(/_/g, "/")
+                        )
+                    );
+
+
+                const userId =
+                    payload[
+                        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+                    ];
+
+
+                const role =
+                    payload[
+                        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+                    ];
+
+
+                const userNameFromToken =
+                    payload[
+                        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+                    ];
+
+
+                // =========================
+                // Lưu User
+                // =========================
+
+                const user = {
+
+                    userId:
+                        Number(userId),
+
+                    userName:
+                        userNameFromToken ||
+                        userName,
+
+                    role:
+                        role
+
+                };
+
+
+                localStorage.setItem(
+                    "user",
+                    JSON.stringify(user)
+                );
+
+
+                alert(
+                    "Đăng nhập thành công!"
+                );
+
+
+                // =========================
+                // Về trang chủ
+                // =========================
+
+                window.location.href =
+                    "../index.html";
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+                alert(
+                    "Không thể kết nối đến Backend."
+                );
+
+            }
+
+        }
+    );
+
+</script>
+<script>
+
+    const token = localStorage.getItem("token");
+
+    const loginLink =
+        document.getElementById("loginLink");
+
+    const logoutLink =
+        document.getElementById("logoutLink");
+
+
+    // =========================
+    // Kiểm tra đăng nhập
+    // =========================
+
+    if (token) {
+
+        loginLink.style.display = "none";
+
+        logoutLink.style.display = "inline-block";
+
+    }
+    else {
+
+        loginLink.style.display = "inline-block";
+
+        logoutLink.style.display = "none";
+
+    }
+
+
+    // =========================
+    // Đăng xuất
+    // =========================
+
+    logoutLink.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("booking");
+
+        window.location.href = "../index.html";
+
+    });
+
+</script>
 </body>
 
 </html>

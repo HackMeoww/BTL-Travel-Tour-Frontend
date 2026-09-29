@@ -18,12 +18,25 @@
                 Travel Tour
             </div>
 
-            <nav class="menu">
-                <a href="index.html">Trang chủ</a>
-                <a href="#">Tour</a>
-                <a href="#">Đăng nhập</a>
-                <a href="#">Đăng ký</a>
-            </nav>
+           <nav class="menu">
+
+    <a href="index.html">
+        Trang chủ
+    </a>
+
+    <a href="pages/tours.html">
+        Tour
+    </a>
+
+    <a href="pages/login.html" id="loginLink">
+        Đăng nhập
+    </a>
+
+    <a href="#" id="logoutLink" style="display: none;">
+        Đăng xuất
+    </a>
+
+</nav>
 
         </div>
     </header>
@@ -177,6 +190,61 @@
 </section>
 
     </main>
+<script>
 
+    const token = localStorage.getItem("token");
+
+    const loginLink =
+        document.getElementById("loginLink");
+
+    const logoutLink =
+        document.getElementById("logoutLink");
+
+
+    // =========================
+    // Kiểm tra trạng thái đăng nhập
+    // =========================
+
+    if (token) {
+
+        // Đã đăng nhập
+        loginLink.style.display = "none";
+
+        logoutLink.style.display = "inline-block";
+
+    }
+    else {
+
+        // Chưa đăng nhập
+        loginLink.style.display = "inline-block";
+
+        logoutLink.style.display = "none";
+
+    }
+
+
+    // =========================
+    // Đăng xuất
+    // =========================
+
+    logoutLink.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        // Xóa JWT
+        localStorage.removeItem("token");
+
+        // Xóa thông tin user
+        localStorage.removeItem("user");
+
+        // Xóa booking nếu có
+        localStorage.removeItem("booking");
+
+        // Về trang chủ
+        window.location.href = "index.html";
+
+    });
+
+</script>
 </body>
 </html>
