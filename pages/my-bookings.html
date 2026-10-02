@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Đơn đặt tour - Travel Tour</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container navbar">
+
+            <div class="logo">
+                Travel Tour
+            </div>
+
+            <nav class="menu">
+
+                <a href="../index.html">
+                    Trang chủ
+                </a>
+
+                <a href="tours.html">
+                    Tour
+                </a>
+
+                <a href="my-bookings.html">
+                    Đơn đặt tour
+                </a>
+
+                <a href="login.html" id="loginLink">
+                    Đăng nhập
+                </a>
+
+                <a href="#" id="logoutLink" style="display: none;">
+                    Đăng xuất
+                </a>
+
+            </nav>
+
+        </div>
+    </header>
+
+
+    <!-- Danh sách booking -->
+    <main>
+
+        <section class="booking-page">
+
+            <div class="container">
+
+                <div class="section-title">
+
+                    <h1>
+                        Đơn đặt tour của tôi
+                    </h1>
+
+                    <p>
+                        Xem và quản lý các tour đã đặt
+                    </p>
+
+                </div>
+
+
+                <div id="bookingList">
+
+                    <p>
+                        Đang tải danh sách booking...
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="../js/api.js"></script>
+
+    <script>
+
+        // =========================
+        // Kiểm tra đăng nhập
+        // =========================
+
+        const token =
+            localStorage.getItem("token");
+
+        const userData =
+            localStorage.getItem("user");
+
+
+        if (!token || !userData) {
+
+            alert(
+                "Bạn cần đăng nhập để xem đơn đặt tour."
+            );
+
+            window.location.href =
+                "login.html";
+
+        }
+
+
+        const user =
+            JSON.parse(userData);
+
+
+        // =========================
+        // Lấy danh sách Booking
+        // =========================
+
+        async function loadMyBookings() {
+
+            const bookingList =
+                document.getElementById("bookingList");
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/Booking`,
+                        {
+                            headers: {
+                                "Authorization":
+                                    `Bearer ${token}`
+                            }
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Không thể lấy danh sách booking"
+                    );
+
+                }
+
+
+                const bookings =
+                    await response.json();
+
+
+                // =========================
+                // Lọc booking của Customer
+                // =========================
+
+                const myBookings =
+                    bookings.filter(
+                        booking =>
+                            Number(booking.customerId) ===
+                            Number(user.customerId)
+                    );
+
+
+                // Không có booking
+
+                if (myBookings.length === 0) {
+
+                    bookingList.innerHTML = `
+
+                        <div class="booking-form">
+
+                            <h2>
+                                Chưa có đơn đặt tour
+                            </h2>
+
+                            <p>
+                                Bạn chưa đặt tour nào.
+                            </p>
+
+                            <br>
+
+                            <a href="tours.html">
+                                Xem danh sách tour
+                            </a>
+
+                        </div>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                // =========================
+                // Hiển thị booking
+                // =========================
+
+                bookingList.innerHTML = "";
+
+
+                myBookings.forEach(
+                    booking => {
+
+                        const bookingItem =
+                            document.createElement("div");
+
+                        bookingItem.className =
+                            "booking-form";
+
+
+                        bookingItem.innerHTML = `
+
+                            <h2>
+                                Booking #${booking.bookingId}
+                            </h2>
+
+                            <div class="summary-item">
+
+                                <span>
+                                    Tour ID
+                                </span>
+
+                                <strong>
+                                    ${booking.tourId}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span>
+                                    Số lượng
+                                </span>
+
+                                <strong>
+                                    ${booking.numberOfPeople}
+                                    người
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span>
+                                    Tổng tiền
+                                </span>
+
+                                <strong>
+                                    ${formatPrice(
+                                        booking.totalPrice
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span>
+                                    Ngày đặt
+                                </span>
+
+                                <strong>
+                                    ${formatDate(
+                                        booking.bookingDate
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span>
+                                    Trạng thái
+                                </span>
+
+                                <strong>
+                                    ${booking.status}
+                                </strong>
+
+                            </div>
+
+                        `;
+
+
+                        bookingList.appendChild(
+                            bookingItem
+                        );
+
+                    }
+                );
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+                bookingList.innerHTML = `
+
+                    <p>
+                        Không thể tải danh sách booking.
+                    </p>
+
+                `;
+
+            }
+
+        }
+
+
+        // =========================
+        // Định dạng tiền
+        // =========================
+
+        function formatPrice(price) {
+
+            return Number(price)
+                .toLocaleString("vi-VN")
+                + " VNĐ";
+
+        }
+
+
+        // =========================
+        // Định dạng ngày
+        // =========================
+
+        function formatDate(date) {
+
+            return new Date(date)
+                .toLocaleString("vi-VN");
+
+        }
+
+
+        // =========================
+        // Đăng xuất
+        // =========================
+
+        const loginLink =
+            document.getElementById("loginLink");
+
+        const logoutLink =
+            document.getElementById("logoutLink");
+
+
+        if (token) {
+
+            loginLink.style.display =
+                "none";
+
+            logoutLink.style.display =
+                "inline-block";
+
+        }
+
+
+        logoutLink.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                localStorage.removeItem("booking");
+
+                window.location.href =
+                    "../index.html";
+
+            }
+        );
+
+
+        // =========================
+        // Chạy
+        // =========================
+
+        loadMyBookings();
+
+    </script>
+
+</body>
+
+</html>
