@@ -18,7 +18,7 @@
                 Travel Tour
             </div>
 
-           <nav class="menu">
+          <nav class="menu">
 
     <a href="index.html">
         Trang chủ
@@ -26,6 +26,10 @@
 
     <a href="pages/tours.html">
         Tour
+    </a>
+
+    <a href="pages/my-bookings.html" id="myBookingsLink" style="display: none;">
+        Đơn đặt tour
     </a>
 
     <a href="pages/login.html" id="loginLink">
@@ -192,35 +196,36 @@
     </main>
 <script>
 
-    const token = localStorage.getItem("token");
+   const token = localStorage.getItem("token");
 
-    const loginLink =
-        document.getElementById("loginLink");
+const loginLink =
+    document.getElementById("loginLink");
 
-    const logoutLink =
-        document.getElementById("logoutLink");
+const logoutLink =
+    document.getElementById("logoutLink");
+
+const myBookingsLink =
+    document.getElementById("myBookingsLink");
 
 
-    // =========================
-    // Kiểm tra trạng thái đăng nhập
-    // =========================
+if (token) {
 
-    if (token) {
+    loginLink.style.display = "none";
 
-        // Đã đăng nhập
-        loginLink.style.display = "none";
+    logoutLink.style.display = "inline-block";
 
-        logoutLink.style.display = "inline-block";
+    myBookingsLink.style.display = "inline-block";
 
-    }
-    else {
+}
+else {
 
-        // Chưa đăng nhập
-        loginLink.style.display = "inline-block";
+    loginLink.style.display = "inline-block";
 
-        logoutLink.style.display = "none";
+    logoutLink.style.display = "none";
 
-    }
+    myBookingsLink.style.display = "none";
+
+}
 
 
     // =========================

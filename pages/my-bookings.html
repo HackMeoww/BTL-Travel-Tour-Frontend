@@ -285,6 +285,30 @@
                                 </strong>
 
                             </div>
+                            <div class="summary-item">
+
+    <span>
+        Trạng thái
+    </span>
+
+    <strong>
+        ${booking.status}
+    </strong>
+
+</div>
+
+${booking.status !== "Cancelled" && booking.status !== "Refunded" ? `
+
+    <button
+        class="booking-button"
+        type="button"
+        onclick="cancelBooking(${booking.bookingId})">
+
+        Hủy booking
+
+    </button>
+
+` : ""}
 
                         `;
 
@@ -382,8 +406,138 @@
         // Chạy
         // =========================
 
-        loadMyBookings();
+        loadMyBookings();// =========================
+// Hủy Booking
+// =========================
 
+// =========================
+// Hủy Booking
+// =========================
+
+async function cancelBooking(bookingId) {
+
+    const confirmCancel =
+        confirm(
+            "Bạn có chắc chắn muốn hủy booking này không?"
+        );
+
+    if (!confirmCancel) {
+        return;
+    }
+
+    const token =
+        localStorage.getItem("token");
+
+    if (!token) {
+
+        alert("Bạn cần đăng nhập.");
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_BASE_URL}/Booking/${bookingId}/cancel`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Authorization":
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
+
+        // Đọc response dạng text trước
+        const text =
+            await response.text();
+
+
+        console.log(
+            "Cancel status:",
+            response.status
+        );
+
+        console.log(
+            "Cancel response:",
+            text
+        );
+
+
+        // Nếu Backend trả lỗi
+        if (!response.ok) {
+
+            let message =
+                "Hủy booking thất bại.";
+
+            try {
+
+                const data =
+                    JSON.parse(text);
+
+                message =
+                    data.message || message;
+
+            }
+            catch (e) {
+                // Response không phải JSON
+            }
+
+            alert(message);
+
+            return;
+        }
+
+
+        // Backend trả thành công
+        let message =
+            "Hủy booking thành công!";
+
+        if (text) {
+
+            try {
+
+                const data =
+                    JSON.parse(text);
+
+                message =
+                    data.message || message;
+
+            }
+            catch (e) {
+                // Không có JSON cũng không sao
+            }
+
+        }
+
+
+        alert(message);
+
+
+        // Tải lại danh sách booking
+        await loadMyBookings();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Lỗi hủy booking:",
+            error
+        );
+
+        alert(
+            "Không thể kết nối đến Backend."
+        );
+
+    }
+
+}
     </script>
 
 </body>
