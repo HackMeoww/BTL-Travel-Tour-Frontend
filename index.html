@@ -31,6 +31,9 @@
     <a href="pages/my-bookings.html" id="myBookingsLink" style="display: none;">
         Đơn đặt tour
     </a>
+    <a href="pages/admin-bookings.html" id="adminBookingsLink" style="display: none;">
+    Quản lý Booking
+</a>
 
     <a href="pages/login.html" id="loginLink">
         Đăng nhập
@@ -196,35 +199,37 @@
     </main>
 <script>
 
-   const token = localStorage.getItem("token");
+   
 
-const loginLink =
-    document.getElementById("loginLink");
+const token = localStorage.getItem("token");
+const userData = localStorage.getItem("user");
 
-const logoutLink =
-    document.getElementById("logoutLink");
+const loginLink = document.getElementById("loginLink");
+const logoutLink = document.getElementById("logoutLink");
+const myBookingsLink = document.getElementById("myBookingsLink");
+const adminBookingsLink = document.getElementById("adminBookingsLink");
 
-const myBookingsLink =
-    document.getElementById("myBookingsLink");
+if (token && userData) {
 
-
-if (token) {
+    const user = JSON.parse(userData);
 
     loginLink.style.display = "none";
-
     logoutLink.style.display = "inline-block";
 
+    // Hiện cho người đã đăng nhập
     myBookingsLink.style.display = "inline-block";
 
-}
-else {
+    // Chỉ Admin và Staff được thấy
+    if (user.role === "Admin" || user.role === "Staff") {
+        adminBookingsLink.style.display = "inline-block";
+    }
+
+} else {
 
     loginLink.style.display = "inline-block";
-
     logoutLink.style.display = "none";
-
     myBookingsLink.style.display = "none";
-
+    adminBookingsLink.style.display = "none";
 }
 
 

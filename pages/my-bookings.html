@@ -120,223 +120,314 @@
 
         async function loadMyBookings() {
 
-            const bookingList =
-                document.getElementById("bookingList");
-
-
-            try {
-
-                const response =
-                    await fetch(
-                        `${API_BASE_URL}/Booking`,
-                        {
-                            headers: {
-                                "Authorization":
-                                    `Bearer ${token}`
-                            }
-                        }
-                    );
-
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        "Không thể lấy danh sách booking"
-                    );
-
-                }
-
-
-                const bookings =
-                    await response.json();
-
-
-                // =========================
-                // Lọc booking của Customer
-                // =========================
-
-                const myBookings =
-                    bookings.filter(
-                        booking =>
-                            Number(booking.customerId) ===
-                            Number(user.customerId)
-                    );
-
-
-                // Không có booking
-
-                if (myBookings.length === 0) {
-
-                    bookingList.innerHTML = `
-
-                        <div class="booking-form">
-
-                            <h2>
-                                Chưa có đơn đặt tour
-                            </h2>
-
-                            <p>
-                                Bạn chưa đặt tour nào.
-                            </p>
-
-                            <br>
-
-                            <a href="tours.html">
-                                Xem danh sách tour
-                            </a>
-
-                        </div>
-
-                    `;
-
-                    return;
-
-                }
-
-
-                // =========================
-                // Hiển thị booking
-                // =========================
-
-                bookingList.innerHTML = "";
-
-
-                myBookings.forEach(
-                    booking => {
-
-                        const bookingItem =
-                            document.createElement("div");
-
-                        bookingItem.className =
-                            "booking-form";
-
-
-                        bookingItem.innerHTML = `
-
-                            <h2>
-                                Booking #${booking.bookingId}
-                            </h2>
-
-                            <div class="summary-item">
-
-                                <span>
-                                    Tour ID
-                                </span>
-
-                                <strong>
-                                    ${booking.tourId}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="summary-item">
-
-                                <span>
-                                    Số lượng
-                                </span>
-
-                                <strong>
-                                    ${booking.numberOfPeople}
-                                    người
-                                </strong>
-
-                            </div>
-
-
-                            <div class="summary-item">
-
-                                <span>
-                                    Tổng tiền
-                                </span>
-
-                                <strong>
-                                    ${formatPrice(
-                                        booking.totalPrice
-                                    )}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="summary-item">
-
-                                <span>
-                                    Ngày đặt
-                                </span>
-
-                                <strong>
-                                    ${formatDate(
-                                        booking.bookingDate
-                                    )}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="summary-item">
-
-                                <span>
-                                    Trạng thái
-                                </span>
-
-                                <strong>
-                                    ${booking.status}
-                                </strong>
-
-                            </div>
-                            <div class="summary-item">
-
-    <span>
-        Trạng thái
-    </span>
-
-    <strong>
-        ${booking.status}
-    </strong>
-
-</div>
-
-${booking.status !== "Cancelled" && booking.status !== "Refunded" ? `
-
-    <button
-        class="booking-button"
-        type="button"
-        onclick="cancelBooking(${booking.bookingId})">
-
-        Hủy booking
-
-    </button>
-
-` : ""}
-
-                        `;
-
-
-                        bookingList.appendChild(
-                            bookingItem
-                        );
-
+    const bookingList =
+        document.getElementById("bookingList");
+
+    try {
+
+        // =========================
+        // 1. Lấy danh sách Customer
+        // =========================
+
+        const customerResponse =
+            await fetch(
+                `${API_BASE_URL}/Customer`,
+                {
+                    headers: {
+                        "Authorization":
+                            `Bearer ${token}`
                     }
-                );
+                }
+            );
 
-            }
-            catch (error) {
 
-                console.error(error);
+        if (!customerResponse.ok) {
 
-                bookingList.innerHTML = `
-
-                    <p>
-                        Không thể tải danh sách booking.
-                    </p>
-
-                `;
-
-            }
+            throw new Error(
+                "Không thể lấy danh sách Customer"
+            );
 
         }
 
+
+        const customers =
+            await customerResponse.json();
+
+
+        // =========================
+        // 2. Tìm Customer của User
+        // =========================
+
+        const customer =
+            customers.find(
+                c =>
+                    Number(c.userId) ===
+                    Number(user.userId)
+            );
+
+
+        if (!customer) {
+
+            bookingList.innerHTML = `
+                <div class="booking-form">
+
+                    <h2>Chưa có thông tin khách hàng</h2>
+
+                    <p>
+                        Tài khoản này chưa được liên kết
+                        với thông tin Customer.
+                    </p>
+
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        // Lấy CustomerId chính xác
+
+        const customerId =
+            customer.customerId;
+
+
+        // Lưu lại vào localStorage
+        // để những trang khác có thể sử dụng
+
+        user.customerId =
+            customerId;
+
+        localStorage.setItem(
+            "user",
+            JSON.stringify(user)
+        );
+
+
+        // =========================
+        // 3. Lấy danh sách Booking
+        // =========================
+
+        const bookingResponse =
+            await fetch(
+                `${API_BASE_URL}/Booking`,
+                {
+                    headers: {
+                        "Authorization":
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
+
+        if (!bookingResponse.ok) {
+
+            throw new Error(
+                "Không thể lấy danh sách booking"
+            );
+
+        }
+
+
+        const bookings =
+            await bookingResponse.json();
+
+
+        // =========================
+        // 4. Lọc Booking của Customer
+        // =========================
+
+        const myBookings =
+            bookings.filter(
+                booking =>
+                    Number(booking.customerId) ===
+                    Number(customerId)
+            );
+
+
+        // =========================
+        // 5. Không có Booking
+        // =========================
+
+        if (myBookings.length === 0) {
+
+            bookingList.innerHTML = `
+
+                <div class="booking-form">
+
+                    <h2>
+                        Chưa có đơn đặt tour
+                    </h2>
+
+                    <p>
+                        Bạn chưa đặt tour nào.
+                    </p>
+
+                    <br>
+
+                    <a href="tours.html">
+                        Xem danh sách tour
+                    </a>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        // =========================
+        // 6. Hiển thị Booking
+        // =========================
+
+        bookingList.innerHTML = "";
+
+
+        myBookings.forEach(
+            booking => {
+
+                const bookingItem =
+                    document.createElement("div");
+
+
+                bookingItem.className =
+                    "booking-form";
+
+
+                bookingItem.innerHTML = `
+
+                    <h2>
+                        Booking #${booking.bookingId}
+                    </h2>
+
+
+                    <div class="summary-item">
+
+                        <span>
+                            Tour ID
+                        </span>
+
+                        <strong>
+                            ${booking.tourId}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <span>
+                            Số lượng
+                        </span>
+
+                        <strong>
+                            ${booking.numberOfPeople}
+                            người
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <span>
+                            Tổng tiền
+                        </span>
+
+                        <strong>
+                            ${formatPrice(
+                                booking.totalPrice
+                            )}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <span>
+                            Ngày đặt
+                        </span>
+
+                        <strong>
+                            ${formatDate(
+                                booking.bookingDate
+                            )}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-item">
+
+                        <span>
+                            Trạng thái
+                        </span>
+
+                        <strong>
+                            ${booking.status}
+                        </strong>
+
+                    </div>
+
+
+                    ${
+                        booking.status !== "Cancelled" &&
+                        booking.status !== "Refunded"
+                        ?
+                        `
+                            <button
+                                class="booking-button"
+                                type="button"
+                                onclick="cancelBooking(
+                                    ${booking.bookingId}
+                                )">
+
+                                Hủy booking
+
+                            </button>
+                        `
+                        :
+                        ""
+                    }
+
+                `;
+
+
+                bookingList.appendChild(
+                    bookingItem
+                );
+
+            }
+        );
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        bookingList.innerHTML = `
+
+            <div class="booking-form">
+
+                <h2>
+                    Không thể tải đơn đặt tour
+                </h2>
+
+                <p>
+                    Vui lòng kiểm tra Backend
+                    và đăng nhập lại.
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+}
 
         // =========================
         // Định dạng tiền

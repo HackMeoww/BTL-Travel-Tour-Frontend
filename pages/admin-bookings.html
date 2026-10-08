@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Quản lý Booking - Travel Tour</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+
+        <div class="container navbar">
+
+            <div class="logo">
+                Travel Tour
+            </div>
+
+            <nav class="menu">
+
+                <a href="../index.html">
+                    Trang chủ
+                </a>
+
+                <a href="tours.html">
+                    Tour
+                </a>
+
+                <a href="admin-bookings.html">
+                    Quản lý Booking
+                </a>
+
+                <a href="#" id="logoutLink">
+                    Đăng xuất
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- Nội dung -->
+    <main>
+
+        <section class="booking-page">
+
+            <div class="container">
+
+                <div class="section-title">
+
+                    <h1>
+                        Quản lý Booking
+                    </h1>
+
+                    <p>
+                        Quản lý đơn đặt tour và hoàn tiền
+                    </p>
+
+                </div>
+
+
+                <!-- Danh sách Booking -->
+
+                <div id="bookingList">
+
+                    <p>
+                        Đang tải danh sách booking...
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="../js/api.js"></script>
+
+    <script>
+
+        // =========================
+        // Kiểm tra đăng nhập
+        // =========================
+
+        const token =
+            localStorage.getItem("token");
+
+        const userData =
+            localStorage.getItem("user");
+
+
+        if (!token || !userData) {
+
+            alert(
+                "Bạn cần đăng nhập."
+            );
+
+            window.location.href =
+                "login.html";
+
+        }
+
+
+        const user =
+            JSON.parse(userData);
+
+
+        // =========================
+        // Kiểm tra quyền
+        // =========================
+
+        if (
+            user.role !== "Admin" &&
+            user.role !== "Staff"
+        ) {
+
+            alert(
+                "Bạn không có quyền truy cập trang này."
+            );
+
+            window.location.href =
+                "../index.html";
+
+        }
+
+
+        // =========================
+        // Hiển thị danh sách Booking
+        // =========================
+
+        async function loadBookings() {
+
+            const bookingList =
+                document.getElementById(
+                    "bookingList"
+                );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/Booking`,
+                        {
+                            headers: {
+
+                                "Authorization":
+                                    `Bearer ${token}`
+
+                            }
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Không thể lấy danh sách booking"
+                    );
+
+                }
+
+
+                const bookings =
+                    await response.json();
+
+
+                // Không có booking
+
+                if (bookings.length === 0) {
+
+                    bookingList.innerHTML = `
+
+                        <div class="booking-form">
+
+                            <h2>
+                                Chưa có booking
+                            </h2>
+
+                            <p>
+                                Hệ thống chưa có đơn đặt tour nào.
+                            </p>
+
+                        </div>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                // Xóa nội dung cũ
+
+                bookingList.innerHTML = "";
+
+
+                // Hiển thị từng booking
+
+                bookings.forEach(
+                    booking => {
+
+                        const bookingItem =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        bookingItem.className =
+                            "booking-form";
+
+
+                        bookingItem.innerHTML = `
+
+                            <h2>
+                                Booking #${booking.bookingId}
+                            </h2>
+
+
+                            <div class="summary-item">
+
+                                <span>
+                                    Tour ID
+                                </span>
+
+                                <strong>
+                                    ${booking.tourId}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span>
+                                    Customer ID
+                                </span>
+
+                                <strong>
+                                    ${booking.customerId}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span>
+                                    Số lượng
+                                </span>
+
+                                <strong>
+                                    ${booking.numberOfPeople}
+                                    người
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span>
+                                    Tổng tiền
+                                </span>
+
+                                <strong>
+                                    ${formatPrice(
+                                        booking.totalPrice
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span>
+                                    Ngày đặt
+                                </span>
+
+                                <strong>
+                                    ${formatDate(
+                                        booking.bookingDate
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-item">
+
+                                <span>
+                                    Trạng thái
+                                </span>
+
+                                <strong>
+                                    ${booking.status}
+                                </strong>
+
+                            </div>
+
+
+                            ${
+                                booking.status === "Cancelled"
+                                ?
+
+                                `
+
+                                    <button
+                                        class="booking-button"
+                                        type="button"
+                                        onclick="refundBooking(${booking.bookingId})">
+
+                                        Hoàn tiền
+
+                                    </button>
+
+                                `
+
+                                :
+
+                                booking.status === "Refunded"
+
+                                ?
+
+                                `
+
+                                    <p>
+                                        <strong>
+                                            Đã hoàn tiền
+                                        </strong>
+                                    </p>
+
+                                `
+
+                                :
+
+                                ""
+
+                            }
+
+                        `;
+
+
+                        bookingList.appendChild(
+                            bookingItem
+                        );
+
+                    }
+                );
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+
+                bookingList.innerHTML = `
+
+                    <div class="booking-form">
+
+                        <p>
+                            Không thể tải danh sách booking.
+                        </p>
+
+                    </div>
+
+                `;
+
+            }
+
+        }
+
+
+        // =========================
+        // Hoàn tiền
+        // =========================
+
+        async function refundBooking(
+            bookingId
+        ) {
+
+            const confirmRefund =
+                confirm(
+                    "Bạn có chắc chắn muốn hoàn tiền cho booking này không?"
+                );
+
+
+            if (!confirmRefund) {
+
+                return;
+
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/Booking/${bookingId}/refund`,
+                        {
+                            method: "POST",
+
+                            headers: {
+
+                                "Authorization":
+                                    `Bearer ${token}`
+
+                            }
+                        }
+                    );
+
+
+                const text =
+                    await response.text();
+
+
+                console.log(
+                    "Refund status:",
+                    response.status
+                );
+
+
+                console.log(
+                    "Refund response:",
+                    text
+                );
+
+
+                if (!response.ok) {
+
+                    let message =
+                        "Hoàn tiền thất bại.";
+
+
+                    try {
+
+                        const data =
+                            JSON.parse(text);
+
+                        message =
+                            data.message ||
+                            message;
+
+                    }
+                    catch (e) {
+                        // Không phải JSON
+                    }
+
+
+                    alert(message);
+
+                    return;
+
+                }
+
+
+                let message =
+                    "Hoàn tiền thành công!";
+
+
+                if (text) {
+
+                    try {
+
+                        const data =
+                            JSON.parse(text);
+
+                        message =
+                            data.message ||
+                            message;
+
+                    }
+                    catch (e) {
+                        // Không phải JSON
+                    }
+
+                }
+
+
+                alert(message);
+
+
+                // Tải lại danh sách
+
+                loadBookings();
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+                alert(
+                    "Không thể kết nối đến Backend."
+                );
+
+            }
+
+        }
+
+
+        // =========================
+        // Định dạng tiền
+        // =========================
+
+        function formatPrice(price) {
+
+            return Number(price)
+                .toLocaleString("vi-VN")
+                + " VNĐ";
+
+        }
+
+
+        // =========================
+        // Định dạng ngày
+        // =========================
+
+        function formatDate(date) {
+
+            return new Date(date)
+                .toLocaleString("vi-VN");
+
+        }
+
+
+        // =========================
+        // Đăng xuất
+        // =========================
+
+        const logoutLink =
+            document.getElementById(
+                "logoutLink"
+            );
+
+
+        logoutLink.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+
+                localStorage.removeItem(
+                    "token"
+                );
+
+                localStorage.removeItem(
+                    "user"
+                );
+
+                localStorage.removeItem(
+                    "booking"
+                );
+
+
+                window.location.href =
+                    "../index.html";
+
+            }
+        );
+
+
+        // =========================
+        // Chạy
+        // =========================
+
+        loadBookings();
+
+    </script>
+
+</body>
+
+</html>
