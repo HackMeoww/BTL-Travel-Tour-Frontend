@@ -39,6 +39,9 @@
         Đăng nhập
     </a>
 
+    <a href="pages/admin.html" id="dashboardLink" style="display: none;">Dashboard</a>
+
+
     <a href="#" id="logoutLink" style="display: none;">
         Đăng xuất
     </a>
@@ -208,6 +211,7 @@ const loginLink = document.getElementById("loginLink");
 const logoutLink = document.getElementById("logoutLink");
 const myBookingsLink = document.getElementById("myBookingsLink");
 const adminBookingsLink = document.getElementById("adminBookingsLink");
+const dashboardLink = document.getElementById("dashboardLink");
 
 if (token && userData) {
 
@@ -221,8 +225,12 @@ if (token && userData) {
 
     // Chỉ Admin và Staff được thấy
     if (user.role === "Admin" || user.role === "Staff") {
-        adminBookingsLink.style.display = "inline-block";
-    }
+    adminBookingsLink.style.display = "inline-block";
+}
+
+if (user.role === "Admin") {
+    dashboardLink.style.display = "inline-block";
+}
 
 } else {
 
@@ -230,6 +238,7 @@ if (token && userData) {
     logoutLink.style.display = "none";
     myBookingsLink.style.display = "none";
     adminBookingsLink.style.display = "none";
+    dashboardLink.style.display = "none";
 }
 
 

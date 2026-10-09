@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Travel Tour</title>
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        .dashboard-page {
+            padding: 40px 0;
+            min-height: 70vh;
+        }
+
+        .dashboard-title {
+            margin-bottom: 30px;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .dashboard-card {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .dashboard-card h3 {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #087eae;
+            overflow-wrap: anywhere;
+        }
+
+        .dashboard-message {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container navbar">
+            <div class="logo">Travel Tour</div>
+
+            <nav class="menu">
+                <a href="../index.html">Trang chủ</a>
+                <a href="tours.html">Tour</a>
+                <a href="admin.html">Dashboard</a>
+                <a href="login.html" id="loginLink">Đăng nhập</a>
+                <a href="#" id="logoutLink" style="display: none;">Đăng xuất</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="dashboard-page">
+            <div class="container">
+                <div class="dashboard-title">
+                    <h1>Dashboard quản trị</h1>
+                    <p>Tổng quan tình hình hoạt động của Travel Tour.</p>
+                </div>
+
+                <div class="dashboard-cards">
+                    <div class="dashboard-card">
+                        <h3>Tổng khách hàng</h3>
+                        <div class="dashboard-number" id="totalCustomers">--</div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <h3>Tổng booking</h3>
+                        <div class="dashboard-number" id="totalBookings">--</div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <h3>Tổng doanh thu</h3>
+                        <div class="dashboard-number" id="totalRevenue">--</div>
+                    </div>
+                </div>
+
+                <p id="dashboardMessage" class="dashboard-message">
+                    Đang tải dữ liệu...
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/api.js"></script>
+
+    <script>
+        const token = localStorage.getItem("token");
+
+        const loginLink = document.getElementById("loginLink");
+        const logoutLink = document.getElementById("logoutLink");
+        const dashboardMessage = document.getElementById("dashboardMessage");
+
+        logoutLink.addEventListener("click", function (event) {
+            event.preventDefault();
+
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+
+            window.location.href = "login.html";
+        });
+
+        if (token) {
+            loginLink.style.display = "none";
+            logoutLink.style.display = "inline";
+        }
+
+        async function loadDashboard() {
+            if (!token) {
+                dashboardMessage.textContent =
+                    "Vui lòng đăng nhập bằng tài khoản Admin để xem thống kê.";
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `${API_BASE_URL}/Dashboard`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    }
+                );
+
+                if (response.status === 401 || response.status === 403) {
+                    dashboardMessage.textContent =
+                        "Bạn không có quyền xem Dashboard. Hãy đăng nhập bằng tài khoản Admin.";
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error("Không thể tải dữ liệu Dashboard.");
+                }
+
+                const data = await response.json();
+
+                document.getElementById("totalCustomers").textContent =
+                    Number(data.totalCustomers ?? 0).toLocaleString("vi-VN");
+
+                document.getElementById("totalBookings").textContent =
+                    Number(data.totalBookings ?? 0).toLocaleString("vi-VN");
+
+                document.getElementById("totalRevenue").textContent =
+                    Number(data.totalRevenue ?? 0).toLocaleString("vi-VN") + " VNĐ";
+
+                dashboardMessage.textContent =
+                    "Đã tải dữ liệu thống kê thành công.";
+            } catch (error) {
+                console.error(error);
+
+                dashboardMessage.textContent =
+                    "Không tải được dữ liệu. Hãy kiểm tra Backend và kết nối mạng.";
+            }
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>
