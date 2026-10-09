@@ -21,24 +21,13 @@
             </div>
 
             <nav class="menu">
-
-    <a href="../index.html">
-        Trang chủ
-    </a>
-
-    <a href="tours.html">
-        Tour
-    </a>
-
-    <a href="login.html" id="loginLink">
-        Đăng nhập
-    </a>
-
-    <a href="#" id="logoutLink" style="display: none;">
-        Đăng xuất
-    </a>
-
-</nav>
+                <a href="../index.html">Trang chủ</a>
+                <a href="tours.html">Tour</a>
+                <a href="my-bookings.html" id="myBookingsLink" style="display: none;">Đơn đặt tour</a>
+                <a href="admin-bookings.html" id="adminBookingsLink" style="display: none;">Quản lý Booking</a>
+                <a href="login.html" id="loginLink">Đăng nhập</a>
+                <a href="#" id="logoutLink" style="display: none;">Đăng xuất</a>
+            </nav>
 
         </div>
     </header>
@@ -170,6 +159,41 @@
                 }
 
 
+                // Tạo bản đồ vị trí tour
+let mapHTML = "";
+
+if (
+    tour.latitude != null &&
+    tour.longitude != null &&
+    Number.isFinite(Number(tour.latitude)) &&
+    Number.isFinite(Number(tour.longitude))
+) {
+    const latitude = Number(tour.latitude);
+    const longitude = Number(tour.longitude);
+
+    mapHTML = `
+        <div class="tour-map">
+            <h2>Vị trí Tour</h2>
+            <iframe
+                src="https://maps.google.com/maps?q=${latitude},${longitude}&z=12&output=embed"
+                width="100%"
+                height="350"
+                style="border: 0;"
+                loading="lazy"
+                allowfullscreen
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Bản đồ vị trí tour">
+            </iframe>
+        </div>
+    `;
+} else {
+    mapHTML = `
+        <div class="tour-map">
+            <h2>Vị trí Tour</h2>
+            <p>Tour chưa có tọa độ để hiển thị bản đồ.</p>
+        </div>
+    `;
+}
                 // =========================
                 // 4. Hiển thị Tour
                 // =========================
@@ -227,11 +251,48 @@
                             </h2>
 
 
+                            
                             <div class="itinerary">
+    ${itineraryHTML}
+</div>
+${mapHTML}
+<!-- Đánh giá Tour -->
+<div class="tour-reviews">
+    <h2>Đánh giá Tour</h2>
 
-                                ${itineraryHTML}
+    <div id="reviewList">
+        <p>Đang tải đánh giá...</p>
+    </div>
 
-                            </div>
+    <div id="reviewForm" style="display: none;">
+        <h3>Viết đánh giá của bạn</h3>
+
+        <label for="reviewRating">Số sao</label>
+        <select id="reviewRating">
+            <option value="5">5 sao</option>
+            <option value="4">4 sao</option>
+            <option value="3">3 sao</option>
+            <option value="2">2 sao</option>
+            <option value="1">1 sao</option>
+        </select>
+
+        <label for="reviewComment">Nội dung đánh giá</label>
+        <textarea
+            id="reviewComment"
+            rows="4"
+            placeholder="Chia sẻ trải nghiệm của bạn..."
+        ></textarea>
+
+        <button
+            type="button"
+            onclick="submitReview()"
+        >
+            Gửi đánh giá
+        </button>
+    </div>
+
+    <p id="reviewMessage"></p>
+</div>
 
                         </div>
 
@@ -278,6 +339,10 @@
 
                 `;
 
+                // Khởi tạo form đánh giá và tải danh sách đánh giá sau khi DOM đã được render
+                setupReviewForm();
+                await loadReviews();
+
             }
             catch (error) {
 
@@ -306,48 +371,307 @@
         }
 
 
-        // Chạy khi mở trang
+        // =========================
+        // ĐÁNH GIÁ TOUR
+        // =========================
+
+        function getCurrentUser() {
+            try {
+                return JSON.parse(localStorage.getItem("user") || "null");
+            } catch {
+                return null;
+            }
+        }
+
+        function escapeReviewText(value) {
+            return String(value).replace(/[&<>"']/g, character => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[character]);
+        }
+
+        async function loadReviews() {
+            const reviewList = document.getElementById("reviewList");
+            if (!reviewList) return;
+
+            if (!tourId) {
+                reviewList.innerHTML = "<p>Không tìm thấy mã tour.</p>";
+                return;
+            }
+
+            try {
+                // Tải danh sách đánh giá và danh sách khách hàng để hiển thị tên
+                const [reviewResponse, customerResponse] = await Promise.all([
+                    fetch(`${API_BASE_URL}/Review`),
+                    fetch(`${API_BASE_URL}/Customer`).catch(() => null)
+                ]);
+
+                if (!reviewResponse.ok) {
+                    throw new Error("Không thể tải danh sách đánh giá.");
+                }
+
+                const reviews = await reviewResponse.json();
+
+                // Tạo map CustomerId -> FullName
+                const customerMap = new Map();
+                if (customerResponse && customerResponse.ok) {
+                    try {
+                        const customers = await customerResponse.json();
+                        customers.forEach(c => {
+                            if (c.customerId) {
+                                customerMap.set(c.customerId, c.fullName || "Khách hàng");
+                            }
+                        });
+                    } catch (e) {
+                        console.warn("Lỗi đọc danh sách khách hàng:", e);
+                    }
+                }
+
+                const tourReviews = reviews
+                    .filter(review => Number(review.tourId) === Number(tourId))
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                if (tourReviews.length === 0) {
+                    reviewList.innerHTML = "<p style='color: #64748b; font-style: italic;'>Chưa có đánh giá nào cho tour này. Hãy là người đầu tiên đánh giá!</p>";
+                    return;
+                }
+
+                reviewList.innerHTML = tourReviews.map(review => {
+                    const rating = Math.max(
+                        0,
+                        Math.min(5, Number(review.rating) || 0)
+                    );
+                    const authorName = customerMap.get(review.customerId) || "Khách hàng";
+                    const dateFormatted = review.createdAt
+                        ? new Date(review.createdAt).toLocaleDateString("vi-VN", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric"
+                        })
+                        : "";
+
+                    return `
+                        <div class="review-item">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <strong style="color: #1e293b;">${escapeReviewText(authorName)}</strong>
+                                <small style="color: #64748b;">${dateFormatted}</small>
+                            </div>
+                            <p class="review-stars">
+                                ${"★".repeat(rating)}${"☆".repeat(5 - rating)}
+                            </p>
+                            <p style="margin-top: 6px; color: #334155; line-height: 1.5;">${escapeReviewText(review.comment || "")}</p>
+                        </div>
+                    `;
+                }).join("");
+
+            } catch (error) {
+                console.error("Lỗi khi tải đánh giá:", error);
+                reviewList.innerHTML = "<p style='color: #dc2626;'>Không thể tải danh sách đánh giá vào lúc này.</p>";
+            }
+        }
+
+        function setupReviewForm() {
+            const user = getCurrentUser();
+            const token = localStorage.getItem("token");
+
+            const form = document.getElementById("reviewForm");
+            const message = document.getElementById("reviewMessage");
+
+            if (!form) return;
+
+            if (user && token) {
+                form.style.display = "block";
+                if (message) message.textContent = "";
+            } else {
+                form.style.display = "none";
+                if (message) {
+                    message.innerHTML = `Vui lòng <a href="login.html" style="color: #087db5; font-weight: 600; text-decoration: underline;">đăng nhập</a> để viết đánh giá.`;
+                }
+            }
+        }
+
+        async function submitReview() {
+            const user = getCurrentUser();
+            const token = localStorage.getItem("token");
+            const ratingSelect = document.getElementById("reviewRating");
+            const commentInput = document.getElementById("reviewComment");
+            const reviewMessage = document.getElementById("reviewMessage");
+            const submitBtn = document.querySelector("#reviewForm button");
+
+            if (reviewMessage) {
+                reviewMessage.textContent = "";
+                reviewMessage.style.color = "#dc2626";
+            }
+
+            if (!token || !user) {
+                if (reviewMessage) reviewMessage.textContent = "Vui lòng đăng nhập trước khi đánh giá.";
+                return;
+            }
+
+            const comment = commentInput ? commentInput.value.trim() : "";
+            const rating = Number(ratingSelect ? ratingSelect.value : 5);
+
+            if (!comment) {
+                if (reviewMessage) reviewMessage.textContent = "Vui lòng nhập nội dung đánh giá.";
+                return;
+            }
+
+            if (rating < 1 || rating > 5) {
+                if (reviewMessage) reviewMessage.textContent = "Số sao phải từ 1 đến 5.";
+                return;
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = "Đang gửi...";
+            }
+
+            try {
+                let customerId = user.customerId;
+
+                if (!customerId) {
+                    const customerResponse = await fetch(
+                        `${API_BASE_URL}/Customer`,
+                        {
+                            headers: {
+                                "Authorization": `Bearer ${token}`
+                            }
+                        }
+                    );
+
+                    if (!customerResponse.ok) {
+                        throw new Error("Không thể lấy thông tin khách hàng.");
+                    }
+
+                    const customers = await customerResponse.json();
+
+                    const customer = customers.find(
+                        item => Number(item.userId) === Number(user.userId)
+                    );
+
+                    if (!customer) {
+                        // Tự động tạo hồ sơ khách hàng nếu tài khoản chưa có
+                        const createCustomerRes = await fetch(`${API_BASE_URL}/Customer`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                userId: Number(user.userId),
+                                fullName: user.userName || "Khách hàng",
+                                phone: "",
+                                email: "",
+                                address: ""
+                            })
+                        });
+
+                        if (createCustomerRes.ok) {
+                            const newCust = await createCustomerRes.json();
+                            customerId = newCust.customerId;
+                        } else {
+                            throw new Error("Không tìm thấy hồ sơ khách hàng của tài khoản này.");
+                        }
+                    } else {
+                        customerId = customer.customerId;
+                    }
+
+                    user.customerId = customerId;
+                    localStorage.setItem("user", JSON.stringify(user));
+                }
+
+                const response = await fetch(`${API_BASE_URL}/Review`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        tourId: Number(tourId),
+                        customerId: Number(customerId),
+                        rating: rating,
+                        comment: comment,
+                        createdAt: new Date().toISOString()
+                    })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => null);
+                    throw new Error(errData?.message || `Gửi đánh giá thất bại: HTTP ${response.status}`);
+                }
+
+                if (commentInput) commentInput.value = "";
+                if (ratingSelect) ratingSelect.value = "5";
+
+                if (reviewMessage) {
+                    reviewMessage.style.color = "#16a34a";
+                    reviewMessage.textContent = "Gửi đánh giá thành công! Cảm ơn bạn.";
+                }
+
+                await loadReviews();
+
+            } catch (error) {
+                console.error("Lỗi khi gửi đánh giá:", error);
+                if (reviewMessage) {
+                    reviewMessage.style.color = "#dc2626";
+                    reviewMessage.textContent = error.message || "Có lỗi xảy ra khi gửi đánh giá.";
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Gửi đánh giá";
+                }
+            }
+        }
+
+        // Khởi chạy tải dữ liệu tour
         loadTourDetail();
-
     </script>
-<script>
 
-    const token = localStorage.getItem("token");
+    <script>
+        const token = localStorage.getItem("token");
+        const userData = localStorage.getItem("user");
 
-    const loginLink =
-        document.getElementById("loginLink");
+        const loginLink = document.getElementById("loginLink");
+        const logoutLink = document.getElementById("logoutLink");
+        const myBookingsLink = document.getElementById("myBookingsLink");
+        const adminBookingsLink = document.getElementById("adminBookingsLink");
 
-    const logoutLink =
-        document.getElementById("logoutLink");
+        if (token && userData) {
+            let user = null;
+            try {
+                user = JSON.parse(userData);
+            } catch (e) {
+                console.error(e);
+            }
 
+            if (loginLink) loginLink.style.display = "none";
+            if (logoutLink) logoutLink.style.display = "inline-block";
+            if (myBookingsLink) myBookingsLink.style.display = "inline-block";
 
-    if (token) {
+            if (adminBookingsLink && user && (user.role === "Admin" || user.role === "Staff")) {
+                adminBookingsLink.style.display = "inline-block";
+            }
+        } else {
+            if (loginLink) loginLink.style.display = "inline-block";
+            if (logoutLink) logoutLink.style.display = "none";
+            if (myBookingsLink) myBookingsLink.style.display = "none";
+            if (adminBookingsLink) adminBookingsLink.style.display = "none";
+        }
 
-        loginLink.style.display = "none";
-        logoutLink.style.display = "inline-block";
-
-    }
-    else {
-
-        loginLink.style.display = "inline-block";
-        logoutLink.style.display = "none";
-
-    }
-
-
-    logoutLink.addEventListener("click", function (event) {
-
-        event.preventDefault();
-
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("booking");
-
-        window.location.href = "../index.html";
-
-    });
-
-</script>
+        if (logoutLink) {
+            logoutLink.addEventListener("click", function (event) {
+                event.preventDefault();
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                localStorage.removeItem("booking");
+                window.location.href = "../index.html";
+            });
+        }
+    </script>
 </body>
 
 </html>

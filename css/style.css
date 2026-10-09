@@ -669,3 +669,115 @@ main {
     text-decoration: none;
     font-weight: bold;
 }
+
+/* =========================
+   ĐÁNH GIÁ TOUR
+========================= */
+
+.tour-reviews {
+    margin-top: 30px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.tour-reviews h2 {
+    margin-bottom: 20px;
+    color: #263238;
+    font-size: 24px;
+}
+
+.tour-reviews h3 {
+    margin: 20px 0 14px;
+    color: #263238;
+    font-size: 20px;
+}
+
+.review-item {
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+}
+
+.review-stars {
+    margin: 0 0 8px;
+    color: #f59e0b;
+    font-size: 20px;
+    letter-spacing: 2px;
+}
+
+.review-item p {
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.review-item small {
+    color: #64748b;
+}
+
+#reviewForm label {
+    display: block;
+    margin: 14px 0 6px;
+    font-weight: 600;
+}
+
+#reviewRating,
+#reviewComment {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font: inherit;
+}
+
+#reviewComment {
+    resize: vertical;
+    min-height: 100px;
+}
+
+#reviewForm button {
+    margin-top: 14px;
+    padding: 11px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #087db5;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#reviewForm button:hover {
+    background: #066694;
+}
+
+#reviewMessage {
+    margin-top: 12px;
+    color: #334155;
+}
+
+/* Bản đồ vị trí tour */
+.tour-map {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.tour-map h2 {
+    margin-bottom: 16px;
+    color: #263238;
+    font-size: 22px;
+}
+
+.tour-map iframe {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 10px;
+    background: #f1f5f9;
+}
+
+.tour-map p {
+    color: #64748b;
+    line-height: 1.6;
+}
