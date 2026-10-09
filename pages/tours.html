@@ -52,9 +52,42 @@
             <div class="container">
 
                 <div class="section-title">
-                    <h1>Danh sách Tour</h1>
-                    <p>Khám phá những tour du lịch hấp dẫn</p>
-                </div>
+    <h1>Danh sách Tour</h1>
+    <p>Khám phá những tour du lịch hấp dẫn</p>
+</div>
+
+<!-- Tìm kiếm và lọc Tour -->
+<div class="tour-filter">
+
+    <input
+        type="text"
+        id="searchDestination"
+        placeholder="Tìm theo địa điểm..."
+    >
+
+    <input
+        type="number"
+        id="minPrice"
+        placeholder="Giá từ"
+        min="0"
+    >
+
+    <input
+        type="number"
+        id="maxPrice"
+        placeholder="Giá đến"
+        min="0"
+    >
+
+    <button onclick="filterTours()">
+        Tìm kiếm
+    </button>
+
+    <button onclick="resetFilter()">
+        Xóa bộ lọc
+    </button>
+
+</div>
 
 
                 <!-- Tour sẽ được lấy từ Backend -->
@@ -76,82 +109,147 @@
 
     <script>
 
-        async function loadTours() {
+        let allTours = [];
 
-            const tourList = document.getElementById("tourList");
+async function loadTours() {
 
-            try {
+    const tourList = document.getElementById("tourList");
 
-                const tours = await getTours();
+    try {
 
-                tourList.innerHTML = "";
+        allTours = await getTours();
 
-                if (tours.length === 0) {
+        displayTours(allTours);
 
-                    tourList.innerHTML =
-                        "<p>Hiện chưa có tour nào.</p>";
+    }
+    catch (error) {
 
-                    return;
-                }
+        console.error(error);
+
+        tourList.innerHTML = `
+            <p>
+                Không thể kết nối đến Backend.
+            </p>
+        `;
+    }
+}
 
 
-                tours.forEach(tour => {
+function displayTours(tours) {
 
-                    const tourCard = document.createElement("div");
+    const tourList = document.getElementById("tourList");
 
-                    tourCard.className = "tour-card";
+    tourList.innerHTML = "";
+
+    if (tours.length === 0) {
+
+        tourList.innerHTML =
+            "<p>Không tìm thấy tour phù hợp.</p>";
+
+        return;
+    }
 
 
-                    tourCard.innerHTML = `
-                        
-                        <div class="tour-image">
-                            <span>${tour.destination}</span>
-                        </div>
+    tours.forEach(tour => {
 
-                        <div class="tour-info">
+        const tourCard = document.createElement("div");
 
-                            <h3>${tour.tourName}</h3>
+        tourCard.className = "tour-card";
 
-                            <p class="destination">
-                                📍 ${tour.destination}
-                            </p>
 
-                            <p>
-                                ${tour.description}
-                            </p>
+        tourCard.innerHTML = `
+            
+            <div class="tour-image">
+                <span>${tour.destination}</span>
+            </div>
 
-                            <div class="tour-bottom">
+            <div class="tour-info">
 
-                                <strong>
-                                    ${Number(tour.price).toLocaleString("vi-VN")} VNĐ
-                                </strong>
+                <h3>${tour.tourName}</h3>
 
-                                <button onclick="viewTour(${tour.tourId})">
-                                    Xem chi tiết
-                                </button>
+                <p class="destination">
+                    📍 ${tour.destination}
+                </p>
 
-                            </div>
+                <p>
+                    ${tour.description}
+                </p>
 
-                        </div>
+                <div class="tour-bottom">
 
-                    `;
+                    <strong>
+                        ${Number(tour.price).toLocaleString("vi-VN")} VNĐ
+                    </strong>
 
-                    tourList.appendChild(tourCard);
+                    <button onclick="viewTour(${tour.tourId})">
+                        Xem chi tiết
+                    </button>
 
-                });
+                </div>
 
-            }
-            catch (error) {
+            </div>
 
-                console.error(error);
+        `;
 
-                tourList.innerHTML = `
-                    <p>
-                        Không thể kết nối đến Backend.
-                    </p>
-                `;
-            }
-        }
+        tourList.appendChild(tourCard);
+
+    });
+}
+
+
+function filterTours() {
+
+    const destination =
+        document.getElementById("searchDestination").value
+        .trim()
+        .toLowerCase();
+
+    const minPrice =
+        Number(document.getElementById("minPrice").value) || 0;
+
+    const maxPriceInput =
+        document.getElementById("maxPrice").value;
+
+    const maxPrice =
+        maxPriceInput === ""
+            ? Infinity
+            : Number(maxPriceInput);
+
+
+    const filteredTours = allTours.filter(tour => {
+
+        const tourDestination =
+            (tour.destination || "").toLowerCase();
+
+        const tourPrice =
+            Number(tour.price);
+
+
+        const matchDestination =
+            tourDestination.includes(destination);
+
+        const matchPrice =
+            tourPrice >= minPrice &&
+            tourPrice <= maxPrice;
+
+
+        return matchDestination && matchPrice;
+
+    });
+
+
+    displayTours(filteredTours);
+}
+
+
+function resetFilter() {
+
+    document.getElementById("searchDestination").value = "";
+    document.getElementById("minPrice").value = "";
+    document.getElementById("maxPrice").value = "";
+
+    displayTours(allTours);
+}
 
 
         function viewTour(tourId) {
