@@ -18,29 +18,65 @@
                 Travel Tour
             </div>
 
-          <nav class="menu">
+         <nav class="menu">
 
-    <a href="index.html">
-        Trang chủ
-    </a>
+    <a href="index.html">Trang chủ</a>
 
-    <a href="pages/tours.html">
-        Tour
-    </a>
+    <a href="pages/tours.html">Khám phá tour</a>
 
-    <a href="pages/my-bookings.html" id="myBookingsLink" style="display: none;">
+    <!-- Customer -->
+    <a href="pages/my-bookings.html"
+       id="myBookingsLink"
+       style="display: none;">
         Đơn đặt tour
     </a>
-    <a href="pages/admin-bookings.html" id="adminBookingsLink" style="display: none;">
-    Quản lý Booking
-</a>
+
+    <a href="pages/my-payments.html"
+       id="myPaymentsLink"
+       style="display: none;">
+        Thanh toán
+    </a>
+
+    <a href="pages/my-refunds.html"
+       id="myRefundsLink"
+       style="display: none;">
+        Hủy tour / Hoàn tiền
+    </a>
+
+    <a href="pages/my-reviews.html"
+       id="myReviewsLink"
+       style="display: none;">
+        Đánh giá của tôi
+    </a>
+
+    <a href="pages/profile.html"
+       id="profileLink"
+       style="display: none;">
+        Tài khoản cá nhân
+    </a>
+
+    <a href="pages/support.html"
+       id="supportLink"
+       style="display: none;">
+        Hỗ trợ
+    </a>
+
+    <!-- Admin và Staff -->
+    <a href="pages/admin-bookings.html"
+       id="adminBookingsLink"
+       style="display: none;">
+        Quản lý Booking
+    </a>
+
+    <a href="pages/admin.html"
+       id="dashboardLink"
+       style="display: none;">
+        Dashboard
+    </a>
 
     <a href="pages/login.html" id="loginLink">
         Đăng nhập
     </a>
-
-    <a href="pages/admin.html" id="dashboardLink" style="display: none;">Dashboard</a>
-
 
     <a href="#" id="logoutLink" style="display: none;">
         Đăng xuất
@@ -54,20 +90,48 @@
     <main>
 
         <section class="hero">
-            <div class="container hero-content">
+    <div class="container hero-content">
+        <span class="hero-label">TRAVEL TOUR · KHÁM PHÁ THẾ GIỚI</span>
 
-                <h1>Khám phá những hành trình tuyệt vời</h1>
+        <h1>
+            Khám phá thế giới,<br>
+            bắt đầu hành trình <span>của bạn</span>
+        </h1>
 
-                <p>
-                    Tìm kiếm và đặt tour du lịch dễ dàng,
-                    nhanh chóng và thuận tiện.
-                </p>
+        <p>
+            Khám phá những điểm đến tuyệt đẹp, trải nghiệm văn hóa độc đáo
+            và tận hưởng kỳ nghỉ đáng nhớ cùng Travel Tour.
+        </p>
 
-                <button>Xem các tour</button>
+        <div class="hero-actions">
+            <a href="pages/tours.html" class="hero-button">
+                Khám phá các tour <span>→</span>
+            </a>
 
+            <a href="#featured-tours" class="hero-secondary">
+                Xem tour nổi bật
+            </a>
+        </div>
+
+        <div class="hero-highlights">
+            <div>
+                <strong>Đa dạng</strong>
+                <span>Điểm đến hấp dẫn</span>
             </div>
-        </section>
-        <section class="featured-tours">
+
+            <div>
+                <strong>Linh hoạt</strong>
+                <span>Lựa chọn hành trình</span>
+            </div>
+
+            <div>
+                <strong>Thuận tiện</strong>
+                <span>Đặt tour trực tuyến</span>
+            </div>
+        </div>
+    </div>
+</section>
+        <section class="featured-tours" id="featured-tours">
     <div class="container">
 
         <div class="section-title">
@@ -96,7 +160,9 @@
 
                     <div class="tour-bottom">
                         <strong>3.000.000 VNĐ</strong>
-                        <button>Xem chi tiết</button>
+                        <a href="pages/tours.html" class="tour-detail-button">
+    Xem chi tiết <span>→</span>
+</a>
                     </div>
                 </div>
             </div>
@@ -120,7 +186,9 @@
 
                     <div class="tour-bottom">
                         <strong>2.500.000 VNĐ</strong>
-                        <button>Xem chi tiết</button>
+                        <a href="pages/tours.html" class="tour-detail-button">
+    Xem chi tiết <span>→</span>
+</a>
                     </div>
                 </div>
             </div>
@@ -144,7 +212,9 @@
 
                     <div class="tour-bottom">
                         <strong>3.500.000 VNĐ</strong>
-                        <button>Xem chi tiết</button>
+                        <a href="pages/tours.html" class="tour-detail-button">
+    Xem chi tiết <span>→</span>
+</a>
                     </div>
                 </div>
             </div>
@@ -201,69 +271,79 @@
 
     </main>
 <script>
-
-   
-
 const token = localStorage.getItem("token");
 const userData = localStorage.getItem("user");
 
 const loginLink = document.getElementById("loginLink");
 const logoutLink = document.getElementById("logoutLink");
-const myBookingsLink = document.getElementById("myBookingsLink");
-const adminBookingsLink = document.getElementById("adminBookingsLink");
-const dashboardLink = document.getElementById("dashboardLink");
+
+const customerLinks = [
+    "myBookingsLink",
+    "myPaymentsLink",
+    "myRefundsLink",
+    "myReviewsLink",
+    "profileLink",
+    "supportLink"
+];
+
+const adminBookingsLink =
+    document.getElementById("adminBookingsLink");
+
+const dashboardLink =
+    document.getElementById("dashboardLink");
+
+// Ẩn tất cả chức năng riêng trước khi kiểm tra quyền
+customerLinks.forEach(id => {
+    document.getElementById(id).style.display = "none";
+});
+
+adminBookingsLink.style.display = "none";
+dashboardLink.style.display = "none";
 
 if (token && userData) {
+    try {
+        const user = JSON.parse(userData);
+        const role = user.role;
 
-    const user = JSON.parse(userData);
+        loginLink.style.display = "none";
+        logoutLink.style.display = "inline-block";
 
-    loginLink.style.display = "none";
-    logoutLink.style.display = "inline-block";
+        if (role === "Customer") {
+            customerLinks.forEach(id => {
+                document.getElementById(id).style.display =
+                    "inline-block";
+            });
+        }
 
-    // Hiện cho người đã đăng nhập
-    myBookingsLink.style.display = "inline-block";
+        if (role === "Admin" || role === "Staff") {
+            adminBookingsLink.style.display = "inline-block";
+        }
 
-    // Chỉ Admin và Staff được thấy
-    if (user.role === "Admin" || user.role === "Staff") {
-    adminBookingsLink.style.display = "inline-block";
-}
+        if (role === "Admin") {
+            dashboardLink.style.display = "inline-block";
+        }
 
-if (user.role === "Admin") {
-    dashboardLink.style.display = "inline-block";
-}
+    } catch (error) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "pages/login.html";
+    }
 
 } else {
-
     loginLink.style.display = "inline-block";
     logoutLink.style.display = "none";
-    myBookingsLink.style.display = "none";
-    adminBookingsLink.style.display = "none";
-    dashboardLink.style.display = "none";
 }
 
+// Đăng xuất
+logoutLink.addEventListener("click", function (event) {
+    event.preventDefault();
 
-    // =========================
-    // Đăng xuất
-    // =========================
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("booking");
 
-    logoutLink.addEventListener("click", function (event) {
-
-        event.preventDefault();
-
-        // Xóa JWT
-        localStorage.removeItem("token");
-
-        // Xóa thông tin user
-        localStorage.removeItem("user");
-
-        // Xóa booking nếu có
-        localStorage.removeItem("booking");
-
-        // Về trang chủ
-        window.location.href = "index.html";
-
-    });
-
+    window.location.href = "pages/login.html";
+});
 </script>
 </body>
 </html>

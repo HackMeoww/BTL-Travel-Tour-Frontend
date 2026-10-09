@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -10,132 +11,144 @@
     <link rel="stylesheet" href="../css/style.css">
 </head>
 
-<body>
+<body class="login-page">
 
-    <header class="header">
-        <div class="container navbar">
+    <main class="login-main">
 
-            <div class="logo">
-                Travel Tour
+        <section class="login-card register-card">
+
+            <div class="login-brand">
+                <span class="brand-icon">✈</span>
+                <span>Travel Tour</span>
             </div>
 
-            <nav class="menu">
-    <a href="../index.html">Trang chủ</a>
-    <a href="tours.html">Tour</a>
-    <a href="login.html">Đăng nhập</a>
-</nav>
+            <h1>Đăng ký tài khoản</h1>
 
-        </div>
-    </header>
+            <p class="login-description">
+                Tạo tài khoản để bắt đầu hành trình khám phá
+            </p>
 
+            <form id="registerForm">
 
-    <main>
-
-        <section class="auth-page">
-
-            <div class="auth-container">
-
-                <h1>Đăng ký tài khoản</h1>
-
-                <p class="auth-description">
-                    Tạo tài khoản để đặt tour và quản lý booking
-                </p>
-
-
-                <form id="registerForm">
-
-                    <div class="form-group">
-                        <label for="userName">
-                            Tên đăng nhập
-                        </label>
-
-                        <input
-                            type="text"
-                            id="userName"
-                            placeholder="Nhập tên đăng nhập"
-                            required
-                        >
-                    </div>
-
-
-                    <div class="form-group">
-                        <label for="password">
-                            Mật khẩu
-                        </label>
-
-                        <input
-                            type="password"
-                            id="password"
-                            placeholder="Nhập mật khẩu"
-                            required
-                        >
-                    </div>
-
-
-                    <div class="form-group">
-                        <label for="fullName">
-                            Họ và tên
-                        </label>
-
-                        <input
-                            type="text"
-                            id="fullName"
-                            placeholder="Nhập họ và tên"
-                            required
-                        >
-                    </div>
-
-
-                    <div class="form-group">
-                        <label for="email">
-                            Email
-                        </label>
-
-                        <input
-                            type="email"
-                            id="email"
-                            placeholder="Nhập email"
-                            required
-                        >
-                    </div>
-
-
-                    <div class="form-group">
-                        <label for="phone">
-                            Số điện thoại
-                        </label>
-
-                        <input
-                            type="tel"
-                            id="phone"
-                            placeholder="Nhập số điện thoại"
-                            required
-                        >
-                    </div>
-
-
-                    <button
-                        type="submit"
-                        class="auth-button"
+                <div class="form-group">
+                    <label for="userName">Tên đăng nhập</label>
+                    <input
+                        type="text"
+                        id="userName"
+                        placeholder="Nhập tên đăng nhập"
+                        required
                     >
-                        Đăng ký
-                    </button>
+                </div>
 
-                </form>
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Tạo mật khẩu"
+                        required
+                    >
+                </div>
 
+                <div class="form-group">
+                    <label for="fullName">Họ và tên</label>
+                    <input
+                        type="text"
+                        id="fullName"
+                        placeholder="Nhập họ và tên"
+                        required
+                    >
+                </div>
 
-                <p class="auth-footer">
-                    Đã có tài khoản?
-                    <a href="login.html">
-                        Đăng nhập
-                    </a>
-                </p>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Nhập email"
+                        required
+                    >
+                </div>
 
-            </div>
+                <div class="form-group">
+                    <label for="phone">Số điện thoại</label>
+                    <input
+                        type="tel"
+                        id="phone"
+                        placeholder="Nhập số điện thoại"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="auth-button">
+                    Đăng ký
+                </button>
+
+            </form>
+
+            <p class="auth-footer">
+                Đã có tài khoản?
+                <a href="login.html">Đăng nhập</a>
+            </p>
 
         </section>
 
     </main>
+
+    <script src="../js/api.js"></script>
+
+<script>
+document.getElementById("registerForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const userName = document.getElementById("userName").value.trim();
+    const password = document.getElementById("password").value;
+    const fullName = document.getElementById("fullName").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+
+    const registerButton = this.querySelector('button[type="submit"]');
+
+    registerButton.disabled = true;
+    registerButton.textContent = "Đang đăng ký...";
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/Auth/register`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                userName: userName,
+                passWord: password,
+                fullName: fullName,
+                email: email,
+                phone: phone
+            })
+        });
+
+        const result = await response.json().catch(() => null);
+
+        if (!response.ok) {
+            throw new Error(
+                result?.message ||
+                result?.title ||
+                "Đăng ký thất bại. Vui lòng kiểm tra lại thông tin."
+            );
+        }
+
+        alert("Đăng ký tài khoản thành công! Vui lòng đăng nhập.");
+
+        window.location.href = "login.html";
+
+    } catch (error) {
+        alert(error.message || "Không thể kết nối đến máy chủ. Vui lòng thử lại.");
+    } finally {
+        registerButton.disabled = false;
+        registerButton.textContent = "Đăng ký";
+    }
+});
+</script>
 
 </body>
 
