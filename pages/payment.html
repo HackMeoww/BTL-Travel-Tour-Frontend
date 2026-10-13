@@ -408,6 +408,14 @@
     // =========================
 
     async function confirmPayment() {
+        const paymentButton = document.querySelector(".payment-button");
+
+if (paymentButton.disabled) {
+    return;
+}
+
+paymentButton.disabled = true;
+paymentButton.textContent = "Đang xử lý thanh toán...";
 
         const token =
             localStorage.getItem("token");
@@ -515,15 +523,15 @@
             // =========================
 
             if (!response.ok) {
+    alert(
+        data.message ||
+        "Thanh toán thất bại."
+    );
 
-                alert(
-                    data.message ||
-                    "Thanh toán thất bại."
-                );
-
-                return;
-
-            }
+    paymentButton.disabled = false;
+    paymentButton.textContent = "Xác nhận thanh toán";
+    return;
+}
 
 
             // =========================

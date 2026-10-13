@@ -449,9 +449,14 @@ let customerId = null;
 try {
 
     const customerResponse =
-        await fetch(
-            `${API_BASE_URL}/Customer`
-        );
+    await fetch(
+        `${API_BASE_URL}/Customer`,
+        {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        }
+    );
 
 
     if (!customerResponse.ok) {
@@ -563,46 +568,24 @@ catch (error) {
         try {
 
             const response = await fetch(
-                `${API_BASE_URL}/Booking`,
-                {
-                    method: "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/json",
-
-                        "Authorization":
-                            `Bearer ${token}`
-
-                    },
-
-                    body: JSON.stringify({
-
-                        bookingId: 0,
-
-                        tourId:
-                            Number(tourId),
-
-                        customerId:
-                            Number(customerId),
-
-                        bookingDate:
-                            new Date().toISOString(),
-
-                        numberOfPeople:
-                            numberOfPeople,
-
-                        totalPrice:
-                            totalPrice,
-
-                        status:
-                            "Pending"
-
-                    })
-
-                }
-            );
+    `${API_BASE_URL}/Booking`,
+    {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            bookingId: 0,
+            tourId: Number(tourId),
+            customerId: Number(customerId),
+            bookingDate: new Date().toISOString(),
+            numberOfPeople: numberOfPeople,
+            totalPrice: totalPrice,
+            status: "Pending"
+        })
+    }
+);
 
 
             const data =
@@ -623,21 +606,12 @@ catch (error) {
 
             // Lưu Booking vừa tạo
 
-            localStorage.setItem(
-                "booking",
-                JSON.stringify(data)
-            );
+            localStorage.setItem("booking", JSON.stringify(data));
 
+alert("Đặt tour thành công!");
 
-            alert(
-                "Đặt tour thành công!"
-            );
-
-
-            // Chuyển sang thanh toán
-
-            window.location.href =
-                `payment.html?bookingId=${data.bookingId}`;
+window.location.href =
+    `payment.html?bookingId=${data.bookingId}`;
 
         }
         catch (error) {

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hóa đơn - Travel Tour</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container navbar">
+            <div class="logo">Travel Tour</div>
+
+            <nav class="menu">
+                <a href="../index.html">Trang chủ</a>
+                <a href="tours.html">Tour</a>
+                <a href="booking-history.html">Lịch sử đặt tour</a>
+                <a href="#" id="logoutLink">Đăng xuất</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container invoice-page">
+        <div class="section-title">
+            <h1>Hóa đơn thanh toán</h1>
+            <p>Thông tin hóa đơn đặt tour của bạn</p>
+        </div>
+
+        <section class="invoice-card">
+            <p>Đang tải thông tin hóa đơn...</p>
+        </section>
+
+        <div class="invoice-actions">
+            <button type="button" onclick="window.print()">
+                In hóa đơn
+            </button>
+
+            <a href="tours.html">Quay lại danh sách tour</a>
+        </div>
+    </main>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/invoice.js"></script>
+</body>
+</html>

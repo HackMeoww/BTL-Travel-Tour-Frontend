@@ -83,6 +83,7 @@
     </main>
 
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="../js/api.js"></script>
 
     <script>
@@ -232,6 +233,26 @@
         const bookings =
             await bookingResponse.json();
 
+// Lấy danh sách tour
+const tourResponse = await fetch(
+    `${API_BASE_URL}/Tour`,
+    {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }
+);
+
+if (!tourResponse.ok) {
+    throw new Error("Không thể lấy danh sách tour");
+}
+
+const tours = await tourResponse.json();
+
+// Tạo danh sách tra cứu tour theo TourId
+const tourMap = new Map(
+    tours.map(tour => [Number(tour.tourId), tour])
+);
 
         // =========================
         // 4. Lọc Booking của Customer
@@ -295,7 +316,15 @@
                 bookingItem.className =
                     "booking-form";
 
+const tour = tourMap.get(Number(booking.tourId));
 
+const tourName = tour
+    ? tour.tourName
+    : `Tour #${booking.tourId}`;
+
+const destination = tour
+    ? tour.destination
+    : "Chưa có thông tin";
                 bookingItem.innerHTML = `
 
                     <h2>
@@ -304,16 +333,14 @@
 
 
                     <div class="summary-item">
+    <span>Tên tour</span>
+    <strong>${tourName}</strong>
+</div>
 
-                        <span>
-                            Tour ID
-                        </span>
-
-                        <strong>
-                            ${booking.tourId}
-                        </strong>
-
-                    </div>
+<div class="summary-item">
+    <span>Điểm đến</span>
+    <strong>${destination}</strong>
+</div>
 
 
                     <div class="summary-item">
@@ -367,7 +394,7 @@
                         </span>
 
                         <strong>
-                            ${booking.status}
+                           ${formatBookingStatus(booking.status)}
                         </strong>
 
                     </div>
@@ -396,9 +423,29 @@
                 `;
 
 
-                bookingList.appendChild(
-                    bookingItem
-                );
+                
+const pdfButton = document.createElement("button");
+
+pdfButton.type = "button";
+pdfButton.className = "booking-button";
+pdfButton.textContent = "In hóa đơn";
+
+pdfButton.addEventListener("click", function () {
+    printBookingPDF({
+        ...booking,
+        tourName: tourName,
+        destination: destination
+    });
+});
+
+bookingItem.appendChild(pdfButton);
+
+
+                
+
+
+
+bookingList.appendChild(bookingItem);
 
             }
         );
@@ -453,6 +500,20 @@
 
         }
 
+// =========================
+// Chuyển trạng thái sang tiếng Việt
+// =========================
+
+function formatBookingStatus(status) {
+    const statuses = {
+        Pending: "Đang chờ xử lý",
+        Confirmed: "Đã xác nhận",
+        Cancelled: "Đã hủy",
+        Refunded: "Đã hoàn tiền"
+    };
+
+    return statuses[status] || status;
+}
 
         // =========================
         // Đăng xuất
@@ -629,6 +690,50 @@ async function cancelBooking(bookingId) {
     }
 
 }
+
+
+function printBookingPDF(booking) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const formatPrice = price =>
+        Number(price).toLocaleString("vi-VN") + " VNĐ";
+
+    const bookingDate = booking.bookingDate
+        ? new Date(booking.bookingDate).toLocaleDateString("vi-VN")
+        : "Chưa có thông tin";
+
+    const statusMap = {
+        Pending: "Đang chờ xử lý",
+        Confirmed: "Đã xác nhận",
+        Cancelled: "Đã hủy",
+        Refunded: "Đã hoàn tiền"
+    };
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("TRAVEL TOUR - HOA DON DAT TOUR", 20, 20);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+
+    doc.text(`Ma booking: ${booking.bookingId}`, 20, 40);
+    doc.text(`Ten tour: ${booking.tourName || "Tour du lich"}`, 20, 50);
+    doc.text(`Diem den: ${booking.destination || "Chua co thong tin"}`, 20, 60);
+    doc.text(`So nguoi: ${booking.numberOfPeople}`, 20, 70);
+    doc.text(`Ngay dat: ${bookingDate}`, 20, 80);
+    doc.text(`Tong tien: ${formatPrice(booking.totalPrice)}`, 20, 90);
+    doc.text(
+        `Trang thai: ${statusMap[booking.status] || booking.status}`,
+        20, 100
+    );
+
+    doc.setFontSize(10);
+    doc.text("Cam on quy khach da su dung dich vu Travel Tour!", 20, 120);
+
+    doc.save(`HoaDon_Booking_${booking.bookingId}.pdf`);
+}
+
     </script>
 
 </body>

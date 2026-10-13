@@ -173,6 +173,15 @@ let voucherPayment = null;
 
             }
 
+            const viewInvoiceButton =
+    document.getElementById("viewInvoiceButton");
+
+if (viewInvoiceButton && currentInvoiceId) {
+    viewInvoiceButton.href =
+        `invoice.html?invoiceId=${currentInvoiceId}`;
+} else if (viewInvoiceButton) {
+    viewInvoiceButton.style.display = "none";
+}
 
             if (!bookingId || !paymentId) {
 
@@ -216,6 +225,33 @@ let voucherPayment = null;
 
                 const payment =
                     await paymentResponse.json();
+
+                // Lấy hóa đơn của Booking vừa thanh toán
+const invoiceResponse = await fetch(
+    `${API_BASE_URL}/Invoice`,
+    {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }
+);
+
+if (!invoiceResponse.ok) {
+    throw new Error("Không thể lấy danh sách hóa đơn.");
+}
+
+const invoices = await invoiceResponse.json();
+
+const invoice = invoices.find(
+    item => Number(item.bookingId) === Number(bookingId)
+);
+
+if (invoice) {
+    // Lưu ID hóa đơn để gán sau khi tạo nút
+    var currentInvoiceId = invoice.invoiceId;
+} else {
+    var currentInvoiceId = null;
+}
 
 
 
@@ -355,12 +391,21 @@ voucherPayment = payment;
     </button>
 
     <a
-        href="../index.html"
-        class="payment-button"
-        style="display: inline-block; text-decoration: none;"
-    >
-        Về trang chủ
-    </a>
+    id="viewInvoiceButton"
+    href="#"
+    class="payment-button"
+    style="display: inline-block; text-decoration: none;"
+>
+    Xem hóa đơn
+</a>
+
+<a
+    href="../index.html"
+    class="payment-button"
+    style="display: inline-block; text-decoration: none;"
+>
+    Về trang chủ
+</a>
 
 </div>
 

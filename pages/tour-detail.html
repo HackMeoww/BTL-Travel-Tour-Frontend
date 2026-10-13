@@ -364,11 +364,31 @@ ${mapHTML}
         // =========================
 
         function bookingTour(tourId) {
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
 
-            window.location.href =
-                `booking.html?tourId=${tourId}`;
+    if (!token || !userData) {
+        alert("Vui lòng đăng nhập trước khi đặt tour.");
+        window.location.href = "login.html";
+        return;
+    }
 
+    try {
+        const user = JSON.parse(userData);
+
+        if (user.role !== "Customer") {
+            alert("Chỉ tài khoản khách hàng mới được đặt tour.");
+            return;
         }
+
+        window.location.href = `booking.html?tourId=${tourId}`;
+    } catch (error) {
+        alert("Thông tin đăng nhập không hợp lệ. Vui lòng đăng nhập lại.");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "login.html";
+    }
+}
 
 
         // =========================
