@@ -214,6 +214,10 @@ function filterTours() {
         maxPriceInput === ""
             ? Infinity
             : Number(maxPriceInput);
+    if (minPrice > maxPrice) {
+    alert("Giá từ không được lớn hơn giá đến.");
+    return;
+}
 
 
     const filteredTours = allTours.filter(tour => {
