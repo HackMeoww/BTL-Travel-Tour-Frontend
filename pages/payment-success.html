@@ -141,16 +141,6 @@ let voucherPayment = null;
 
             }
 
-            const viewInvoiceButton =
-    document.getElementById("viewInvoiceButton");
-
-if (viewInvoiceButton && currentInvoiceId) {
-    viewInvoiceButton.href =
-        `invoice.html?invoiceId=${currentInvoiceId}`;
-} else if (viewInvoiceButton) {
-    viewInvoiceButton.style.display = "none";
-}
-
             if (!bookingId || !paymentId) {
 
                 result.innerHTML = `
@@ -379,6 +369,14 @@ voucherPayment = payment;
 
                 `;
 
+                const viewInvoiceBtn = document.getElementById("viewInvoiceButton");
+                if (viewInvoiceBtn) {
+                    viewInvoiceBtn.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        openInvoiceModal({ invoiceId: currentInvoiceId, bookingId: bookingId });
+                    });
+                }
+
             }
             catch (error) {
 
@@ -528,6 +526,7 @@ function exportVoucher() {
         loadPayment();
     </script>
 
+    <script src="../js/invoice-modal.js"></script>
     <script src="../js/navbar.js"></script>
 </body>
 

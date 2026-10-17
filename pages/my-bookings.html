@@ -421,7 +421,7 @@ pdfButton.className = "booking-button";
 pdfButton.innerHTML = "🖨️ In hóa đơn";
 
 pdfButton.addEventListener("click", function () {
-    window.open(`invoice.html?bookingId=${booking.bookingId}`, "_blank");
+    openInvoiceModal({ bookingId: booking.bookingId });
 });
 
 bookingItem.appendChild(pdfButton);
@@ -683,9 +683,9 @@ function printBookingPDF(booking) {
 
     doc.save(`HoaDon_Booking_${booking.bookingId}.pdf`);
 }
-
     </script>
 
+    <script src="../js/invoice-modal.js"></script>
     <script src="../js/navbar.js"></script>
 </body>
 

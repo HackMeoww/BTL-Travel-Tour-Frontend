@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Tour Du lịch - Travel Tour</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <!-- Header đồng bộ tự động với navbar.js -->
+    <header class="header">
+        <div class="container navbar">
+            <a href="../index.html" class="logo">Travel Tour</a>
+
+            <nav class="menu">
+                <a href="../index.html" data-nav="home">Trang chủ</a>
+                <a href="admin-tours.html" data-nav="admin-tours">Quản lý Tour</a>
+                <a href="admin-bookings.html" data-nav="admin-bookings">Quản lý Booking</a>
+                <a href="admin.html" data-nav="admin">Dashboard</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="tour-mgmt-page">
+        <div class="container">
+
+            <!-- MÀN HÌNH CHẶN QUYỀN TRUY CẬP (NẾU KHÔNG PHẢI ADMIN) -->
+            <div id="accessDeniedSection" class="admin-denied-container" style="display: none;">
+                <div class="admin-denied-icon">🔒</div>
+                <h2>Quyền truy cập bị từ chối</h2>
+                <p id="accessDeniedMessage">
+                    Khu vực quản trị kho Tour (Thêm, Sửa, Xóa) chỉ dành cho <strong>Quản trị viên (Admin)</strong>.
+                    Vui lòng đăng nhập với tài khoản Admin để tiếp tục.
+                </p>
+                <div class="admin-denied-buttons">
+                    <a href="login.html" class="btn-admin-hero btn-primary">
+                        🔑 Đăng nhập Admin
+                    </a>
+                    <a href="../index.html" class="btn-admin-hero btn-ghost" style="color: #0369a1; border-color: #cbd5e1; background: #f8fafc;">
+                        🏠 Quay về Trang chủ
+                    </a>
+                </div>
+            </div>
+
+            <!-- GIAO DIỆN QUẢN LÝ TOUR CHÍNH -->
+            <div id="tourMainSection" style="display: none;">
+
+                <!-- HERO BANNER QUẢN TRỊ TOUR -->
+                <div class="admin-hero-card" style="margin-bottom: 24px;">
+                    <div class="admin-hero-left">
+                        <div class="admin-role-badge-tag">
+                            🏢 QUẢN TRỊ KHO TOUR & TUYẾN ĐIỂM
+                        </div>
+                        <h1>Quản lý Tour Du lịch</h1>
+                        <p>Thêm mới chương trình tour, cập nhật bảng giá, điều chỉnh thời lượng, tọa độ và xóa các tour hết hạn.</p>
+                        <div class="admin-live-time">
+                            <span>🕒</span>
+                            <span id="liveClockText">Đang đồng bộ...</span>
+                        </div>
+                    </div>
+
+                    <div class="admin-hero-actions">
+                        <button type="button" class="btn-admin-hero btn-primary" id="btnOpenAddModal" onclick="openCreateTourModal()">
+                            <span>➕</span>
+                            <span>Thêm Tour Mới</span>
+                        </button>
+                        <button type="button" class="btn-admin-hero btn-ghost" id="btnRefreshList" onclick="loadAllTours()" title="Làm mới danh sách">
+                            <span id="refreshIcon">🔄</span>
+                            <span>Làm mới</span>
+                        </button>
+                        <a href="admin.html" class="btn-admin-hero btn-ghost">
+                            <span>📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="admin-bookings.html" class="btn-admin-hero btn-ghost">
+                            <span>📑</span>
+                            <span>Quản lý Booking</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 4 THẺ CHỈ SỐ KPI TOUR -->
+                <div class="tour-stats-grid">
+                    <div class="tour-stat-card">
+                        <div class="tour-stat-icon" style="background: #e0f2fe; color: #0284c7;">🗺️</div>
+                        <div class="tour-stat-info">
+                            <div class="tour-stat-title">Tổng số Tour</div>
+                            <div class="tour-stat-val" id="statTotalTours">--</div>
+                        </div>
+                    </div>
+
+                    <div class="tour-stat-card">
+                        <div class="tour-stat-icon" style="background: #fef3c7; color: #b45309;">📍</div>
+                        <div class="tour-stat-info">
+                            <div class="tour-stat-title">Số điểm đến</div>
+                            <div class="tour-stat-val" id="statTotalDestinations">--</div>
+                        </div>
+                    </div>
+
+                    <div class="tour-stat-card">
+                        <div class="tour-stat-icon" style="background: #dcfce7; color: #15803d;">💵</div>
+                        <div class="tour-stat-info">
+                            <div class="tour-stat-title">Giá trung bình</div>
+                            <div class="tour-stat-val" id="statAvgPrice">--</div>
+                        </div>
+                    </div>
+
+                    <div class="tour-stat-card">
+                        <div class="tour-stat-icon" style="background: #ede9fe; color: #7c3aed;">⏱️</div>
+                        <div class="tour-stat-info">
+                            <div class="tour-stat-title">Thời lượng phổ biến</div>
+                            <div class="tour-stat-val" id="statCommonDuration">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- THANH TÌM KIẾM & BỘ LỌC ĐA NĂNG -->
+                <div class="booking-control-bar" style="margin-bottom: 20px;">
+                    <!-- Ô tìm kiếm tức thì -->
+                    <div class="search-input-group" style="flex: 2; min-width: 260px;">
+                        <span class="search-icon">🔍</span>
+                        <input
+                            type="text"
+                            id="tourSearchInput"
+                            placeholder="Tìm theo tên tour, điểm đến, mã #TR, mô tả..."
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <!-- Lọc theo điểm đến -->
+                    <div class="control-select-group" style="flex: 1.2; min-width: 170px;">
+                        <span class="select-prefix-icon">📍</span>
+                        <select id="filterDestinationSelect">
+                            <option value="all">Tất cả điểm đến</option>
+                        </select>
+                    </div>
+
+                    <!-- Lọc theo thời lượng -->
+                    <div class="control-select-group" style="flex: 1; min-width: 150px;">
+                        <span class="select-prefix-icon">⏱️</span>
+                        <select id="filterDurationSelect">
+                            <option value="all">Tất cả thời lượng</option>
+                            <option value="1">1 ngày (Trong ngày)</option>
+                            <option value="2">2 ngày</option>
+                            <option value="3">3 ngày</option>
+                            <option value="4">4 ngày</option>
+                            <option value="5+">5 ngày trở lên</option>
+                        </select>
+                    </div>
+
+                    <!-- Lọc theo khoảng giá -->
+                    <div class="control-select-group" style="flex: 1.2; min-width: 160px;">
+                        <span class="select-prefix-icon">💰</span>
+                        <select id="filterPriceSelect">
+                            <option value="all">Tất cả mức giá</option>
+                            <option value="under-2m">Dưới 2.000.000đ</option>
+                            <option value="2m-5m">2.000.000đ - 5.000.000đ</option>
+                            <option value="5m-10m">5.000.000đ - 10.000.000đ</option>
+                            <option value="above-10m">Trên 10.000.000đ</option>
+                        </select>
+                    </div>
+
+                    <!-- Sắp xếp -->
+                    <div class="control-select-group" style="flex: 1.2; min-width: 170px;">
+                        <span class="select-prefix-icon">🔃</span>
+                        <select id="tourSortSelect">
+                            <option value="id-desc">Mới nhất (Mã giảm dần)</option>
+                            <option value="id-asc">Cũ nhất (Mã tăng dần)</option>
+                            <option value="price-asc">Giá tăng dần</option>
+                            <option value="price-desc">Giá giảm dần</option>
+                            <option value="duration-desc">Thời lượng nhiều nhất</option>
+                            <option value="name-asc">Tên tour (A - Z)</option>
+                        </select>
+                    </div>
+
+                    <!-- Nút đặt lại -->
+                    <button type="button" class="btn-reset-filters" id="btnResetTourFilters" title="Đặt lại toàn bộ bộ lọc">
+                        ✕ Đặt lại
+                    </button>
+                </div>
+
+                <!-- BẢNG DỮ LIỆU TOUR SAAS -->
+                <div class="admin-table-card">
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 100px;">Mã Tour</th>
+                                    <th>Tên Tour Du Lịch</th>
+                                    <th style="width: 170px;">Điểm Đến</th>
+                                    <th style="width: 120px; text-align: center;">Thời Lượng</th>
+                                    <th style="width: 160px; text-align: right;">Giá Tour / Khách</th>
+                                    <th style="width: 150px; text-align: center;">Tọa Độ GPS</th>
+                                    <th style="width: 180px; text-align: center;">Hành Động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tourTableBody">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 40px 0; color: #64748b;">
+                                        <div class="invoice-spinner"></div>
+                                        <p style="margin: 0;">Đang kết nối cơ sở dữ liệu và tải danh sách tour...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- THANH ĐIỀU HƯỚNG PHÂN TRANG -->
+                <div class="pagination-container" id="paginationBar" style="display: none;">
+                    <div class="pagination-left">
+                        <span>Hiển thị</span>
+                        <strong id="pageRangeText">0 - 0</strong>
+                        <span>trên tổng số</span>
+                        <strong id="pageTotalToursText">0</strong>
+                        <span>tour</span>
+                        <span style="margin: 0 4px; color: #cbd5e1;">|</span>
+                        <span>Mỗi trang:</span>
+                        <select id="pageSizeSelect" style="padding: 4px 8px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 700; color: #0f172a; cursor: pointer;">
+                            <option value="15">15</option>
+                            <option value="25" selected>25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+
+                    <div class="pagination-controls" id="paginationButtons">
+                        <!-- Nút phân trang render bằng JS -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- ==========================================================================
+         MODAL FORM: THÊM MỚI HOẶC CHỈNH SỬA TOUR
+         ========================================================================== -->
+    <div id="tourFormModal" class="booking-modal-overlay" style="display: none;">
+        <div class="tour-modal-card">
+            <div class="booking-modal-header">
+                <h3>
+                    <span id="formModalTitleIcon">➕</span>
+                    <span id="formModalTitleText">Thêm Tour du lịch mới</span>
+                </h3>
+                <button type="button" class="btn-action-sm btn-detail" onclick="closeTourFormModal()" style="font-size: 16px; padding: 4px 10px;">✕</button>
+            </div>
+
+            <form id="tourForm" onsubmit="handleTourFormSubmit(event)">
+                <div class="tour-form-body">
+                    <!-- ID ẩn (0: thêm mới, > 0: sửa) -->
+                    <input type="hidden" id="tourIdInput" value="0">
+
+                    <div class="tour-form-grid full-col" style="margin-bottom: 16px;">
+                        <div class="form-group">
+                            <label for="tourNameInput">
+                                <span>🏷️ Tên Tour du lịch</span>
+                                <span class="req-star">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="tourNameInput"
+                                class="form-input"
+                                placeholder="Ví dụ: Tour Đà Nẵng - Hội An - Bà Nà Hills 4N3Đ Trọn Gói"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="tour-form-grid" style="margin-bottom: 16px;">
+                        <!-- Điểm đến -->
+                        <div class="form-group">
+                            <label for="tourDestinationInput">
+                                <span>📍 Điểm đến du lịch</span>
+                                <span class="req-star">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="tourDestinationInput"
+                                class="form-input"
+                                placeholder="Ví dụ: Đà Nẵng, Quảng Ninh, Phú Quốc..."
+                                required
+                            >
+                        </div>
+
+                        <!-- Thời lượng -->
+                        <div class="form-group">
+                            <label for="tourDurationInput">
+                                <span>⏱️ Thời lượng (Số ngày)</span>
+                                <span class="req-star">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                id="tourDurationInput"
+                                class="form-input"
+                                placeholder="Ví dụ: 3"
+                                min="1"
+                                max="60"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="tour-form-grid full-col" style="margin-bottom: 16px;">
+                        <!-- Giá tour -->
+                        <div class="form-group">
+                            <label for="tourPriceInput">
+                                <span>💰 Giá tour (VNĐ / Khách)</span>
+                                <span class="req-star">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                id="tourPriceInput"
+                                class="form-input"
+                                placeholder="Ví dụ: 2500000"
+                                min="0"
+                                step="10000"
+                                required
+                            >
+                            <div class="price-preview-tag" id="pricePreviewTag">
+                                💵 Hiển thị: 0 VNĐ
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tọa độ bản đồ GPS -->
+                    <div class="tour-form-grid" style="margin-bottom: 8px;">
+                        <div class="form-group">
+                            <label for="tourLatitudeInput">
+                                <span>🌐 Vĩ độ (Latitude)</span>
+                                <span class="req-star">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                id="tourLatitudeInput"
+                                class="form-input"
+                                placeholder="Ví dụ: 16.0544"
+                                step="any"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tourLongitudeInput">
+                                <span>🌐 Kinh độ (Longitude)</span>
+                                <span class="req-star">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                id="tourLongitudeInput"
+                                class="form-input"
+                                placeholder="Ví dụ: 108.2022"
+                                step="any"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Tiện ích chọn nhanh tọa độ các địa điểm nổi tiếng -->
+                    <div class="coord-presets-wrapper" style="margin-bottom: 16px;">
+                        <span class="coord-presets-title">⚡ Chọn nhanh tọa độ & điểm đến phổ biến (1-Click):</span>
+                        <div class="coord-presets-chips">
+                            <button type="button" class="coord-chip" onclick="applyCoordPreset('Hà Nội', 21.0285, 105.8542)">🏛️ Hà Nội</button>
+                            <button type="button" class="coord-chip" onclick="applyCoordPreset('Quảng Ninh', 20.9500, 107.0733)">⛵ Hạ Long</button>
+                            <button type="button" class="coord-chip" onclick="applyCoordPreset('Đà Nẵng', 16.0544, 108.2022)">🌉 Đà Nẵng</button>
+                            <button type="button" class="coord-chip" onclick="applyCoordPreset('Nha Trang', 12.2388, 109.1967)">🏖️ Nha Trang</button>
+                            <button type="button" class="coord-chip" onclick="applyCoordPreset('Đà Lạt', 11.9404, 108.4583)">🌲 Đà Lạt</button>
+                            <button type="button" class="coord-chip" onclick="applyCoordPreset('Phú Quốc', 10.2899, 103.9840)">🏝️ Phú Quốc</button>
+                            <button type="button" class="coord-chip" onclick="applyCoordPreset('Sapa', 22.3364, 103.8438)">🏔️ Sapa</button>
+                            <button type="button" class="coord-chip" onclick="applyCoordPreset('Huế', 16.4637, 107.5909)">🏯 Huế</button>
+                            <button type="button" class="coord-chip" onclick="applyCoordPreset('TP. Hồ Chí Minh', 10.8231, 106.6297)">🏙️ TP.HCM</button>
+                            <button type="button" class="coord-chip" onclick="applyCoordPreset('Ninh Bình', 20.2506, 105.9745)">🚣 Ninh Bình</button>
+                        </div>
+                    </div>
+
+                    <!-- Mô tả tour -->
+                    <div class="tour-form-grid full-col">
+                        <div class="form-group">
+                            <label for="tourDescriptionInput">
+                                <span>📝 Mô tả tour & Lịch trình tóm tắt</span>
+                            </label>
+                            <textarea
+                                id="tourDescriptionInput"
+                                class="form-textarea"
+                                placeholder="Nhập điểm tham quan nổi bật, tiện ích bao gồm, lưu ý hành trình..."
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-modal-footer">
+                    <button type="button" class="btn-action-sm btn-detail" onclick="closeTourFormModal()" style="padding: 10px 18px; font-size: 13.5px;">
+                        Hủy bỏ
+                    </button>
+                    <button type="submit" class="btn-action-sm btn-edit" id="btnSubmitTourForm" style="padding: 10px 22px; font-size: 13.5px; background: linear-gradient(135deg, #0284c7, #0369a1);">
+                        <span id="submitTourBtnText">💾 Lưu Tour</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL: XEM CHI TIẾT TOUR
+         ========================================================================== -->
+    <div id="tourDetailModal" class="booking-modal-overlay" style="display: none;">
+        <div class="booking-modal-card">
+            <div class="booking-modal-header">
+                <h3>
+                    <span>🧭 Chi tiết Tour Du lịch</span>
+                    <span id="detailModalTourCode" style="color: #0284c7; font-size: 16px;">#TR-0000</span>
+                </h3>
+                <button type="button" class="btn-action-sm btn-detail" onclick="closeTourDetailModal()" style="font-size: 16px; padding: 4px 10px;">✕</button>
+            </div>
+
+            <div class="booking-modal-body" id="detailModalBody">
+                <p>Đang tải thông tin chi tiết tour...</p>
+            </div>
+
+            <div class="booking-modal-footer" id="detailModalFooter">
+                <button type="button" class="btn-action-sm btn-detail" onclick="closeTourDetailModal()" style="padding: 9px 16px; font-size: 13px;">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div class="admin-toast-container" id="adminToastContainer"></div>
+
+    <!-- SCRIPTS CẦN THIẾT -->
+    <script src="../js/api.js"></script>
+    <script src="../js/navbar.js"></script>
+
+    <script>
+        /**
+         * admin-tours.js - Xử lý nghiệp vụ Thêm, Sửa, Xóa và quản lý danh mục Tour
+         */
+        document.addEventListener("DOMContentLoaded", function () {
+            const token = localStorage.getItem("token");
+            const userData = localStorage.getItem("user");
+            let user = null;
+
+            if (token && userData) {
+                try {
+                    user = JSON.parse(userData);
+                } catch (e) {
+                    console.error("Lỗi parse user:", e);
+                }
+            }
+
+            const accessDeniedSection = document.getElementById("accessDeniedSection");
+            const accessDeniedMessage = document.getElementById("accessDeniedMessage");
+            const tourMainSection = document.getElementById("tourMainSection");
+
+            // ==========================================
+            // 1. KIỂM SOÁT PHÂN QUYỀN (CHỈ DÀNH CHO ADMIN)
+            // ==========================================
+            if (!token || !user) {
+                accessDeniedSection.style.display = "block";
+                tourMainSection.style.display = "none";
+                accessDeniedMessage.innerHTML = "Bạn chưa đăng nhập. Vui lòng đăng nhập bằng tài khoản <strong>Quản trị viên (Admin)</strong>.";
+                return;
+            }
+
+            if (user.role !== "Admin") {
+                accessDeniedSection.style.display = "block";
+                tourMainSection.style.display = "none";
+                accessDeniedMessage.innerHTML = `Tài khoản của bạn (<strong>${user.userName || user.name}</strong>) có vai trò là <strong>${user.role || 'Khách hàng'}</strong>. Chức năng Thêm, Sửa, Xóa Tour yêu cầu quyền <strong>Admin</strong> cao nhất.`;
+                return;
+            }
+
+            // Hợp lệ -> Hiển thị trang quản lý chính
+            accessDeniedSection.style.display = "none";
+            tourMainSection.style.display = "block";
+
+            // Đồng hồ thời gian thực
+            function updateClock() {
+                const now = new Date();
+                const clockEl = document.getElementById("liveClockText");
+                if (clockEl) {
+                    clockEl.textContent = now.toLocaleDateString("vi-VN", {
+                        weekday: "long",
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric"
+                    }) + " · " + now.toLocaleTimeString("vi-VN");
+                }
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // ==========================================
+            // 2. BIẾN TRẠNG THÁI VÀ TIỆN ÍCH
+            // ==========================================
+            let allTours = [];
+            let filteredTours = [];
+            let currentPage = 1;
+            let pageSize = 25;
+
+            let currentSearchKeyword = "";
+            let currentDestinationFilter = "all";
+            let currentDurationFilter = "all";
+            let currentPriceFilter = "all";
+            let currentSortBy = "id-desc";
+
+            function formatVND(amount) {
+                if (!amount && amount !== 0) return "0 VNĐ";
+                return Number(amount).toLocaleString("vi-VN") + " VNĐ";
+            }
+
+            function escapeHtml(text) {
+                if (!text) return "";
+                return String(text)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            // Toast notification
+            window.showToast = function (message, type = "success") {
+                const container = document.getElementById("adminToastContainer");
+                if (!container) return;
+
+                const toast = document.createElement("div");
+                toast.className = `admin-toast toast-${type}`;
+                let icon = "✅";
+                if (type === "error") icon = "❌";
+                if (type === "info") icon = "ℹ️";
+
+                toast.innerHTML = `
+                    <span style="font-size: 18px;">${icon}</span>
+                    <span style="flex: 1;">${escapeHtml(message)}</span>
+                `;
+
+                container.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+                    toast.style.opacity = "0";
+                    toast.style.transform = "translateX(40px)";
+                    setTimeout(() => toast.remove(), 300);
+                }, 3500);
+            };
+
+            // Preview giá tiền live khi người dùng nhập vào ô input giá
+            const priceInput = document.getElementById("tourPriceInput");
+            const pricePreviewTag = document.getElementById("pricePreviewTag");
+            if (priceInput && pricePreviewTag) {
+                priceInput.addEventListener("input", function () {
+                    const val = Number(this.value) || 0;
+                    pricePreviewTag.textContent = `💵 Hiển thị: ${formatVND(val)}`;
+                });
+            }
+
+            // Chọn nhanh tọa độ
+            window.applyCoordPreset = function (destination, lat, lng) {
+                const destInput = document.getElementById("tourDestinationInput");
+                const latInput = document.getElementById("tourLatitudeInput");
+                const lngInput = document.getElementById("tourLongitudeInput");
+
+                if (destInput && (!destInput.value || destInput.value.trim() === "")) {
+                    destInput.value = destination;
+                }
+                if (latInput) latInput.value = lat;
+                if (lngInput) lngInput.value = lng;
+                showToast(`Đã áp dụng tọa độ ${destination} (${lat}, ${lng})`, "info");
+            };
+
+            // ==========================================
+            // 3. TẢI DỮ LIỆU TOUR TỪ API
+            // ==========================================
+            window.loadAllTours = async function () {
+                const tbody = document.getElementById("tourTableBody");
+                const refreshIcon = document.getElementById("refreshIcon");
+
+                if (refreshIcon) refreshIcon.style.animation = "invoiceSpin 0.8s linear infinite";
+
+                try {
+                    const res = await fetch(`${API_BASE_URL}/Tour`);
+                    if (!res.ok) {
+                        throw new Error(`HTTP ${res.status}: Không thể tải danh sách tour.`);
+                    }
+
+                    allTours = await res.json();
+                    if (!Array.isArray(allTours)) allTours = [];
+
+                    // Cập nhật các thống kê KPI
+                    updateStats();
+
+                    // Cập nhật dropdown danh sách điểm đến
+                    populateDestinationFilter();
+
+                    // Áp dụng bộ lọc và render bảng
+                    applyFilterAndRender();
+
+                } catch (err) {
+                    console.error("Lỗi tải tour:", err);
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px 0; color: #dc2626;">
+                                <div style="font-size: 32px; margin-bottom: 8px;">⚠️</div>
+                                <strong style="font-size: 15px;">Không thể tải dữ liệu danh sách tour!</strong>
+                                <p style="color: #64748b; font-size: 13px; margin: 6px 0 14px;">${escapeHtml(err.message)}</p>
+                                <button type="button" class="btn-action-sm btn-edit" onclick="loadAllTours()" style="padding: 7px 16px;">
+                                    🔄 Thử lại
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                } finally {
+                    if (refreshIcon) refreshIcon.style.animation = "";
+                }
+            };
+
+            // Cập nhật 4 thẻ KPI
+            function updateStats() {
+                const totalTours = allTours.length;
+                document.getElementById("statTotalTours").textContent = totalTours.toLocaleString("vi-VN") + " tour";
+
+                // Điểm đến độc nhất
+                const destinations = new Set();
+                let totalPrice = 0;
+                const durationCounts = {};
+
+                allTours.forEach(t => {
+                    if (t.destination && t.destination.trim()) {
+                        destinations.add(t.destination.trim());
+                    }
+                    totalPrice += Number(t.price) || 0;
+
+                    const d = t.duration || 1;
+                    durationCounts[d] = (durationCounts[d] || 0) + 1;
+                });
+
+                document.getElementById("statTotalDestinations").textContent = destinations.size.toLocaleString("vi-VN") + " điểm đến";
+
+                const avgPrice = totalTours > 0 ? (totalPrice / totalTours) : 0;
+                document.getElementById("statAvgPrice").textContent = formatVND(Math.round(avgPrice));
+
+                // Thời lượng phổ biến nhất
+                let mostCommonDur = 3;
+                let maxCount = 0;
+                for (const [dur, count] of Object.entries(durationCounts)) {
+                    if (count > maxCount) {
+                        maxCount = count;
+                        mostCommonDur = dur;
+                    }
+                }
+                document.getElementById("statCommonDuration").textContent = totalTours > 0 ? `${mostCommonDur} ngày` : "--";
+            }
+
+            // Điền danh sách điểm đến vào filter dropdown
+            function populateDestinationFilter() {
+                const select = document.getElementById("filterDestinationSelect");
+                if (!select) return;
+
+                const destCounts = {};
+                allTours.forEach(t => {
+                    const d = (t.destination || "").trim();
+                    if (d) destCounts[d] = (destCounts[d] || 0) + 1;
+                });
+
+                const sortedDests = Object.keys(destCounts).sort((a, b) => destCounts[b] - destCounts[a]);
+
+                let optionsHtml = `<option value="all">Tất cả điểm đến (${allTours.length})</option>`;
+                sortedDests.forEach(d => {
+                    optionsHtml += `<option value="${escapeHtml(d)}">${escapeHtml(d)} (${destCounts[d]})</option>`;
+                });
+
+                select.innerHTML = optionsHtml;
+                select.value = currentDestinationFilter;
+            }
+
+            // ==========================================
+            // 4. LỌC, SẮP XẾP & PHÂN TRANG TOUR
+            // ==========================================
+            function applyFilterAndRender(resetPage = true) {
+                if (resetPage) currentPage = 1;
+
+                let list = [...allTours];
+
+                // 1. Tìm kiếm theo từ khóa
+                if (currentSearchKeyword.trim() !== "") {
+                    const kw = currentSearchKeyword.trim().toLowerCase();
+                    list = list.filter(t => {
+                        const idStr = String(t.tourId);
+                        const name = (t.tourName || "").toLowerCase();
+                        const dest = (t.destination || "").toLowerCase();
+                        const desc = (t.description || "").toLowerCase();
+                        return idStr.includes(kw) || name.includes(kw) || dest.includes(kw) || desc.includes(kw);
+                    });
+                }
+
+                // 2. Lọc theo điểm đến
+                if (currentDestinationFilter !== "all") {
+                    list = list.filter(t => (t.destination || "").toLowerCase() === currentDestinationFilter.toLowerCase());
+                }
+
+                // 3. Lọc theo thời lượng
+                if (currentDurationFilter !== "all") {
+                    if (currentDurationFilter === "5+") {
+                        list = list.filter(t => (Number(t.duration) || 0) >= 5);
+                    } else {
+                        const targetD = Number(currentDurationFilter);
+                        list = list.filter(t => (Number(t.duration) || 0) === targetD);
+                    }
+                }
+
+                // 4. Lọc theo khoảng giá
+                if (currentPriceFilter !== "all") {
+                    if (currentPriceFilter === "under-2m") {
+                        list = list.filter(t => Number(t.price) < 2000000);
+                    } else if (currentPriceFilter === "2m-5m") {
+                        list = list.filter(t => Number(t.price) >= 2000000 && Number(t.price) <= 5000000);
+                    } else if (currentPriceFilter === "5m-10m") {
+                        list = list.filter(t => Number(t.price) > 5000000 && Number(t.price) <= 10000000);
+                    } else if (currentPriceFilter === "above-10m") {
+                        list = list.filter(t => Number(t.price) > 10000000);
+                    }
+                }
+
+                // 5. Sắp xếp
+                list.sort((a, b) => {
+                    switch (currentSortBy) {
+                        case "id-desc":
+                            return Number(b.tourId) - Number(a.tourId);
+                        case "id-asc":
+                            return Number(a.tourId) - Number(b.tourId);
+                        case "price-asc":
+                            return (Number(a.price) || 0) - (Number(b.price) || 0);
+                        case "price-desc":
+                            return (Number(b.price) || 0) - (Number(a.price) || 0);
+                        case "duration-desc":
+                            return (Number(b.duration) || 0) - (Number(a.duration) || 0);
+                        case "name-asc":
+                            return (a.tourName || "").localeCompare(b.tourName || "", "vi");
+                        default:
+                            return Number(b.tourId) - Number(a.tourId);
+                    }
+                });
+
+                filteredTours = list;
+                renderTourTable();
+                renderPagination();
+            }
+
+            // Render bảng dữ liệu
+            function renderTourTable() {
+                const tbody = document.getElementById("tourTableBody");
+                if (!tbody) return;
+
+                if (filteredTours.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 48px 0; color: #64748b;">
+                                <div style="font-size: 36px; margin-bottom: 8px;">🔍</div>
+                                <strong style="font-size: 15px; color: #0f172a;">Không tìm thấy tour du lịch nào phù hợp!</strong>
+                                <p style="font-size: 13px; margin: 4px 0 16px;">Vui lòng thử tìm từ khóa khác hoặc bấm nút đặt lại bộ lọc.</p>
+                                <button type="button" class="btn-action-sm btn-detail" onclick="document.getElementById('btnResetTourFilters').click()">
+                                    ✕ Xóa bộ lọc
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                // Phân trang
+                const startIndex = (currentPage - 1) * pageSize;
+                const endIndex = Math.min(startIndex + pageSize, filteredTours.length);
+                const pageTours = filteredTours.slice(startIndex, endIndex);
+
+                let html = "";
+                pageTours.forEach(tour => {
+                    const tid = tour.tourId;
+                    const code = `#TR-${String(tid).padStart(4, "0")}`;
+                    const name = tour.tourName || `Chương trình Tour #${tid}`;
+                    const dest = tour.destination || "Việt Nam";
+                    const duration = tour.duration || 1;
+                    const price = tour.price || 0;
+                    const lat = Number(tour.latitude || 0).toFixed(4);
+                    const lng = Number(tour.longitude || 0).toFixed(4);
+
+                    html += `
+                        <tr>
+                            <td style="font-weight: 800; color: #0284c7; white-space: nowrap;">
+                                ${code}
+                            </td>
+                            <td>
+                                <div style="font-weight: 700; color: #0f172a; font-size: 14px; margin-bottom: 4px;">
+                                    ${escapeHtml(name)}
+                                </div>
+                                <div style="font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 8px;">
+                                    <span style="background: #e2e8f0; color: #334155; padding: 1px 7px; border-radius: 4px; font-weight: 600;">
+                                        ⏱️ ${duration} ngày
+                                    </span>
+                                    <a href="tour-detail.html?id=${tid}" target="_blank" style="color: #0284c7; text-decoration: none; font-weight: 600;">
+                                        Xem trang khách ↗
+                                    </a>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-status status-confirmed" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">
+                                    📍 ${escapeHtml(dest)}
+                                </span>
+                            </td>
+                            <td style="text-align: center; font-weight: 700; color: #334155;">
+                                ${duration} ngày
+                            </td>
+                            <td style="text-align: right; font-weight: 800; color: #087db5; font-size: 14.5px; white-space: nowrap;">
+                                ${formatVND(price)}
+                            </td>
+                            <td style="text-align: center; font-size: 11.5px; color: #64748b; font-family: monospace;">
+                                <div>Lat: ${lat}</div>
+                                <div>Lng: ${lng}</div>
+                            </td>
+                            <td style="text-align: center; white-space: nowrap;">
+                                <div style="display: inline-flex; gap: 5px; justify-content: center;">
+                                    <button type="button" class="btn-action-sm btn-view" onclick="showTourDetail(${tid})" title="Xem chi tiết tour">
+                                        👁️ Xem
+                                    </button>
+                                    <button type="button" class="btn-action-sm btn-edit" onclick="openEditTourModal(${tid})" title="Chỉnh sửa thông tin tour">
+                                        ✏️ Sửa
+                                    </button>
+                                    <button type="button" class="btn-action-sm btn-delete" onclick="deleteTourAction(${tid})" title="Xóa tour">
+                                        🗑️ Xóa
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = html;
+            }
+
+            // Render điều khiển phân trang
+            function renderPagination() {
+                const paginationBar = document.getElementById("paginationBar");
+                const pageRangeText = document.getElementById("pageRangeText");
+                const pageTotalToursText = document.getElementById("pageTotalToursText");
+                const paginationButtons = document.getElementById("paginationButtons");
+
+                if (!paginationBar || !paginationButtons) return;
+
+                const total = filteredTours.length;
+                if (total === 0) {
+                    paginationBar.style.display = "none";
+                    return;
+                }
+
+                paginationBar.style.display = "flex";
+
+                const totalPages = Math.ceil(total / pageSize);
+                const startIndex = (currentPage - 1) * pageSize + 1;
+                const endIndex = Math.min(currentPage * pageSize, total);
+
+                pageRangeText.textContent = `${startIndex} - ${endIndex}`;
+                pageTotalToursText.textContent = total.toLocaleString("vi-VN");
+
+                let btnHtml = "";
+
+                // Nút Đầu & Trước
+                btnHtml += `
+                    <button type="button" class="page-btn" ${currentPage === 1 ? "disabled" : ""} onclick="goToPage(1)" title="Trang đầu">«</button>
+                    <button type="button" class="page-btn" ${currentPage === 1 ? "disabled" : ""} onclick="goToPage(${currentPage - 1})" title="Trang trước">‹</button>
+                `;
+
+                // Thuật toán hiển thị các trang xung quanh currentPage
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+
+                if (startPage > 1) {
+                    btnHtml += `<button type="button" class="page-btn" onclick="goToPage(1)">1</button>`;
+                    if (startPage > 2) btnHtml += `<span style="padding: 0 4px; color: #94a3b8;">…</span>`;
+                }
+
+                for (let p = startPage; p <= endPage; p++) {
+                    btnHtml += `
+                        <button type="button" class="page-btn ${p === currentPage ? "active" : ""}" onclick="goToPage(${p})">
+                            ${p}
+                        </button>
+                    `;
+                }
+
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) btnHtml += `<span style="padding: 0 4px; color: #94a3b8;">…</span>`;
+                    btnHtml += `<button type="button" class="page-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+                }
+
+                // Nút Sau & Cuối
+                btnHtml += `
+                    <button type="button" class="page-btn" ${currentPage === totalPages ? "disabled" : ""} onclick="goToPage(${currentPage + 1})" title="Trang sau">›</button>
+                    <button type="button" class="page-btn" ${currentPage === totalPages ? "disabled" : ""} onclick="goToPage(${totalPages})" title="Trang cuối">»</button>
+                `;
+
+                paginationButtons.innerHTML = btnHtml;
+            }
+
+            window.goToPage = function (page) {
+                const totalPages = Math.ceil(filteredTours.length / pageSize);
+                if (page < 1 || page > totalPages) return;
+                currentPage = page;
+                renderTourTable();
+                renderPagination();
+                window.scrollTo({ top: 340, behavior: "smooth" });
+            };
+
+            // ==========================================
+            // 5. THÊM & SỬA TOUR (MODAL & API CALLS)
+            // ==========================================
+
+            // Mở modal thêm tour mới
+            window.openCreateTourModal = function () {
+                const modal = document.getElementById("tourFormModal");
+                const form = document.getElementById("tourForm");
+                if (!modal || !form) return;
+
+                form.reset();
+                document.getElementById("tourIdInput").value = "0";
+                document.getElementById("formModalTitleIcon").textContent = "➕";
+                document.getElementById("formModalTitleText").textContent = "Thêm Tour du lịch mới";
+                document.getElementById("submitTourBtnText").textContent = "💾 Tạo Tour Mới";
+
+                // Đặt mặc định
+                document.getElementById("tourDurationInput").value = "3";
+                document.getElementById("tourPriceInput").value = "2500000";
+                document.getElementById("tourLatitudeInput").value = "16.0544";
+                document.getElementById("tourLongitudeInput").value = "108.2022";
+                document.getElementById("tourDestinationInput").value = "Đà Nẵng";
+                document.getElementById("pricePreviewTag").textContent = `💵 Hiển thị: ${formatVND(2500000)}`;
+
+                modal.style.display = "flex";
+                document.body.classList.add("invoice-modal-open");
+                document.getElementById("tourNameInput").focus();
+            };
+
+            // Mở modal sửa tour
+            window.openEditTourModal = function (tourId) {
+                const tour = allTours.find(t => Number(t.tourId) === Number(tourId));
+                if (!tour) {
+                    showToast("Không tìm thấy thông tin tour cần sửa!", "error");
+                    return;
+                }
+
+                const modal = document.getElementById("tourFormModal");
+                if (!modal) return;
+
+                document.getElementById("tourIdInput").value = tour.tourId;
+                document.getElementById("formModalTitleIcon").textContent = "✏️";
+                document.getElementById("formModalTitleText").textContent = `Chỉnh sửa Tour #TR-${String(tour.tourId).padStart(4, "0")}`;
+                document.getElementById("submitTourBtnText").textContent = "💾 Cập Nhật Tour";
+
+                document.getElementById("tourNameInput").value = tour.tourName || "";
+                document.getElementById("tourDestinationInput").value = tour.destination || "";
+                document.getElementById("tourDurationInput").value = tour.duration || 1;
+                document.getElementById("tourPriceInput").value = tour.price || 0;
+                document.getElementById("tourLatitudeInput").value = tour.latitude || 0;
+                document.getElementById("tourLongitudeInput").value = tour.longitude || 0;
+                document.getElementById("tourDescriptionInput").value = tour.description || "";
+
+                document.getElementById("pricePreviewTag").textContent = `💵 Hiển thị: ${formatVND(tour.price || 0)}`;
+
+                modal.style.display = "flex";
+                document.body.classList.add("invoice-modal-open");
+                document.getElementById("tourNameInput").focus();
+            };
+
+            // Đóng modal Thêm / Sửa
+            window.closeTourFormModal = function () {
+                const modal = document.getElementById("tourFormModal");
+                if (modal) modal.style.display = "none";
+                document.body.classList.remove("invoice-modal-open");
+            };
+
+            // Submit Form (POST nếu ID = 0, PUT nếu ID > 0)
+            window.handleTourFormSubmit = async function (e) {
+                e.preventDefault();
+
+                const tourId = Number(document.getElementById("tourIdInput").value) || 0;
+                const isNew = tourId === 0;
+
+                const tourName = document.getElementById("tourNameInput").value.trim();
+                const destination = document.getElementById("tourDestinationInput").value.trim();
+                const duration = parseInt(document.getElementById("tourDurationInput").value, 10) || 1;
+                const price = parseFloat(document.getElementById("tourPriceInput").value) || 0;
+                const latitude = parseFloat(document.getElementById("tourLatitudeInput").value) || 0;
+                const longitude = parseFloat(document.getElementById("tourLongitudeInput").value) || 0;
+                const description = document.getElementById("tourDescriptionInput").value.trim();
+
+                if (!tourName) {
+                    alert("Vui lòng nhập tên tour du lịch!");
+                    return;
+                }
+                if (!destination) {
+                    alert("Vui lòng nhập điểm đến du lịch!");
+                    return;
+                }
+
+                const payload = {
+                    tourName,
+                    destination,
+                    duration,
+                    price,
+                    latitude,
+                    longitude,
+                    description
+                };
+
+                if (!isNew) {
+                    payload.tourId = tourId;
+                }
+
+                const btnSubmit = document.getElementById("btnSubmitTourForm");
+                const submitText = document.getElementById("submitTourBtnText");
+                const originalText = submitText.textContent;
+
+                btnSubmit.disabled = true;
+                submitText.textContent = "⏳ Đang lưu dữ liệu...";
+
+                try {
+                    const url = isNew ? `${API_BASE_URL}/Tour` : `${API_BASE_URL}/Tour/${tourId}`;
+                    const method = isNew ? "POST" : "PUT";
+
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            "Content-Type": "application/json; charset=utf-8",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        let errMsg = "Thao tác không thành công";
+                        try {
+                            const errData = await response.json();
+                            if (errData && errData.message) errMsg = errData.message;
+                        } catch (_) {}
+                        throw new Error(`HTTP ${response.status}: ${errMsg}`);
+                    }
+
+                    if (isNew) {
+                        const createdTour = await response.json();
+                        showToast(`Thêm tour mới thành công! (Mã #TR-${createdTour.tourId})`, "success");
+                    } else {
+                        showToast(`Cập nhật tour #${tourId} thành công!`, "success");
+                    }
+
+                    closeTourFormModal();
+
+                    // Tải lại dữ liệu mới nhất từ server
+                    await loadAllTours();
+
+                } catch (err) {
+                    console.error("Lỗi lưu tour:", err);
+                    alert(`Lỗi: ${err.message}`);
+                } finally {
+                    btnSubmit.disabled = false;
+                    submitText.textContent = originalText;
+                }
+            };
+
+            // ==========================================
+            // 6. XÓA TOUR (DELETE TOUR)
+            // ==========================================
+            window.deleteTourAction = async function (tourId) {
+                const tour = allTours.find(t => Number(t.tourId) === Number(tourId));
+                const tourName = tour ? tour.tourName : `#${tourId}`;
+
+                const confirmMsg = `Bạn có chắc chắn muốn XÓA tour sau đây không?\n\n- Mã Tour: #TR-${tourId}\n- Tên Tour: "${tourName}"\n\n⚠️ Lưu ý: Thao tác này không thể hoàn tác!`;
+                if (!confirm(confirmMsg)) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/Tour/${tourId}`, {
+                        method: "DELETE",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        let errMsg = "Không thể xóa tour này";
+                        try {
+                            const errData = await response.json();
+                            if (errData && errData.message) errMsg = errData.message;
+                        } catch (_) {}
+                        throw new Error(errMsg);
+                    }
+
+                    showToast(`Đã xóa thành công tour #TR-${tourId}!`, "success");
+
+                    // Tải lại danh sách
+                    await loadAllTours();
+
+                } catch (err) {
+                    console.error("Lỗi xóa tour:", err);
+                    alert(`❌ Lỗi khi xóa: ${err.message}`);
+                }
+            };
+
+            // ==========================================
+            // 7. XEM CHI TIẾT TOUR (MODAL)
+            // ==========================================
+            window.showTourDetail = function (tourId) {
+                const tour = allTours.find(t => Number(t.tourId) === Number(tourId));
+                if (!tour) return;
+
+                const modal = document.getElementById("tourDetailModal");
+                const codeEl = document.getElementById("detailModalTourCode");
+                const bodyEl = document.getElementById("detailModalBody");
+                const footerEl = document.getElementById("detailModalFooter");
+
+                codeEl.textContent = `#TR-${String(tour.tourId).padStart(4, "0")}`;
+
+                bodyEl.innerHTML = `
+                    <div style="margin-bottom: 20px;">
+                        <span style="background: #e0f2fe; color: #0284c7; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                            📍 ${escapeHtml(tour.destination)}
+                        </span>
+                        <h2 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 10px 0 6px;">
+                            ${escapeHtml(tour.tourName)}
+                        </h2>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px;">
+                        <div style="background: #f8fafc; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Giá tour / khách</div>
+                            <div style="font-size: 18px; font-weight: 800; color: #0284c7; margin-top: 4px;">${formatVND(tour.price)}</div>
+                        </div>
+
+                        <div style="background: #f8fafc; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Thời lượng hành trình</div>
+                            <div style="font-size: 18px; font-weight: 800; color: #0f172a; margin-top: 4px;">⏱️ ${tour.duration} ngày</div>
+                        </div>
+
+                        <div style="background: #f8fafc; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Tọa độ bản đồ (GPS)</div>
+                            <div style="font-size: 13.5px; font-weight: 700; color: #475569; margin-top: 6px;">
+                                Lat: ${tour.latitude} | Lng: ${tour.longitude}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px;">
+                        <div style="font-size: 12px; font-weight: 800; color: #0284c7; text-transform: uppercase; margin-bottom: 8px;">
+                            📝 Mô tả chi tiết & Điểm nhấn tour
+                        </div>
+                        <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0; white-space: pre-line;">
+                            ${escapeHtml(tour.description || "Chưa có mô tả chi tiết cho tour này.")}
+                        </p>
+                    </div>
+                `;
+
+                footerEl.innerHTML = `
+                    <a href="tour-detail.html?id=${tour.tourId}" target="_blank" class="btn-action-sm btn-view" style="padding: 9px 16px; font-size: 13px; text-decoration: none;">
+                        🌐 Xem trang khách ↗
+                    </a>
+                    <button type="button" class="btn-action-sm btn-edit" onclick="closeTourDetailModal(); openEditTourModal(${tour.tourId});" style="padding: 9px 16px; font-size: 13px;">
+                        ✏️ Sửa tour này
+                    </button>
+                    <button type="button" class="btn-action-sm btn-detail" onclick="closeTourDetailModal()" style="padding: 9px 16px; font-size: 13px;">
+                        Đóng
+                    </button>
+                `;
+
+                modal.style.display = "flex";
+                document.body.classList.add("invoice-modal-open");
+            };
+
+            window.closeTourDetailModal = function () {
+                const modal = document.getElementById("tourDetailModal");
+                if (modal) modal.style.display = "none";
+                document.body.classList.remove("invoice-modal-open");
+            };
+
+            // ==========================================
+            // 8. SỰ KIỆN TÌM KIẾM & BỘ LỌC
+            // ==========================================
+
+            // Tìm kiếm real-time có debounce
+            const searchInput = document.getElementById("tourSearchInput");
+            if (searchInput) {
+                let debounceTimer = null;
+                searchInput.addEventListener("input", function () {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        currentSearchKeyword = this.value;
+                        applyFilterAndRender();
+                    }, 250);
+                });
+            }
+
+            // Lọc điểm đến
+            const destSelect = document.getElementById("filterDestinationSelect");
+            if (destSelect) {
+                destSelect.addEventListener("change", function () {
+                    currentDestinationFilter = this.value;
+                    applyFilterAndRender();
+                });
+            }
+
+            // Lọc thời lượng
+            const durationSelect = document.getElementById("filterDurationSelect");
+            if (durationSelect) {
+                durationSelect.addEventListener("change", function () {
+                    currentDurationFilter = this.value;
+                    applyFilterAndRender();
+                });
+            }
+
+            // Lọc mức giá
+            const priceSelect = document.getElementById("filterPriceSelect");
+            if (priceSelect) {
+                priceSelect.addEventListener("change", function () {
+                    currentPriceFilter = this.value;
+                    applyFilterAndRender();
+                });
+            }
+
+            // Sắp xếp
+            const sortSelect = document.getElementById("tourSortSelect");
+            if (sortSelect) {
+                sortSelect.addEventListener("change", function () {
+                    currentSortBy = this.value;
+                    applyFilterAndRender();
+                });
+            }
+
+            // Đổi số bản ghi mỗi trang
+            const pageSizeSelect = document.getElementById("pageSizeSelect");
+            if (pageSizeSelect) {
+                pageSizeSelect.addEventListener("change", function () {
+                    pageSize = Number(this.value) || 25;
+                    applyFilterAndRender();
+                });
+            }
+
+            // Nút đặt lại bộ lọc
+            const btnReset = document.getElementById("btnResetTourFilters");
+            if (btnReset) {
+                btnReset.addEventListener("click", function () {
+                    if (searchInput) searchInput.value = "";
+                    if (destSelect) destSelect.value = "all";
+                    if (durationSelect) durationSelect.value = "all";
+                    if (priceSelect) priceSelect.value = "all";
+                    if (sortSelect) sortSelect.value = "id-desc";
+
+                    currentSearchKeyword = "";
+                    currentDestinationFilter = "all";
+                    currentDurationFilter = "all";
+                    currentPriceFilter = "all";
+                    currentSortBy = "id-desc";
+
+                    applyFilterAndRender();
+                });
+            }
+
+            // Đóng modal khi bấm ra vùng mờ overlay ngoài
+            document.querySelectorAll(".booking-modal-overlay").forEach(overlay => {
+                overlay.addEventListener("click", function (e) {
+                    if (e.target === overlay) {
+                        closeTourFormModal();
+                        closeTourDetailModal();
+                    }
+                });
+            });
+
+            // Tải dữ liệu ban đầu
+            loadAllTours();
+        });
+    </script>
+</body>
+</html>

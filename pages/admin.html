@@ -3,58 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - Travel Tour</title>
+    <title>Dashboard Quản trị - Travel Tour</title>
     <link rel="stylesheet" href="../css/style.css">
-
-    <style>
-        .dashboard-page {
-            padding: 40px 0;
-            min-height: 70vh;
-        }
-
-        .dashboard-title {
-            margin-bottom: 30px;
-        }
-
-        .dashboard-cards {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 20px;
-        }
-
-        .dashboard-card {
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .dashboard-card h3 {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 15px;
-        }
-
-        .dashboard-number {
-            font-size: 28px;
-            font-weight: bold;
-            color: #087eae;
-            overflow-wrap: anywhere;
-        }
-
-        .dashboard-message {
-            margin-top: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-cards {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <!-- Chart.js Thư viện biểu đồ chuẩn quốc tế -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
+    <!-- Header đồng bộ -->
     <header class="header">
         <div class="container navbar">
             <a href="../index.html" class="logo">Travel Tour</a>
@@ -67,96 +23,746 @@
         </div>
     </header>
 
-    <main>
-        <section class="dashboard-page">
-            <div class="container">
-                <div class="dashboard-title">
-                    <h1>Dashboard quản trị</h1>
-                    <p>Tổng quan tình hình hoạt động của Travel Tour.</p>
-                </div>
+    <main class="admin-dashboard-page">
+        <div class="container">
 
-                <div class="dashboard-cards">
-                    <div class="dashboard-card">
-                        <h3>Tổng khách hàng</h3>
-                        <div class="dashboard-number" id="totalCustomers">--</div>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <h3>Tổng booking</h3>
-                        <div class="dashboard-number" id="totalBookings">--</div>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <h3>Tổng doanh thu</h3>
-                        <div class="dashboard-number" id="totalRevenue">--</div>
-                    </div>
-                </div>
-
-                <p id="dashboardMessage" class="dashboard-message">
-                    Đang tải dữ liệu...
+            <!-- MÀN HÌNH CHẶN QUYỀN KHI KHÔNG PHẢI ADMIN -->
+            <div id="accessDeniedSection" class="admin-denied-container" style="display: none;">
+                <div class="admin-denied-icon">🔒</div>
+                <h2>Quyền truy cập bị từ chối</h2>
+                <p id="accessDeniedMessage">
+                    Trang Dashboard này chỉ dành riêng cho <strong>Quản trị viên (Admin)</strong>.
+                    Vui lòng đăng nhập bằng tài khoản có thẩm quyền để xem và quản lý hệ thống.
                 </p>
+                <div class="admin-denied-buttons">
+                    <a href="login.html" class="btn-admin-hero btn-primary">
+                        🔑 Đăng nhập tài khoản Admin
+                    </a>
+                    <a href="../index.html" class="btn-admin-hero btn-ghost" style="color: #0369a1; border-color: #cbd5e1; background: #f8fafc;">
+                        🏠 Quay về Trang chủ
+                    </a>
+                </div>
             </div>
-        </section>
+
+            <!-- GIAO DIỆN DASHBOARD CHÍNH CHO ADMIN -->
+            <div id="dashboardMainSection" style="display: none;">
+
+                <!-- HERO BANNER CHÀO MỪNG -->
+                <div class="admin-hero-card">
+                    <div class="admin-hero-left">
+                        <div class="admin-role-badge-tag">
+                            🛡️ HỆ THỐNG ĐIỀU HÀNH ADMIN
+                        </div>
+                        <h1>Xin chào, <span id="adminGreetingName">Quản trị viên</span>! 👋</h1>
+                        <p>Tổng quan tình hình kinh doanh, doanh thu và các đơn đặt tour theo thời gian thực.</p>
+                        <div class="admin-live-time">
+                            <span>🕒</span>
+                            <span id="liveTimeText">Đang đồng bộ thời gian...</span>
+                        </div>
+                    </div>
+
+                    <div class="admin-hero-actions">
+                        <button type="button" class="btn-admin-hero btn-ghost" id="btnRefreshDashboard" title="Làm mới dữ liệu">
+                            <span id="refreshIcon">🔄</span>
+                            <span>Làm mới dữ liệu</span>
+                        </button>
+                        <a href="admin-bookings.html" class="btn-admin-hero btn-primary">
+                            <span>📑</span>
+                            <span>Quản lý Booking</span>
+                        </a>
+                        <a href="admin-tours.html" class="btn-admin-hero btn-ghost">
+                            <span>🧭</span>
+                            <span>Quản lý Tour</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 4 THẺ CHỈ SỐ KPI TỔNG QUAN -->
+                <div class="admin-stats-grid">
+                    <!-- Doanh thu -->
+                    <div class="admin-stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-title">Tổng doanh thu</span>
+                            <div class="stat-card-icon icon-revenue">💰</div>
+                        </div>
+                        <div class="stat-card-value" id="statRevenue">-- VNĐ</div>
+                        <div class="stat-card-subtext">
+                            <span>✓</span>
+                            <span>Từ các đơn đã hoàn tất thanh toán</span>
+                        </div>
+                    </div>
+
+                    <!-- Tổng đơn booking -->
+                    <div class="admin-stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-title">Tổng đơn đặt tour</span>
+                            <div class="stat-card-icon icon-bookings">🎫</div>
+                        </div>
+                        <div class="stat-card-value" id="statBookings">-- đơn</div>
+                        <div class="stat-card-subtext">
+                            <span class="highlight" id="statBookingSuccessRate">--%</span>
+                            <span>tỉ lệ hoàn thành thành công</span>
+                        </div>
+                    </div>
+
+                    <!-- Khách hàng -->
+                    <div class="admin-stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-title">Tổng khách hàng</span>
+                            <div class="stat-card-icon icon-customers">👥</div>
+                        </div>
+                        <div class="stat-card-value" id="statCustomers">-- khách</div>
+                        <div class="stat-card-subtext">
+                            <span>👤</span>
+                            <span>Khách hàng thành viên đã đăng ký</span>
+                        </div>
+                    </div>
+
+                    <!-- Tour đang mở bán -->
+                    <div class="admin-stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-title">Tour đang mở bán</span>
+                            <div class="stat-card-icon icon-tours">🏖️</div>
+                        </div>
+                        <div class="stat-card-value" id="statTours">-- tour</div>
+                        <div class="stat-card-subtext">
+                            <span>🌍</span>
+                            <span>Hành trình trong và ngoài nước</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TÌNH TRẠNG & THANH PHÂN BỔ ĐƠN TOUR (HEALTH DISTRIBUTION) -->
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <div>
+                            <h2>📊 Tình trạng phân bổ đơn đặt tour</h2>
+                            <div class="admin-card-subtitle">Tỉ lệ hoàn tất, đang chờ xử lý và đơn đã hủy trong hệ thống</div>
+                        </div>
+                        <div id="bookingHealthTotalText" style="font-weight: 700; color: #0284c7; font-size: 14px;">
+                            Tổng cộng: -- đơn
+                        </div>
+                    </div>
+
+                    <div class="booking-health-bar">
+                        <div class="health-segment segment-confirmed" id="healthConfirmed" style="width: 0%;" title="Đã xác nhận"></div>
+                        <div class="health-segment segment-pending" id="healthPending" style="width: 0%;" title="Chờ xử lý"></div>
+                        <div class="health-segment segment-cancelled" id="healthCancelled" style="width: 0%;" title="Đã hủy"></div>
+                    </div>
+
+                    <div class="booking-health-legend">
+                        <div class="health-legend-item">
+                            <span class="health-dot dot-confirmed"></span>
+                            <span><strong>Đã xác nhận:</strong> <span id="legendConfirmedCount">0</span> đơn (<span id="legendConfirmedPercent">0%</span>)</span>
+                        </div>
+                        <div class="health-legend-item">
+                            <span class="health-dot dot-pending"></span>
+                            <span><strong>Đang chờ duyệt:</strong> <span id="legendPendingCount">0</span> đơn (<span id="legendPendingPercent">0%</span>)</span>
+                        </div>
+                        <div class="health-legend-item">
+                            <span class="health-dot dot-cancelled"></span>
+                            <span><strong>Đã hủy / Hoàn tiền:</strong> <span id="legendCancelledCount">0</span> đơn (<span id="legendCancelledPercent">0%</span>)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KHU VỰC BIỂU ĐỒ TRỰC QUAN -->
+                <div class="admin-charts-grid">
+                    <!-- Biểu đồ phân bổ trạng thái (Doughnut) -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <h2>🍩 Cơ cấu trạng thái Booking</h2>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="statusDoughnutChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Biểu đồ doanh thu theo tour (Bar Chart) -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <h2>📈 Doanh thu theo Tour hàng đầu</h2>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="topToursBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KHU VỰC 2 CỘT: TOP TOUR BÁN CHẠY & PHÍM TẮT HỆ THỐNG -->
+                <div class="admin-charts-grid">
+                    <!-- Top Tour bán chạy -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <h2>🏆 Top Tour được đặt nhiều nhất</h2>
+                            <a href="admin-tours.html" style="font-size: 13px; color: #0284c7; text-decoration: none; font-weight: 700;">Xem tất cả →</a>
+                        </div>
+                        <div class="admin-top-tours-list" id="topToursListContainer">
+                            <p style="color: #64748b; font-size: 13.5px; text-align: center; padding: 20px 0;">Đang tính toán bảng xếp hạng...</p>
+                        </div>
+                    </div>
+
+                    <!-- Phím tắt quản trị & Tiện ích -->
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <h2>⚡ Phím tắt & Tiện ích quản trị</h2>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 14px;">
+                            <a href="admin-bookings.html" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; text-decoration: none; color: inherit; transition: all 0.2s;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <span style="font-size: 22px;">📑</span>
+                                    <div>
+                                        <strong style="color: #0f172a; font-size: 14px;">Duyệt đơn đặt tour & Hoàn tiền</strong>
+                                        <div style="font-size: 12px; color: #64748b;">Xem danh sách chi tiết, đổi trạng thái và xử lý yêu cầu khách hàng</div>
+                                    </div>
+                                </div>
+                                <span style="color: #0284c7; font-weight: 700;">Mở →</span>
+                            </a>
+
+                            <a href="admin-tours.html" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; text-decoration: none; color: inherit; transition: all 0.2s;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <span style="font-size: 22px;">🧭</span>
+                                    <div>
+                                        <strong style="color: #0f172a; font-size: 14px;">Quản lý kho Tour & Tuyến điểm</strong>
+                                        <div style="font-size: 12px; color: #64748b;">Khám phá các tour hiện hành, thêm mới, sửa và xóa tour</div>
+                                    </div>
+                                </div>
+                                <span style="color: #0284c7; font-weight: 700;">Mở →</span>
+                            </a>
+
+                            <a href="../index.html" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; text-decoration: none; color: inherit; transition: all 0.2s;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <span style="font-size: 22px;">🌐</span>
+                                    <div>
+                                        <strong style="color: #0f172a; font-size: 14px;">Xem trang chủ người dùng</strong>
+                                        <div style="font-size: 12px; color: #64748b;">Trải nghiệm giao diện đặt tour của khách hàng</div>
+                                    </div>
+                                </div>
+                                <span style="color: #0284c7; font-weight: 700;">Mở →</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BẢNG ĐƠN ĐẶT TOUR MỚI NHẤT (RECENT BOOKINGS) -->
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <div>
+                            <h2>🕒 Đơn đặt tour mới nhất</h2>
+                            <div class="admin-card-subtitle">Cập nhật danh sách các đơn booking vừa phát sinh trên hệ thống</div>
+                        </div>
+                        <a href="admin-bookings.html" class="btn-table-action btn-manage" style="padding: 8px 14px; font-size: 13px;">
+                            Xem tất cả đơn booking →
+                        </a>
+                    </div>
+
+                    <div class="admin-table-container">
+                        <table class="admin-data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 100px;">Mã đơn</th>
+                                    <th>Khách hàng</th>
+                                    <th>Tour du lịch & Điểm đến</th>
+                                    <th>Thời gian đặt</th>
+                                    <th style="text-align: center;">Số khách</th>
+                                    <th style="text-align: right;">Tổng tiền</th>
+                                    <th style="text-align: center;">Trạng thái</th>
+                                    <th style="text-align: center; width: 140px;">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentBookingsTbody">
+                                <tr>
+                                    <td colspan="8" style="text-align: center; padding: 30px; color: #64748b;">
+                                        Đang tải danh sách booking...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
     </main>
 
+    <!-- Scripts cần thiết -->
     <script src="../js/api.js"></script>
+    <script src="../js/invoice-modal.js"></script>
+    <script src="../js/navbar.js"></script>
 
     <script>
-        const token = localStorage.getItem("token");
-        const dashboardMessage = document.getElementById("dashboardMessage");
+        /**
+         * admin.js logic tích hợp trực tiếp trong admin.html
+         */
+        document.addEventListener("DOMContentLoaded", function () {
+            const token = localStorage.getItem("token");
+            const userData = localStorage.getItem("user");
+            let user = null;
 
-        async function loadDashboard() {
-            if (!token) {
-                dashboardMessage.textContent =
-                    "Vui lòng đăng nhập bằng tài khoản Admin để xem thống kê.";
+            if (token && userData) {
+                try {
+                    user = JSON.parse(userData);
+                } catch (e) {
+                    console.error("Lỗi parse user:", e);
+                }
+            }
+
+            const accessDeniedSection = document.getElementById("accessDeniedSection");
+            const accessDeniedMessage = document.getElementById("accessDeniedMessage");
+            const dashboardMainSection = document.getElementById("dashboardMainSection");
+
+            // ==========================================
+            // 1. KIỂM TRA BẢO MẬT & QUYỀN HẠN ADMIN
+            // ==========================================
+            if (!token || !user) {
+                accessDeniedSection.style.display = "block";
+                dashboardMainSection.style.display = "none";
+                accessDeniedMessage.innerHTML = "Bạn chưa đăng nhập vào hệ thống. Vui lòng đăng nhập bằng tài khoản <strong>Admin</strong> để tiếp tục.";
                 return;
             }
 
-            try {
-                const response = await fetch(
-                    `${API_BASE_URL}/Dashboard`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${token}`
+            if (user.role !== "Admin") {
+                accessDeniedSection.style.display = "block";
+                dashboardMainSection.style.display = "none";
+                accessDeniedMessage.innerHTML = `Tài khoản của bạn (<strong>${user.userName || user.name}</strong>) có vai trò là <strong>${user.role || 'Khách hàng'}</strong>, không có thẩm quyền truy cập Dashboard quản trị tối cao.`;
+                return;
+            }
+
+            // Đã xác thực thành công là Admin
+            accessDeniedSection.style.display = "none";
+            dashboardMainSection.style.display = "block";
+
+            // Điền tên chào mừng
+            const greetingName = user.fullName || user.userName || "Quản trị viên";
+            document.getElementById("adminGreetingName").textContent = greetingName;
+
+            // ==========================================
+            // 2. ĐỒNG HỒ THỜI GIAN THỰC
+            // ==========================================
+            function updateLiveTime() {
+                const now = new Date();
+                const days = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+                const dayName = days[now.getDay()];
+                const dateStr = now.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
+                const timeStr = now.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+                const timeEl = document.getElementById("liveTimeText");
+                if (timeEl) {
+                    timeEl.textContent = `${dayName}, ${dateStr} · ${timeStr} (GMT+7)`;
+                }
+            }
+            updateLiveTime();
+            setInterval(updateLiveTime, 1000);
+
+            // ==========================================
+            // 3. TIỆN ÍCH ĐỊNH DẠNG
+            // ==========================================
+            function formatVND(amount) {
+                if (!amount && amount !== 0) return "0 VNĐ";
+                return Number(amount).toLocaleString("vi-VN") + " VNĐ";
+            }
+
+            function formatDateTime(dateStr) {
+                if (!dateStr) return "N/A";
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                return d.toLocaleDateString("vi-VN", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+            }
+
+            function escapeHtml(text) {
+                if (!text) return "";
+                return String(text).replace(/[&<>"']/g, function (m) {
+                    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];
+                });
+            }
+
+            let statusChartInstance = null;
+            let revenueChartInstance = null;
+
+            // ==========================================
+            // 4. TẢI DỮ LIỆU TỔNG QUAN DASHBOARD
+            // ==========================================
+            async function loadDashboardData() {
+                const refreshBtn = document.getElementById("btnRefreshDashboard");
+                const refreshIcon = document.getElementById("refreshIcon");
+                if (refreshIcon) refreshIcon.style.animation = "invoiceSpin 0.8s linear infinite";
+
+                const authHeaders = {
+                    "Authorization": `Bearer ${token}`
+                };
+
+                try {
+                    // Gọi song song các API chính
+                    const [dashRes, bookingsRes, toursRes, customersRes] = await Promise.all([
+                        fetch(`${API_BASE_URL}/Dashboard`, { headers: authHeaders }).catch(() => null),
+                        fetch(`${API_BASE_URL}/Booking`, { headers: authHeaders }).catch(() => null),
+                        fetch(`${API_BASE_URL}/Tour`).catch(() => null),
+                        fetch(`${API_BASE_URL}/Customer`, { headers: authHeaders }).catch(() => null)
+                    ]);
+
+                    let dashData = null;
+                    if (dashRes && dashRes.ok) {
+                        dashData = await dashRes.json();
+                    }
+
+                    let bookings = [];
+                    if (bookingsRes && bookingsRes.ok) {
+                        bookings = await bookingsRes.json();
+                    }
+
+                    let tours = [];
+                    if (toursRes && toursRes.ok) {
+                        tours = await toursRes.json();
+                    }
+
+                    let customers = [];
+                    if (customersRes && customersRes.ok) {
+                        customers = await customersRes.json();
+                    }
+
+                    // Bản đồ ánh xạ ID -> Tour & ID -> Customer
+                    const tourMap = {};
+                    tours.forEach(t => { tourMap[t.tourId] = t; });
+
+                    const customerMap = {};
+                    customers.forEach(c => { customerMap[c.customerId] = c; });
+
+                    // Tính toán các chỉ số
+                    const totalCustomersCount = dashData?.totalCustomers ?? customers.length;
+                    const totalToursCount = tours.length;
+                    const totalBookingsCount = bookings.length;
+
+                    // Tính toán theo trạng thái
+                    let confirmedCount = 0;
+                    let pendingCount = 0;
+                    let cancelledCount = 0;
+                    let calculatedRevenue = 0;
+
+                    bookings.forEach(b => {
+                        const status = (b.status || "").toLowerCase();
+                        if (status === "confirmed" || status === "paid" || status === "đã xác nhận") {
+                            confirmedCount++;
+                            calculatedRevenue += Number(b.totalPrice) || 0;
+                        } else if (status === "pending" || status === "đang chờ" || status === "chờ xử lý") {
+                            pendingCount++;
+                        } else {
+                            cancelledCount++;
+                        }
+                    });
+
+                    const finalRevenue = dashData?.totalRevenue ?? calculatedRevenue;
+
+                    // Điền vào 4 thẻ KPI
+                    document.getElementById("statRevenue").textContent = formatVND(finalRevenue);
+                    document.getElementById("statBookings").textContent = totalBookingsCount.toLocaleString("vi-VN") + " đơn";
+                    document.getElementById("statCustomers").textContent = totalCustomersCount.toLocaleString("vi-VN") + " khách";
+                    document.getElementById("statTours").textContent = totalToursCount.toLocaleString("vi-VN") + " tour";
+
+                    const successRate = totalBookingsCount > 0 ? Math.round((confirmedCount / totalBookingsCount) * 100) : 0;
+                    document.getElementById("statBookingSuccessRate").textContent = successRate + "%";
+
+                    // ==========================================
+                    // 5. CẬP NHẬT THANH PHÂN BỔ TRẠNG THÁI (HEALTH BAR)
+                    // ==========================================
+                    document.getElementById("bookingHealthTotalText").textContent = `Tổng cộng: ${totalBookingsCount} đơn đặt tour`;
+
+                    const confirmedPct = totalBookingsCount > 0 ? ((confirmedCount / totalBookingsCount) * 100).toFixed(1) : 0;
+                    const pendingPct = totalBookingsCount > 0 ? ((pendingCount / totalBookingsCount) * 100).toFixed(1) : 0;
+                    const cancelledPct = totalBookingsCount > 0 ? ((cancelledCount / totalBookingsCount) * 100).toFixed(1) : 0;
+
+                    document.getElementById("healthConfirmed").style.width = confirmedPct + "%";
+                    document.getElementById("healthPending").style.width = pendingPct + "%";
+                    document.getElementById("healthCancelled").style.width = cancelledPct + "%";
+
+                    document.getElementById("legendConfirmedCount").textContent = confirmedCount;
+                    document.getElementById("legendConfirmedPercent").textContent = confirmedPct + "%";
+
+                    document.getElementById("legendPendingCount").textContent = pendingCount;
+                    document.getElementById("legendPendingPercent").textContent = pendingPct + "%";
+
+                    document.getElementById("legendCancelledCount").textContent = cancelledCount;
+                    document.getElementById("legendCancelledPercent").textContent = cancelledPct + "%";
+
+                    // ==========================================
+                    // 6. VẼ BIỂU ĐỒ CHART.JS
+                    // ==========================================
+                    renderStatusChart(confirmedCount, pendingCount, cancelledCount);
+                    renderRevenueBarChart(bookings, tourMap);
+
+                    // ==========================================
+                    // 7. XẾP HẠNG TOP TOUR BÁN CHẠY
+                    // ==========================================
+                    renderTopTours(bookings, tourMap);
+
+                    // ==========================================
+                    // 8. BẢNG BOOKING GẦN ĐÂY
+                    // ==========================================
+                    renderRecentBookingsTable(bookings, tourMap, customerMap);
+
+                } catch (error) {
+                    console.error("Lỗi khi tải Dashboard:", error);
+                } finally {
+                    if (refreshIcon) refreshIcon.style.animation = "none";
+                }
+            }
+
+            // Vẽ Doughnut Chart
+            function renderStatusChart(confirmed, pending, cancelled) {
+                const ctx = document.getElementById("statusDoughnutChart");
+                if (!ctx || typeof Chart === "undefined") return;
+
+                if (statusChartInstance) {
+                    statusChartInstance.destroy();
+                }
+
+                statusChartInstance = new Chart(ctx, {
+                    type: "doughnut",
+                    data: {
+                        labels: ["Đã xác nhận", "Chờ xử lý", "Đã hủy / Hoàn"],
+                        datasets: [{
+                            data: [confirmed, pending, cancelled],
+                            backgroundColor: ["#10b981", "#f59e0b", "#ef4444"],
+                            borderWidth: 2,
+                            borderColor: "#ffffff"
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: "bottom",
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 16,
+                                    font: { family: "'Segoe UI', sans-serif", size: 12 }
+                                }
+                            }
+                        },
+                        cutout: "68%"
+                    }
+                });
+            }
+
+            // Vẽ Bar Chart Top Doanh thu theo Tour
+            function renderRevenueBarChart(bookings, tourMap) {
+                const ctx = document.getElementById("topToursBarChart");
+                if (!ctx || typeof Chart === "undefined") return;
+
+                if (revenueChartInstance) {
+                    revenueChartInstance.destroy();
+                }
+
+                // Nhóm doanh thu theo tour
+                const tourRevenueMap = {};
+                bookings.forEach(b => {
+                    const status = (b.status || "").toLowerCase();
+                    if (status === "confirmed" || status === "paid" || status === "đã xác nhận") {
+                        const t = tourMap[b.tourId];
+                        const name = t ? t.tourName : `Tour #${b.tourId}`;
+                        tourRevenueMap[name] = (tourRevenueMap[name] || 0) + (Number(b.totalPrice) || 0);
+                    }
+                });
+
+                // Lấy top 5 tour có doanh thu cao nhất
+                const sorted = Object.entries(tourRevenueMap)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5);
+
+                const labels = sorted.map(item => item[0].length > 18 ? item[0].substring(0, 18) + "…" : item[0]);
+                const dataValues = sorted.map(item => item[1] / 1000000); // Đổi sang Triệu VNĐ
+
+                revenueChartInstance = new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: labels.length > 0 ? labels : ["Chưa có dữ liệu"],
+                        datasets: [{
+                            label: "Doanh thu (Triệu VNĐ)",
+                            data: dataValues.length > 0 ? dataValues : [0],
+                            backgroundColor: "rgba(2, 132, 199, 0.85)",
+                            borderRadius: 6,
+                            maxBarThickness: 32
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return (context.raw * 1000000).toLocaleString("vi-VN") + " VNĐ";
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function (val) {
+                                        return val + " Tr";
+                                    }
+                                }
+                            }
                         }
                     }
-                );
+                });
+            }
 
-                if (response.status === 401 || response.status === 403) {
-                    dashboardMessage.textContent =
-                        "Bạn không có quyền xem Dashboard. Hãy đăng nhập bằng tài khoản Admin.";
+            // Xếp hạng top tour
+            function renderTopTours(bookings, tourMap) {
+                const container = document.getElementById("topToursListContainer");
+                if (!container) return;
+
+                const tourStats = {};
+                bookings.forEach(b => {
+                    const tid = b.tourId;
+                    if (!tourStats[tid]) {
+                        tourStats[tid] = { count: 0, revenue: 0, tourId: tid };
+                    }
+                    tourStats[tid].count++;
+                    const status = (b.status || "").toLowerCase();
+                    if (status === "confirmed" || status === "paid") {
+                        tourStats[tid].revenue += Number(b.totalPrice) || 0;
+                    }
+                });
+
+                const sortedTours = Object.values(tourStats)
+                    .sort((a, b) => b.count - a.count)
+                    .slice(0, 4);
+
+                if (sortedTours.length === 0) {
+                    container.innerHTML = `<p style="color: #64748b; font-size: 13.5px; text-align: center; padding: 20px 0;">Chưa có dữ liệu đặt tour.</p>`;
                     return;
                 }
 
-                if (!response.ok) {
-                    throw new Error("Không thể tải dữ liệu Dashboard.");
+                const rankIcons = ["🥇", "🥈", "🥉", "4️⃣"];
+
+                let html = "";
+                sortedTours.forEach((item, index) => {
+                    const tour = tourMap[item.tourId];
+                    const tourName = tour ? tour.tourName : `Chương trình tour #${item.tourId}`;
+                    const destination = tour ? tour.destination : "Điểm đến du lịch";
+                    const rankBadge = rankIcons[index] || `#${index + 1}`;
+
+                    html += `
+                        <div class="top-tour-item">
+                            <div class="top-tour-left">
+                                <span class="top-tour-rank">${rankBadge}</span>
+                                <div>
+                                    <div class="top-tour-title">${escapeHtml(tourName)}</div>
+                                    <div class="top-tour-dest">📍 ${escapeHtml(destination)}</div>
+                                </div>
+                            </div>
+                            <div class="top-tour-right">
+                                <div class="top-tour-revenue">${formatVND(item.revenue)}</div>
+                                <div class="top-tour-count">${item.count} lượt đặt</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+            }
+
+            // Render bảng Booking gần đây
+            function renderRecentBookingsTable(bookings, tourMap, customerMap) {
+                const tbody = document.getElementById("recentBookingsTbody");
+                if (!tbody) return;
+
+                if (bookings.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 30px; color: #64748b;">
+                                Chưa có đơn đặt tour nào trong hệ thống.
+                            </td>
+                        </tr>
+                    `;
+                    return;
                 }
 
-                const data = await response.json();
+                // Sắp xếp đơn mới nhất lên đầu
+                const sorted = [...bookings].sort((a, b) => {
+                    return new Date(b.bookingDate || 0) - new Date(a.bookingDate || 0);
+                }).slice(0, 7);
 
-                document.getElementById("totalCustomers").textContent =
-                    Number(data.totalCustomers ?? 0).toLocaleString("vi-VN");
+                let rowsHtml = "";
+                sorted.forEach(b => {
+                    const tour = tourMap[b.tourId];
+                    const tourName = tour ? tour.tourName : `Tour #${b.tourId}`;
+                    const destination = tour ? tour.destination : "Điểm đến du lịch";
 
-                document.getElementById("totalBookings").textContent =
-                    Number(data.totalBookings ?? 0).toLocaleString("vi-VN");
+                    const customer = customerMap[b.customerId];
+                    const customerName = customer ? customer.fullName : `Khách #${b.customerId}`;
+                    const customerPhone = customer ? customer.phone : "Chưa cập nhật";
+                    const initial = customerName.charAt(0).toUpperCase();
 
-                document.getElementById("totalRevenue").textContent =
-                    Number(data.totalRevenue ?? 0).toLocaleString("vi-VN") + " VNĐ";
+                    const rawStatus = (b.status || "").toLowerCase();
+                    let statusBadge = "";
+                    if (rawStatus === "confirmed" || rawStatus === "đã xác nhận" || rawStatus === "paid") {
+                        statusBadge = `<span class="badge-status status-confirmed">✓ Đã xác nhận</span>`;
+                    } else if (rawStatus === "pending" || rawStatus === "đang chờ" || rawStatus === "chờ xử lý") {
+                        statusBadge = `<span class="badge-status status-pending">⏳ Chờ xử lý</span>`;
+                    } else if (rawStatus === "refunded" || rawStatus === "đã hoàn tiền") {
+                        statusBadge = `<span class="badge-status status-refunded">↩ Đã hoàn tiền</span>`;
+                    } else {
+                        statusBadge = `<span class="badge-status status-cancelled">✕ Đã hủy</span>`;
+                    }
 
-                dashboardMessage.textContent =
-                    "Đã tải dữ liệu thống kê thành công.";
-            } catch (error) {
-                console.error(error);
+                    const bookingCode = "BK-" + String(b.bookingId).padStart(6, "0");
 
-                dashboardMessage.textContent =
-                    "Không tải được dữ liệu. Hãy kiểm tra Backend và kết nối mạng.";
+                    rowsHtml += `
+                        <tr>
+                            <td style="font-weight: 700; color: #0284c7;">#${bookingCode}</td>
+                            <td>
+                                <div class="customer-cell">
+                                    <div class="customer-avatar-mini">${initial}</div>
+                                    <div class="customer-info-text">
+                                        <strong>${escapeHtml(customerName)}</strong>
+                                        <small>${escapeHtml(customerPhone)}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 600; color: #0f172a;">${escapeHtml(tourName)}</div>
+                                <small style="color: #64748b;">📍 ${escapeHtml(destination)}</small>
+                            </td>
+                            <td style="color: #64748b; font-size: 13px;">${formatDateTime(b.bookingDate)}</td>
+                            <td style="text-align: center; font-weight: 700;">${b.numberOfPeople}</td>
+                            <td style="text-align: right; font-weight: 700; color: #087db5;">${formatVND(b.totalPrice)}</td>
+                            <td style="text-align: center;">${statusBadge}</td>
+                            <td style="text-align: center; white-space: nowrap;">
+                                <button type="button" class="btn-table-action btn-print" onclick="openInvoiceModal({ bookingId: ${b.bookingId} })" title="In hóa đơn chi tiết">
+                                    🖨️ In
+                                </button>
+                                <a href="admin-bookings.html" class="btn-table-action btn-manage" title="Xem chi tiết đơn">
+                                    Xử lý
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = rowsHtml;
             }
-        }
 
-        loadDashboard();
+            // Gán sự kiện cho nút Làm mới dữ liệu
+            const refreshBtn = document.getElementById("btnRefreshDashboard");
+            if (refreshBtn) {
+                refreshBtn.addEventListener("click", loadDashboardData);
+            }
+
+            // Tải dữ liệu lần đầu
+            loadDashboardData();
+        });
     </script>
-
-    <script src="../js/navbar.js"></script>
 </body>
 </html>

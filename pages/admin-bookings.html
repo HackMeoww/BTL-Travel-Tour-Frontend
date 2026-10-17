@@ -1,18 +1,14 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Quản lý Booking - Travel Tour</title>
-
     <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>
-
-    <!-- Header -->
+    <!-- Header đồng bộ -->
     <header class="header">
         <div class="container navbar">
             <a href="../index.html" class="logo">Travel Tour</a>
@@ -25,509 +21,894 @@
         </div>
     </header>
 
+    <main class="booking-mgmt-page">
+        <div class="container">
 
-    <!-- Nội dung -->
-    <main>
+            <!-- MÀN HÌNH CHẶN QUYỀN TRUY CẬP (NẾU KHÔNG PHẢI ADMIN / STAFF) -->
+            <div id="accessDeniedSection" class="admin-denied-container" style="display: none;">
+                <div class="admin-denied-icon">🔒</div>
+                <h2>Quyền truy cập bị từ chối</h2>
+                <p id="accessDeniedMessage">
+                    Trang quản lý đơn booking chỉ dành cho <strong>Quản trị viên (Admin)</strong> và <strong>Nhân viên (Staff)</strong>.
+                    Vui lòng đăng nhập với tài khoản có thẩm quyền để tiếp tục.
+                </p>
+                <div class="admin-denied-buttons">
+                    <a href="login.html" class="btn-admin-hero btn-primary">
+                        🔑 Đăng nhập lại
+                    </a>
+                    <a href="../index.html" class="btn-admin-hero btn-ghost" style="color: #0369a1; border-color: #cbd5e1; background: #f8fafc;">
+                        🏠 Quay về Trang chủ
+                    </a>
+                </div>
+            </div>
 
-        <section class="booking-page">
+            <!-- GIAO DIỆN QUẢN LÝ BOOKING CHÍNH -->
+            <div id="bookingMainSection" style="display: none;">
 
-            <div class="container">
+                <!-- HERO BANNER TIÊU ĐỀ TRANG -->
+                <div class="admin-hero-card" style="margin-bottom: 24px;">
+                    <div class="admin-hero-left">
+                        <div class="admin-role-badge-tag">
+                            📑 NGHIỆP VỤ ĐIỀU HÀNH & BÁN VÉ
+                        </div>
+                        <h1>Quản lý Đơn đặt tour (Bookings)</h1>
+                        <p>Theo dõi tiến độ, tiếp nhận duyệt đơn, in hóa đơn du lịch và xử lý hoàn tiền cho khách hàng.</p>
+                        <div class="admin-live-time">
+                            <span>🕒</span>
+                            <span id="liveClockText">Đang đồng bộ...</span>
+                        </div>
+                    </div>
 
-                <div class="section-title">
-
-                    <h1>
-                        Quản lý Booking
-                    </h1>
-
-                    <p>
-                        Quản lý đơn đặt tour và hoàn tiền
-                    </p>
-
+                    <div class="admin-hero-actions">
+                        <button type="button" class="btn-admin-hero btn-ghost" id="btnRefreshList" title="Làm mới danh sách">
+                            <span id="refreshIcon">🔄</span>
+                            <span>Làm mới</span>
+                        </button>
+                        <a href="admin.html" class="btn-admin-hero btn-primary" id="btnGoDashboard">
+                            <span>📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="admin-tours.html" class="btn-admin-hero btn-ghost">
+                            <span>🧭</span>
+                            <span>Kho Tour</span>
+                        </a>
+                    </div>
                 </div>
 
+                <!-- TABS BỘ LỌC TRẠNG THÁI NHANH -->
+                <div class="quick-filter-tabs">
+                    <button type="button" class="filter-tab-btn active" data-status="all">
+                        <span>📋 Tất cả đơn</span>
+                        <span class="tab-count" id="countAll">0</span>
+                    </button>
+                    <button type="button" class="filter-tab-btn" data-status="pending">
+                        <span>⏳ Chờ duyệt</span>
+                        <span class="tab-count" id="countPending" style="background: #fef3c7; color: #b45309;">0</span>
+                    </button>
+                    <button type="button" class="filter-tab-btn" data-status="confirmed">
+                        <span>✓ Đã xác nhận</span>
+                        <span class="tab-count" id="countConfirmed" style="background: #dcfce7; color: #15803d;">0</span>
+                    </button>
+                    <button type="button" class="filter-tab-btn" data-status="cancelled">
+                        <span>✕ Đã hủy</span>
+                        <span class="tab-count" id="countCancelled" style="background: #fee2e2; color: #b91c1c;">0</span>
+                    </button>
+                    <button type="button" class="filter-tab-btn" data-status="refunded">
+                        <span>↩ Đã hoàn tiền</span>
+                        <span class="tab-count" id="countRefunded" style="background: #ede9fe; color: #6d28d9;">0</span>
+                    </button>
+                </div>
 
-                <!-- Danh sách Booking -->
+                <!-- THANH TÌM KIẾM & BỘ LỌC CHI TIẾT -->
+                <div class="booking-control-bar">
+                    <div class="search-input-wrapper">
+                        <span class="search-icon-inside">🔍</span>
+                        <input type="text" id="searchInput" placeholder="Tìm theo mã đơn (#BK-...), tên khách, SĐT, tên tour, điểm đến...">
+                    </div>
 
-                <div id="bookingList">
+                    <div class="filters-group">
+                        <select id="sortSelect" class="booking-select-filter">
+                            <option value="date-desc">Sắp xếp: Mới nhất trước</option>
+                            <option value="date-asc">Sắp xếp: Cũ nhất trước</option>
+                            <option value="price-desc">Tổng tiền: Cao → Thấp</option>
+                            <option value="price-asc">Tổng tiền: Thấp → Cao</option>
+                            <option value="people-desc">Số khách: Nhiều nhất</option>
+                            <option value="depart-asc">Ngày đi: Gần nhất</option>
+                        </select>
 
-                    <p>
-                        Đang tải danh sách booking...
-                    </p>
+                        <button type="button" id="btnResetFilters" class="btn-reset-filter" title="Xóa các bộ lọc tìm kiếm">
+                            <span>✕</span>
+                            <span>Xóa lọc</span>
+                        </button>
+                    </div>
+                </div>
 
+                <!-- BẢNG DỮ LIỆU BOOKING CHUYÊN NGHIỆP -->
+                <div class="admin-card" style="padding: 0; overflow: hidden;">
+                    <div style="padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div style="font-weight: 700; color: #0f172a; font-size: 15px;">
+                            Danh sách Booking (<span id="showingCountText">0</span>)
+                        </div>
+                        <div style="font-size: 13px; color: #64748b;">
+                            Click vào nút <strong>In</strong> để in hóa đơn A4 tại chỗ không mở tab mới
+                        </div>
+                    </div>
+
+                    <div class="admin-table-container" style="border: none; border-radius: 0;">
+                        <table class="admin-data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 105px;">Mã Booking</th>
+                                    <th>Khách hàng</th>
+                                    <th>Chương trình Tour</th>
+                                    <th>Lịch trình</th>
+                                    <th style="text-align: center; width: 85px;">Số khách</th>
+                                    <th style="text-align: right; width: 130px;">Tổng tiền</th>
+                                    <th style="text-align: center; width: 135px;">Trạng thái</th>
+                                    <th style="text-align: center; width: 220px;">Hành động nghiệp vụ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookingsTableBody">
+                                <tr>
+                                    <td colspan="8" style="text-align: center; padding: 40px; color: #64748b;">
+                                        Đang tải dữ liệu đơn đặt tour...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
             </div>
 
-        </section>
-
+        </div>
     </main>
 
+    <!-- MODAL XEM CHI TIẾT & THAO TÁC ĐƠN BOOKING -->
+    <div id="bookingDetailModal" class="booking-modal-overlay" style="display: none;">
+        <div class="booking-modal-card">
+            <div class="booking-modal-header">
+                <h3>
+                    <span>📄 Chi tiết Đơn đặt tour</span>
+                    <span id="modalBookingCode" style="color: #0284c7; font-size: 16px;">#BK-000000</span>
+                </h3>
+                <button type="button" class="btn-action-sm btn-detail" onclick="closeBookingDetailModal()" style="font-size: 16px; padding: 4px 10px;">✕</button>
+            </div>
 
+            <div class="booking-modal-body" id="modalBookingBody">
+                <p>Đang tải thông tin chi tiết...</p>
+            </div>
+
+            <div class="booking-modal-footer" id="modalBookingFooter">
+                <button type="button" class="btn-action-sm btn-detail" onclick="closeBookingDetailModal()" style="padding: 9px 16px; font-size: 13px;">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts cần thiết -->
     <script src="../js/api.js"></script>
+    <script src="../js/invoice-modal.js"></script>
+    <script src="../js/navbar.js"></script>
 
     <script>
+        /**
+         * admin-bookings.js logic - Xử lý nghiệp vụ quản lý Booking chuyên nghiệp
+         */
+        document.addEventListener("DOMContentLoaded", function () {
+            const token = localStorage.getItem("token");
+            const userData = localStorage.getItem("user");
+            let user = null;
 
-        // =========================
-        // Kiểm tra đăng nhập
-        // =========================
+            if (token && userData) {
+                try {
+                    user = JSON.parse(userData);
+                } catch (e) {
+                    console.error("Lỗi parse user:", e);
+                }
+            }
 
-        const token =
-            localStorage.getItem("token");
+            const accessDeniedSection = document.getElementById("accessDeniedSection");
+            const accessDeniedMessage = document.getElementById("accessDeniedMessage");
+            const bookingMainSection = document.getElementById("bookingMainSection");
 
-        const userData =
-            localStorage.getItem("user");
+            // ==========================================
+            // 1. PHÂN QUYỀN TRUY CẬP (ADMIN / STAFF)
+            // ==========================================
+            if (!token || !user) {
+                accessDeniedSection.style.display = "block";
+                bookingMainSection.style.display = "none";
+                accessDeniedMessage.innerHTML = "Bạn chưa đăng nhập. Vui lòng đăng nhập bằng tài khoản <strong>Admin</strong> hoặc <strong>Nhân viên (Staff)</strong>.";
+                return;
+            }
 
+            if (user.role !== "Admin" && user.role !== "Staff") {
+                accessDeniedSection.style.display = "block";
+                bookingMainSection.style.display = "none";
+                accessDeniedMessage.innerHTML = `Tài khoản của bạn (<strong>${user.userName || user.name}</strong>) có vai trò là <strong>${user.role || 'Khách hàng'}</strong>, không có quyền quản lý booking.`;
+                return;
+            }
 
-        if (!token || !userData) {
+            accessDeniedSection.style.display = "none";
+            bookingMainSection.style.display = "block";
 
-            alert(
-                "Bạn cần đăng nhập."
-            );
+            // Nếu là Staff, ẩn nút Dashboard (chỉ Admin mới có quyền Dashboard)
+            if (user.role !== "Admin") {
+                const btnGoDashboard = document.getElementById("btnGoDashboard");
+                if (btnGoDashboard) btnGoDashboard.style.display = "none";
+            }
 
-            window.location.href =
-                "login.html";
+            // Đồng hồ thời gian thực
+            function updateClock() {
+                const now = new Date();
+                const clockEl = document.getElementById("liveClockText");
+                if (clockEl) {
+                    clockEl.textContent = now.toLocaleDateString("vi-VN", {
+                        weekday: "long",
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric"
+                    }) + " · " + now.toLocaleTimeString("vi-VN");
+                }
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
 
-        }
+            // ==========================================
+            // 2. BIẾN TRẠNG THÁI & TIỆN ÍCH
+            // ==========================================
+            let allBookings = [];
+            let allTours = [];
+            let allCustomers = [];
+            let tourMap = {};
+            let customerMap = {};
 
+            let currentStatusFilter = "all";
+            let currentSearchKeyword = "";
+            let currentSortBy = "date-desc";
 
-        const user =
-            JSON.parse(userData);
+            function formatVND(amount) {
+                if (!amount && amount !== 0) return "0 VNĐ";
+                return Number(amount).toLocaleString("vi-VN") + " VNĐ";
+            }
 
+            function formatDateTime(dateStr) {
+                if (!dateStr) return "N/A";
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                return d.toLocaleDateString("vi-VN", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+            }
 
-        // =========================
-        // Kiểm tra quyền
-        // =========================
+            function formatDate(dateStr) {
+                if (!dateStr) return "Chưa ấn định";
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                return d.toLocaleDateString("vi-VN", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
+                });
+            }
 
-        if (
-            user.role !== "Admin" &&
-            user.role !== "Staff"
-        ) {
+            function escapeHtml(text) {
+                if (!text) return "";
+                return String(text).replace(/[&<>"']/g, function (m) {
+                    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];
+                });
+            }
 
-            alert(
-                "Bạn không có quyền truy cập trang này."
-            );
+            function removeVietnameseTones(str) {
+                str = String(str || "").toLowerCase();
+                str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+                str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+                str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+                str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+                str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+                str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+                str = str.replace(/đ/g, "d");
+                return str;
+            }
 
-            window.location.href =
-                "../index.html";
+            // ==========================================
+            // 3. TẢI TOÀN BỘ DỮ LIỆU TỪ SERVER
+            // ==========================================
+            async function loadAllData() {
+                const refreshIcon = document.getElementById("refreshIcon");
+                if (refreshIcon) refreshIcon.style.animation = "invoiceSpin 0.8s linear infinite";
 
-        }
+                const authHeaders = {
+                    "Authorization": `Bearer ${token}`
+                };
 
+                try {
+                    const [bookingsRes, toursRes, customersRes] = await Promise.all([
+                        fetch(`${API_BASE_URL}/Booking`, { headers: authHeaders }),
+                        fetch(`${API_BASE_URL}/Tour`),
+                        fetch(`${API_BASE_URL}/Customer`, { headers: authHeaders }).catch(() => null)
+                    ]);
 
-        // =========================
-        // Hiển thị danh sách Booking
-        // =========================
+                    if (!bookingsRes.ok) throw new Error("Không thể tải danh sách booking từ máy chủ.");
+                    allBookings = await bookingsRes.json();
 
-        async function loadBookings() {
+                    if (toursRes.ok) {
+                        allTours = await toursRes.json();
+                        tourMap = {};
+                        allTours.forEach(t => { tourMap[t.tourId] = t; });
+                    }
 
-            const bookingList =
-                document.getElementById(
-                    "bookingList"
-                );
+                    if (customersRes && customersRes.ok) {
+                        allCustomers = await customersRes.json();
+                        customerMap = {};
+                        allCustomers.forEach(c => { customerMap[c.customerId] = c; });
+                    }
 
+                    updateTabCounters();
+                    applyFilterAndRender();
 
-            try {
+                } catch (error) {
+                    console.error("Lỗi khi tải dữ liệu:", error);
+                    const tbody = document.getElementById("bookingsTableBody");
+                    if (tbody) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 40px; color: #dc2626;">
+                                    ⚠️ ${escapeHtml(error.message || "Đã xảy ra lỗi khi tải dữ liệu.")}
+                                    <br><br>
+                                    <button type="button" class="btn-action-sm btn-approve" onclick="location.reload()" style="padding: 8px 16px;">
+                                        🔄 Thử tải lại
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                } finally {
+                    if (refreshIcon) refreshIcon.style.animation = "none";
+                }
+            }
 
-                const response =
-                    await fetch(
-                        `${API_BASE_URL}/Booking`,
-                        {
-                            headers: {
+            // ==========================================
+            // 4. CẬP NHẬT SỐ LƯỢNG TRÊN CÁC TAB LỌC
+            // ==========================================
+            function updateTabCounters() {
+                let countAll = allBookings.length;
+                let countPending = 0;
+                let countConfirmed = 0;
+                let countCancelled = 0;
+                let countRefunded = 0;
 
-                                "Authorization":
-                                    `Bearer ${token}`
+                allBookings.forEach(b => {
+                    const status = (b.status || "").toLowerCase();
+                    if (status === "pending" || status === "đang chờ" || status === "chờ xử lý") {
+                        countPending++;
+                    } else if (status === "confirmed" || status === "paid" || status === "đã xác nhận") {
+                        countConfirmed++;
+                    } else if (status === "refunded" || status === "đã hoàn tiền") {
+                        countRefunded++;
+                    } else {
+                        countCancelled++;
+                    }
+                });
 
-                            }
+                document.getElementById("countAll").textContent = countAll;
+                document.getElementById("countPending").textContent = countPending;
+                document.getElementById("countConfirmed").textContent = countConfirmed;
+                document.getElementById("countCancelled").textContent = countCancelled;
+                document.getElementById("countRefunded").textContent = countRefunded;
+            }
+
+            // ==========================================
+            // 5. LỌC, TÌM KIẾM, SẮP XẾP & HIỂN THỊ
+            // ==========================================
+            function applyFilterAndRender() {
+                let filtered = [...allBookings];
+
+                // 1. Lọc theo trạng thái tab
+                if (currentStatusFilter !== "all") {
+                    filtered = filtered.filter(b => {
+                        const s = (b.status || "").toLowerCase();
+                        if (currentStatusFilter === "pending") {
+                            return s === "pending" || s === "đang chờ" || s === "chờ xử lý";
                         }
-                    );
-
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        "Không thể lấy danh sách booking"
-                    );
-
+                        if (currentStatusFilter === "confirmed") {
+                            return s === "confirmed" || s === "paid" || s === "đã xác nhận";
+                        }
+                        if (currentStatusFilter === "cancelled") {
+                            return s === "cancelled" || s === "đã hủy";
+                        }
+                        if (currentStatusFilter === "refunded") {
+                            return s === "refunded" || s === "đã hoàn tiền";
+                        }
+                        return true;
+                    });
                 }
 
+                // 2. Tìm kiếm theo từ khóa
+                if (currentSearchKeyword.trim()) {
+                    const rawKey = currentSearchKeyword.trim();
+                    const cleanKey = removeVietnameseTones(rawKey);
 
-                const bookings =
-                    await response.json();
+                    filtered = filtered.filter(b => {
+                        const bookingCode = "BK-" + String(b.bookingId).padStart(6, "0");
+                        const rawCode = String(b.bookingId);
 
+                        const tour = tourMap[b.tourId];
+                        const tourName = tour ? tour.tourName : "";
+                        const destination = tour ? tour.destination : "";
 
-                // Không có booking
+                        const customer = customerMap[b.customerId];
+                        const customerName = customer ? customer.fullName : "";
+                        const phone = customer ? customer.phone : "";
+                        const email = customer ? customer.email : "";
+
+                        const searchPool = [
+                            bookingCode,
+                            rawCode,
+                            tourName,
+                            destination,
+                            customerName,
+                            phone,
+                            email
+                        ].join(" ");
+
+                        return removeVietnameseTones(searchPool).includes(cleanKey);
+                    });
+                }
+
+                // 3. Sắp xếp
+                filtered.sort((a, b) => {
+                    if (currentSortBy === "date-desc") {
+                        return new Date(b.bookingDate || 0) - new Date(a.bookingDate || 0);
+                    }
+                    if (currentSortBy === "date-asc") {
+                        return new Date(a.bookingDate || 0) - new Date(b.bookingDate || 0);
+                    }
+                    if (currentSortBy === "price-desc") {
+                        return (Number(b.totalPrice) || 0) - (Number(a.totalPrice) || 0);
+                    }
+                    if (currentSortBy === "price-asc") {
+                        return (Number(a.totalPrice) || 0) - (Number(b.totalPrice) || 0);
+                    }
+                    if (currentSortBy === "people-desc") {
+                        return (Number(b.numberOfPeople) || 0) - (Number(a.numberOfPeople) || 0);
+                    }
+                    if (currentSortBy === "depart-asc") {
+                        return new Date(a.departureDate || "9999-12-31") - new Date(b.departureDate || "9999-12-31");
+                    }
+                    return 0;
+                });
+
+                document.getElementById("showingCountText").textContent = `${filtered.length} / ${allBookings.length} đơn`;
+
+                renderTableRows(filtered);
+            }
+
+            // Render các hàng trong bảng
+            function renderTableRows(bookings) {
+                const tbody = document.getElementById("bookingsTableBody");
+                if (!tbody) return;
 
                 if (bookings.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 40px; color: #64748b;">
+                                🔍 Không tìm thấy đơn đặt tour nào phù hợp với bộ lọc hiện tại.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
 
-                    bookingList.innerHTML = `
+                let html = "";
+                bookings.forEach(b => {
+                    const tour = tourMap[b.tourId];
+                    const tourName = tour ? tour.tourName : `Chương trình tour #${b.tourId}`;
+                    const destination = tour ? tour.destination : "Điểm đến du lịch";
 
-                        <div class="booking-form">
+                    const customer = customerMap[b.customerId];
+                    const customerName = customer ? customer.fullName : `Khách hàng #${b.customerId}`;
+                    const customerPhone = customer ? customer.phone : "Chưa có SĐT";
+                    const initial = customerName.charAt(0).toUpperCase();
 
-                            <h2>
-                                Chưa có booking
-                            </h2>
+                    const bookingCode = "BK-" + String(b.bookingId).padStart(6, "0");
 
-                            <p>
-                                Hệ thống chưa có đơn đặt tour nào.
-                            </p>
+                    const rawStatus = (b.status || "").toLowerCase();
+                    let statusBadge = "";
+                    let isPending = false;
+                    let isConfirmed = false;
+                    let isCancelled = false;
+                    let isRefunded = false;
 
-                        </div>
+                    if (rawStatus === "confirmed" || rawStatus === "paid" || rawStatus === "đã xác nhận") {
+                        statusBadge = `<span class="badge-status status-confirmed">✓ Đã xác nhận</span>`;
+                        isConfirmed = true;
+                    } else if (rawStatus === "pending" || rawStatus === "đang chờ" || rawStatus === "chờ xử lý") {
+                        statusBadge = `<span class="badge-status status-pending">⏳ Chờ duyệt</span>`;
+                        isPending = true;
+                    } else if (rawStatus === "refunded" || rawStatus === "đã hoàn tiền") {
+                        statusBadge = `<span class="badge-status status-refunded">↩ Đã hoàn tiền</span>`;
+                        isRefunded = true;
+                    } else {
+                        statusBadge = `<span class="badge-status status-cancelled">✕ Đã hủy</span>`;
+                        isCancelled = true;
+                    }
 
+                    // Nhóm nút hành động nghiệp vụ
+                    let actionsHtml = `
+                        <button type="button" class="btn-action-sm btn-detail" onclick="showBookingDetail(${b.bookingId})" title="Xem chi tiết đơn">
+                            👁️ Chi tiết
+                        </button>
+                        <button type="button" class="btn-action-sm btn-print" onclick="openInvoiceModal({ bookingId: ${b.bookingId} })" title="In hóa đơn A4 tại chỗ (Không mở website mới)" style="background: #0284c7; color: #fff;">
+                            🖨️ In
+                        </button>
                     `;
 
-                    return;
+                    // Nếu đang Pending -> có nút Duyệt đơn
+                    if (isPending) {
+                        actionsHtml += `
+                            <button type="button" class="btn-action-sm btn-approve" onclick="approveBooking(${b.bookingId})" title="Xác nhận duyệt đơn">
+                                ✓ Duyệt
+                            </button>
+                            <button type="button" class="btn-action-sm btn-cancel" onclick="cancelBookingAction(${b.bookingId})" title="Hủy booking">
+                                ✕ Hủy
+                            </button>
+                        `;
+                    }
 
+                    // Nếu Confirmed -> có thể hủy nếu khách báo hủy
+                    if (isConfirmed) {
+                        actionsHtml += `
+                            <button type="button" class="btn-action-sm btn-cancel" onclick="cancelBookingAction(${b.bookingId})" title="Hủy booking theo yêu cầu">
+                                ✕ Hủy
+                            </button>
+                        `;
+                    }
+
+                    // Nếu Cancelled -> có nút Hoàn tiền
+                    if (isCancelled) {
+                        actionsHtml += `
+                            <button type="button" class="btn-action-sm btn-refund" onclick="refundBookingAction(${b.bookingId})" title="Hoàn tiền cho khách">
+                                💸 Hoàn tiền
+                            </button>
+                        `;
+                    }
+
+                    html += `
+                        <tr>
+                            <td style="font-weight: 800; color: #0284c7; white-space: nowrap;">#${bookingCode}</td>
+                            <td>
+                                <div class="customer-cell">
+                                    <div class="customer-avatar-mini">${initial}</div>
+                                    <div class="customer-info-text">
+                                        <strong>${escapeHtml(customerName)}</strong>
+                                        <small>📞 ${escapeHtml(customerPhone)}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 600; color: #0f172a; max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(tourName)}</div>
+                                <small style="color: #0284c7; font-weight: 600;">📍 ${escapeHtml(destination)}</small>
+                            </td>
+                            <td style="font-size: 12.5px; color: #475569; white-space: nowrap;">
+                                <div>${formatDateTime(b.bookingDate)}</div>
+                                <small style="color: #94a3b8;">Khởi hành: <strong>${formatDate(b.departureDate)}</strong></small>
+                            </td>
+                            <td style="text-align: center; font-weight: 800; font-size: 14px;">
+                                ${b.numberOfPeople} <span style="font-size: 11px; font-weight: normal; color: #64748b;">khách</span>
+                            </td>
+                            <td style="text-align: right; font-weight: 800; color: #087db5; font-size: 14.5px; white-space: nowrap;">
+                                ${formatVND(b.totalPrice)}
+                            </td>
+                            <td style="text-align: center;">
+                                ${statusBadge}
+                            </td>
+                            <td style="text-align: center; white-space: nowrap;">
+                                <div style="display: inline-flex; gap: 5px; flex-wrap: wrap; justify-content: center;">
+                                    ${actionsHtml}
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = html;
+            }
+
+            // ==========================================
+            // 6. CÁC HÀNH ĐỘNG NGHIỆP VỤ (DUYỆT, HỦY, HOÀN TIỀN)
+            // ==========================================
+
+            // Duyệt đơn (Đổi trạng thái sang Confirmed)
+            window.approveBooking = async function (bookingId) {
+                const booking = allBookings.find(b => Number(b.bookingId) === Number(bookingId));
+                if (!booking) return;
+
+                if (!confirm(`Bạn có chắc chắn muốn DUYỆT ĐƠN booking #${bookingId} không?`)) {
+                    return;
                 }
 
+                try {
+                    const updatePayload = {
+                        bookingId: booking.bookingId,
+                        tourId: booking.tourId,
+                        customerId: booking.customerId,
+                        bookingDate: booking.bookingDate,
+                        departureDate: booking.departureDate,
+                        numberOfPeople: booking.numberOfPeople,
+                        totalPrice: booking.totalPrice,
+                        status: "Confirmed"
+                    };
 
-                // Xóa nội dung cũ
+                    const response = await fetch(`${API_BASE_URL}/Booking/${bookingId}`, {
+                        method: "PUT",
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(updatePayload)
+                    });
 
-                bookingList.innerHTML = "";
-
-
-                // Hiển thị từng booking
-
-                bookings.forEach(
-                    booking => {
-
-                        const bookingItem =
-                            document.createElement(
-                                "div"
-                            );
-
-
-                        bookingItem.className =
-                            "booking-form";
-
-
-                        bookingItem.innerHTML = `
-
-                            <h2>
-                                Booking #${booking.bookingId}
-                            </h2>
-
-
-                            <div class="summary-item">
-
-                                <span>
-                                    Tour ID
-                                </span>
-
-                                <strong>
-                                    ${booking.tourId}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="summary-item">
-
-                                <span>
-                                    Customer ID
-                                </span>
-
-                                <strong>
-                                    ${booking.customerId}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="summary-item">
-
-                                <span>
-                                    Số lượng
-                                </span>
-
-                                <strong>
-                                    ${booking.numberOfPeople}
-                                    người
-                                </strong>
-
-                            </div>
-
-
-                            <div class="summary-item">
-
-                                <span>
-                                    Tổng tiền
-                                </span>
-
-                                <strong>
-                                    ${formatPrice(
-                                        booking.totalPrice
-                                    )}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="summary-item">
-
-                                <span>
-                                    Ngày đặt
-                                </span>
-
-                                <strong>
-                                    ${formatDate(
-                                        booking.bookingDate
-                                    )}
-                                </strong>
-
-                            </div>
-
-                            <div class="summary-item">
-
-                                <span>
-                                    Ngày đi
-                                </span>
-
-                                <strong>
-                                    ${booking.departureDate ? formatDate(booking.departureDate) : "Chưa xác định"}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="summary-item">
-
-                                <span>
-                                    Trạng thái
-                                </span>
-
-                                <strong>
-                                    ${booking.status}
-                                </strong>
-
-                            </div>
-
-
-                            ${
-                                booking.status === "Cancelled"
-                                ?
-                                `
-                                    <button
-                                        class="booking-button"
-                                        type="button"
-                                        onclick="refundBooking(${booking.bookingId})">
-                                        Hoàn tiền
-                                    </button>
-                                `
-                                :
-                                booking.status === "Refunded"
-                                ?
-                                `
-                                    <p>
-                                        <strong>
-                                            Đã hoàn tiền
-                                        </strong>
-                                    </p>
-                                `
-                                :
-                                ""
-                            }
-
-                            <button
-                                class="booking-button"
-                                type="button"
-                                style="background: #087db5; margin-top: 10px;"
-                                onclick="window.open('invoice.html?bookingId=${booking.bookingId}', '_blank')">
-                                🖨️ In hóa đơn
-                            </button>
-
-                        `;
-
-
-                        bookingList.appendChild(
-                            bookingItem
-                        );
-
+                    if (!response.ok) {
+                        const errText = await response.text();
+                        throw new Error(errText || "Không thể cập nhật trạng thái đơn.");
                     }
-                );
 
-            }
-            catch (error) {
+                    alert(`Đã duyệt đơn #${bookingId} thành công!`);
+                    closeBookingDetailModal();
+                    await loadAllData();
 
-                console.error(error);
+                } catch (error) {
+                    console.error("Lỗi duyệt đơn:", error);
+                    alert("Duyệt đơn thất bại: " + error.message);
+                }
+            };
 
+            // Hủy đơn booking
+            window.cancelBookingAction = async function (bookingId) {
+                if (!confirm(`Bạn có chắc chắn muốn HỦY booking #${bookingId} này không?`)) {
+                    return;
+                }
 
-                bookingList.innerHTML = `
+                try {
+                    const response = await fetch(`${API_BASE_URL}/Booking/${bookingId}/cancel`, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
 
-                    <div class="booking-form">
+                    const text = await response.text();
+                    if (!response.ok) {
+                        let msg = "Hủy booking thất bại.";
+                        try { msg = JSON.parse(text).message || msg; } catch (e) {}
+                        throw new Error(msg);
+                    }
 
-                        <p>
-                            Không thể tải danh sách booking.
-                        </p>
+                    alert(`Đã hủy booking #${bookingId} thành công.`);
+                    closeBookingDetailModal();
+                    await loadAllData();
 
+                } catch (error) {
+                    console.error("Lỗi hủy booking:", error);
+                    alert("Không thể hủy: " + error.message);
+                }
+            };
+
+            // Hoàn tiền cho đơn đã hủy
+            window.refundBookingAction = async function (bookingId) {
+                if (!confirm(`Xác nhận HOÀN TIỀN cho đơn booking #${bookingId}? Thao tác này sẽ cập nhật trạng thái thanh toán và đơn đặt sang "Refunded".`)) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/Booking/${bookingId}/refund`, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+
+                    const text = await response.text();
+                    if (!response.ok) {
+                        let msg = "Hoàn tiền thất bại.";
+                        try { msg = JSON.parse(text).message || msg; } catch (e) {}
+                        throw new Error(msg);
+                    }
+
+                    alert(`Hoàn tiền thành công cho đơn #${bookingId}!`);
+                    closeBookingDetailModal();
+                    await loadAllData();
+
+                } catch (error) {
+                    console.error("Lỗi hoàn tiền:", error);
+                    alert("Không thể hoàn tiền: " + error.message);
+                }
+            };
+
+            // ==========================================
+            // 7. MODAL XEM CHI TIẾT ĐƠN BOOKING
+            // ==========================================
+            window.showBookingDetail = function (bookingId) {
+                const b = allBookings.find(item => Number(item.bookingId) === Number(bookingId));
+                if (!b) return;
+
+                const tour = tourMap[b.tourId];
+                const customer = customerMap[b.customerId];
+
+                document.getElementById("modalBookingCode").textContent = `#BK-${String(b.bookingId).padStart(6, "0")}`;
+
+                const modalBody = document.getElementById("modalBookingBody");
+                modalBody.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                        <div style="background: #f8fafc; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <div style="font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase; margin-bottom: 6px;">THÔNG TIN KHÁCH HÀNG</div>
+                            <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">${escapeHtml(customer ? customer.fullName : "Chưa cập nhật")}</div>
+                            <div style="font-size: 13px; color: #475569; margin-bottom: 3px;">📞 ${escapeHtml(customer ? customer.phone : "Chưa cập nhật")}</div>
+                            <div style="font-size: 13px; color: #475569; margin-bottom: 3px;">✉️ ${escapeHtml(customer ? customer.email : "Chưa cập nhật")}</div>
+                            <div style="font-size: 12.5px; color: #64748b;">📍 ${escapeHtml(customer ? customer.address : "Việt Nam")}</div>
+                        </div>
+
+                        <div style="background: #f8fafc; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <div style="font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase; margin-bottom: 6px;">THÔNG TIN TOUR & LỊCH TRÌNH</div>
+                            <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">${escapeHtml(tour ? tour.tourName : `Tour #${b.tourId}`)}</div>
+                            <div style="font-size: 13px; color: #0284c7; font-weight: 600; margin-bottom: 3px;">📍 ${escapeHtml(tour ? tour.destination : "")}</div>
+                            <div style="font-size: 13px; color: #475569; margin-bottom: 3px;">🗓️ Khởi hành: <strong>${formatDate(b.departureDate)}</strong></div>
+                            <div style="font-size: 13px; color: #475569;">🕒 Đặt lúc: ${formatDateTime(b.bookingDate)}</div>
+                        </div>
                     </div>
 
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 18px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="color: #64748b; font-size: 13.5px;">Số lượng khách tham gia:</span>
+                            <strong style="color: #0f172a; font-size: 14.5px;">${b.numberOfPeople} người</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="color: #64748b; font-size: 13.5px;">Đơn giá vé tour / người:</span>
+                            <span style="color: #0f172a; font-weight: 600;">${formatVND(tour ? tour.price : (b.totalPrice / b.numberOfPeople))}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px dashed #e2e8f0;">
+                            <span style="color: #0f172a; font-weight: 800; font-size: 15px;">TỔNG THANH TOÁN:</span>
+                            <strong style="color: #0284c7; font-size: 18px;">${formatVND(b.totalPrice)}</strong>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;">
+                        <span style="font-size: 13px; color: #166534; font-weight: 600;">Trạng thái đơn hiện tại:</span>
+                        <strong style="font-size: 14px; color: #15803d;">${b.status}</strong>
+                    </div>
                 `;
 
-            }
+                // Cập nhật các nút thao tác trong Modal
+                const modalFooter = document.getElementById("modalBookingFooter");
+                let footerActions = `
+                    <button type="button" class="btn-action-sm btn-print" onclick="openInvoiceModal({ bookingId: ${b.bookingId} })" style="background: #0284c7; color: #fff; padding: 8px 16px; font-size: 13px;">
+                        🖨️ In hóa đơn
+                    </button>
+                `;
 
-        }
-
-
-        // =========================
-        // Hoàn tiền
-        // =========================
-
-        async function refundBooking(
-            bookingId
-        ) {
-
-            const confirmRefund =
-                confirm(
-                    "Bạn có chắc chắn muốn hoàn tiền cho booking này không?"
-                );
-
-
-            if (!confirmRefund) {
-
-                return;
-
-            }
-
-
-            try {
-
-                const response =
-                    await fetch(
-                        `${API_BASE_URL}/Booking/${bookingId}/refund`,
-                        {
-                            method: "POST",
-
-                            headers: {
-
-                                "Authorization":
-                                    `Bearer ${token}`
-
-                            }
-                        }
-                    );
-
-
-                const text =
-                    await response.text();
-
-
-                console.log(
-                    "Refund status:",
-                    response.status
-                );
-
-
-                console.log(
-                    "Refund response:",
-                    text
-                );
-
-
-                if (!response.ok) {
-
-                    let message =
-                        "Hoàn tiền thất bại.";
-
-
-                    try {
-
-                        const data =
-                            JSON.parse(text);
-
-                        message =
-                            data.message ||
-                            message;
-
-                    }
-                    catch (e) {
-                        // Không phải JSON
-                    }
-
-
-                    alert(message);
-
-                    return;
-
+                const s = (b.status || "").toLowerCase();
+                if (s === "pending" || s === "đang chờ" || s === "chờ xử lý") {
+                    footerActions += `
+                        <button type="button" class="btn-action-sm btn-approve" onclick="approveBooking(${b.bookingId})" style="padding: 8px 16px; font-size: 13px;">
+                            ✓ Duyệt đơn
+                        </button>
+                        <button type="button" class="btn-action-sm btn-cancel" onclick="cancelBookingAction(${b.bookingId})" style="padding: 8px 16px; font-size: 13px;">
+                            ✕ Hủy đơn
+                        </button>
+                    `;
+                } else if (s === "confirmed" || s === "paid") {
+                    footerActions += `
+                        <button type="button" class="btn-action-sm btn-cancel" onclick="cancelBookingAction(${b.bookingId})" style="padding: 8px 16px; font-size: 13px;">
+                            ✕ Hủy đơn
+                        </button>
+                    `;
+                } else if (s === "cancelled") {
+                    footerActions += `
+                        <button type="button" class="btn-action-sm btn-refund" onclick="refundBookingAction(${b.bookingId})" style="padding: 8px 16px; font-size: 13px;">
+                            💸 Hoàn tiền
+                        </button>
+                    `;
                 }
 
+                footerActions += `
+                    <button type="button" class="btn-action-sm btn-detail" onclick="closeBookingDetailModal()" style="padding: 8px 16px; font-size: 13px;">
+                        Đóng
+                    </button>
+                `;
 
-                let message =
-                    "Hoàn tiền thành công!";
+                modalFooter.innerHTML = footerActions;
 
+                const modal = document.getElementById("bookingDetailModal");
+                modal.style.display = "flex";
+                document.body.style.overflow = "hidden";
+            };
 
-                if (text) {
+            window.closeBookingDetailModal = function () {
+                const modal = document.getElementById("bookingDetailModal");
+                if (modal) modal.style.display = "none";
+                document.body.style.overflow = "";
+            };
 
-                    try {
-
-                        const data =
-                            JSON.parse(text);
-
-                        message =
-                            data.message ||
-                            message;
-
-                    }
-                    catch (e) {
-                        // Không phải JSON
-                    }
-
-                }
-
-
-                alert(message);
-
-
-                // Tải lại danh sách
-
-                loadBookings();
-
+            // Bấm ra ngoài hoặc phím Escape để đóng modal
+            const detailModal = document.getElementById("bookingDetailModal");
+            if (detailModal) {
+                detailModal.addEventListener("click", function (e) {
+                    if (e.target === detailModal) closeBookingDetailModal();
+                });
             }
-            catch (error) {
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape") closeBookingDetailModal();
+            });
 
-                console.error(error);
+            // ==========================================
+            // 8. SỰ KIỆN TÌM KIẾM & BỘ LỌC
+            // ==========================================
+            // Bấm tab lọc trạng thái
+            document.querySelectorAll(".filter-tab-btn").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    document.querySelectorAll(".filter-tab-btn").forEach(b => b.classList.remove("active"));
+                    this.classList.add("active");
+                    currentStatusFilter = this.getAttribute("data-status");
+                    applyFilterAndRender();
+                });
+            });
 
-                alert(
-                    "Không thể kết nối đến Backend."
-                );
-
+            // Nhập tìm kiếm real-time
+            const searchInput = document.getElementById("searchInput");
+            if (searchInput) {
+                let debounceTimer = null;
+                searchInput.addEventListener("input", function () {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        currentSearchKeyword = this.value;
+                        applyFilterAndRender();
+                    }, 250);
+                });
             }
 
-        }
+            // Thay đổi sắp xếp
+            const sortSelect = document.getElementById("sortSelect");
+            if (sortSelect) {
+                sortSelect.addEventListener("change", function () {
+                    currentSortBy = this.value;
+                    applyFilterAndRender();
+                });
+            }
 
+            // Xóa bộ lọc
+            const btnReset = document.getElementById("btnResetFilters");
+            if (btnReset) {
+                btnReset.addEventListener("click", function () {
+                    if (searchInput) searchInput.value = "";
+                    currentSearchKeyword = "";
+                    currentStatusFilter = "all";
+                    currentSortBy = "date-desc";
+                    if (sortSelect) sortSelect.value = "date-desc";
 
-        // =========================
-        // Định dạng tiền
-        // =========================
+                    document.querySelectorAll(".filter-tab-btn").forEach(b => {
+                        b.classList.remove("active");
+                        if (b.getAttribute("data-status") === "all") b.classList.add("active");
+                    });
 
-        function formatPrice(price) {
+                    applyFilterAndRender();
+                });
+            }
 
-            return Number(price)
-                .toLocaleString("vi-VN")
-                + " VNĐ";
+            // Nút làm mới dữ liệu
+            const btnRefresh = document.getElementById("btnRefreshList");
+            if (btnRefresh) {
+                btnRefresh.addEventListener("click", loadAllData);
+            }
 
-        }
-
-
-        // =========================
-        // Định dạng ngày
-        // =========================
-
-        function formatDate(date) {
-
-            return new Date(date)
-                .toLocaleString("vi-VN");
-
-        }
-
-
-        // =========================
-        // Chạy
-        // =========================
-
-        loadBookings();
-
+            // Tải dữ liệu ban đầu
+            loadAllData();
+        });
     </script>
-
-    <script src="../js/navbar.js"></script>
 </body>
-
 </html>

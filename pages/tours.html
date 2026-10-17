@@ -36,6 +36,18 @@
                 <div class="section-title">
                     <h1>Khám phá Tour du lịch</h1>
                     <p>Hàng trăm điểm đến tuyệt đẹp và trải nghiệm khó quên đang chờ đón bạn</p>
+                <!-- Banner nhắc nhở Admin chuyển sang trang Quản trị Tour -->
+                <div id="adminNoticeBanner" style="display: none; justify-content: space-between; align-items: center; background: #e0f2fe; border: 1px solid #7dd3fc; padding: 14px 20px; border-radius: 14px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 24px;">⚙️</span>
+                        <div>
+                            <strong style="color: #0369a1; font-size: 14.5px;">Bạn đang đăng nhập với tư cách Quản trị viên (Admin)</strong>
+                            <div style="font-size: 13px; color: #475569;">Bạn có toàn quyền thêm mới tour, cập nhật bảng giá, sửa thời lượng hoặc xóa các tour trên hệ thống.</div>
+                        </div>
+                    </div>
+                    <a href="admin-tours.html" class="btn-action-sm btn-edit" style="text-decoration: none; padding: 9px 18px; font-size: 13.5px; border-radius: 9px; white-space: nowrap;">
+                        🧭 Mở Quản lý Tour →
+                    </a>
                 </div>
 
                 <!-- Bộ lọc và tìm kiếm tour hiện đại -->
@@ -438,6 +450,17 @@
         // Chạy khi mở trang
         loadTours();
 
+        // Hiển thị banner cho Admin nếu đang đăng nhập
+        try {
+            const storedUser = localStorage.getItem("user");
+            if (storedUser) {
+                const u = JSON.parse(storedUser);
+                if (u && u.role === "Admin") {
+                    const banner = document.getElementById("adminNoticeBanner");
+                    if (banner) banner.style.display = "flex";
+                }
+            }
+        } catch (_) {}
     </script>
 <script src="../js/navbar.js"></script>
 </body>
