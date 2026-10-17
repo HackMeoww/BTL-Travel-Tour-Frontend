@@ -14,35 +14,15 @@
 
     <!-- Header -->
     <header class="header">
-
         <div class="container navbar">
-
-            <div class="logo">
-                Travel Tour
-            </div>
+            <a href="../index.html" class="logo">Travel Tour</a>
 
             <nav class="menu">
-
-                <a href="../index.html">
-                    Trang chủ
-                </a>
-
-                <a href="tours.html">
-                    Tour
-                </a>
-
-                <a href="admin-bookings.html">
-                    Quản lý Booking
-                </a>
-
-                <a href="#" id="logoutLink">
-                    Đăng xuất
-                </a>
-
+                <a href="../index.html" data-nav="home">Trang chủ</a>
+                <a href="tours.html" data-nav="tours">Tour</a>
+                <a href="login.html" data-nav="login" id="loginLink">Đăng nhập</a>
             </nav>
-
         </div>
-
     </header>
 
 
@@ -295,6 +275,18 @@
 
                             </div>
 
+                            <div class="summary-item">
+
+                                <span>
+                                    Ngày đi
+                                </span>
+
+                                <strong>
+                                    ${booking.departureDate ? formatDate(booking.departureDate) : "Chưa xác định"}
+                                </strong>
+
+                            </div>
+
 
                             <div class="summary-item">
 
@@ -312,41 +304,35 @@
                             ${
                                 booking.status === "Cancelled"
                                 ?
-
                                 `
-
                                     <button
                                         class="booking-button"
                                         type="button"
                                         onclick="refundBooking(${booking.bookingId})">
-
                                         Hoàn tiền
-
                                     </button>
-
                                 `
-
                                 :
-
                                 booking.status === "Refunded"
-
                                 ?
-
                                 `
-
                                     <p>
                                         <strong>
                                             Đã hoàn tiền
                                         </strong>
                                     </p>
-
                                 `
-
                                 :
-
                                 ""
-
                             }
+
+                            <button
+                                class="booking-button"
+                                type="button"
+                                style="background: #087db5; margin-top: 10px;"
+                                onclick="window.open('invoice.html?bookingId=${booking.bookingId}', '_blank')">
+                                🖨️ In hóa đơn
+                            </button>
 
                         `;
 
@@ -534,43 +520,6 @@
 
 
         // =========================
-        // Đăng xuất
-        // =========================
-
-        const logoutLink =
-            document.getElementById(
-                "logoutLink"
-            );
-
-
-        logoutLink.addEventListener(
-            "click",
-            function (event) {
-
-                event.preventDefault();
-
-
-                localStorage.removeItem(
-                    "token"
-                );
-
-                localStorage.removeItem(
-                    "user"
-                );
-
-                localStorage.removeItem(
-                    "booking"
-                );
-
-
-                window.location.href =
-                    "../index.html";
-
-            }
-        );
-
-
-        // =========================
         // Chạy
         // =========================
 
@@ -578,6 +527,7 @@
 
     </script>
 
+    <script src="../js/navbar.js"></script>
 </body>
 
 </html>

@@ -13,83 +13,13 @@
 
     <header class="header">
         <div class="container navbar">
+            <a href="index.html" class="logo">Travel Tour</a>
 
-            <div class="logo">
-                Travel Tour
-            </div>
-
-         <nav class="menu">
-
-    <a href="index.html">Trang chủ</a>
-
-    <a href="pages/tours.html">Khám phá tour</a>
-
-    <!-- Customer -->
-    <a href="pages/my-bookings.html"
-       id="myBookingsLink"
-       style="display: none;">
-        Đơn đặt tour
-    </a>
-
-    <a href="pages/my-payments.html"
-       id="myPaymentsLink"
-       style="display: none;">
-        Thanh toán
-    </a>
-
-    <a href="pages/invoice.html"
-   id="invoiceLink"
-   style="display: none;">
-    Hóa đơn
-</a>
-
-    <a href="pages/my-refunds.html"
-       id="myRefundsLink"
-       style="display: none;">
-        Hủy tour / Hoàn tiền
-    </a>
-
-    <a href="pages/my-reviews.html"
-       id="myReviewsLink"
-       style="display: none;">
-        Đánh giá của tôi
-    </a>
-
-    <a href="pages/profile.html"
-       id="profileLink"
-       style="display: none;">
-        Tài khoản cá nhân
-    </a>
-
-    <a href="pages/support.html"
-       id="supportLink"
-       style="display: none;">
-        Hỗ trợ
-    </a>
-
-    <!-- Admin và Staff -->
-    <a href="pages/admin-bookings.html"
-       id="adminBookingsLink"
-       style="display: none;">
-        Quản lý Booking
-    </a>
-
-    <a href="pages/admin.html"
-       id="dashboardLink"
-       style="display: none;">
-        Dashboard
-    </a>
-
-    <a href="pages/login.html" id="loginLink">
-        Đăng nhập
-    </a>
-
-    <a href="#" id="logoutLink" style="display: none;">
-        Đăng xuất
-    </a>
-
-</nav>
-
+            <nav class="menu">
+                <a href="index.html" data-nav="home">Trang chủ</a>
+                <a href="pages/tours.html" data-nav="tours">Tour</a>
+                <a href="pages/login.html" data-nav="login" id="loginLink">Đăng nhập</a>
+            </nav>
         </div>
     </header>
 
@@ -229,122 +159,7 @@
 
     </div>
 </section>
-<section class="search-section">
-    <div class="container">
-
-        <div class="section-title">
-            <h2>Tìm kiếm tour</h2>
-            <p>Tìm tour phù hợp với nhu cầu của bạn</p>
-        </div>
-
-        <div class="search-box">
-
-            <div class="search-field">
-                <label for="destination">Địa điểm</label>
-                <input
-                    type="text"
-                    id="destination"
-                    placeholder="Nhập địa điểm..."
-                >
-            </div>
-
-            <div class="search-field">
-                <label for="minPrice">Giá từ</label>
-                <input
-                    type="number"
-                    id="minPrice"
-                    placeholder="Giá thấp nhất"
-                >
-            </div>
-
-            <div class="search-field">
-                <label for="maxPrice">Đến giá</label>
-                <input
-                    type="number"
-                    id="maxPrice"
-                    placeholder="Giá cao nhất"
-                >
-            </div>
-
-            <button class="search-button">
-                Tìm kiếm
-            </button>
-
-        </div>
-
-    </div>
-</section>
-
     </main>
-<script>
-const token = localStorage.getItem("token");
-const userData = localStorage.getItem("user");
-
-const loginLink = document.getElementById("loginLink");
-const logoutLink = document.getElementById("logoutLink");
-
-const customerLinks = [
-    "myBookingsLink"
-];
-
-const adminBookingsLink =
-    document.getElementById("adminBookingsLink");
-
-const dashboardLink =
-    document.getElementById("dashboardLink");
-
-// Ẩn tất cả chức năng riêng trước khi kiểm tra quyền
-customerLinks.forEach(id => {
-    document.getElementById(id).style.display = "none";
-});
-
-adminBookingsLink.style.display = "none";
-dashboardLink.style.display = "none";
-
-if (token && userData) {
-    try {
-        const user = JSON.parse(userData);
-        const role = user.role;
-
-        loginLink.style.display = "none";
-        logoutLink.style.display = "inline-block";
-
-        if (role === "Customer") {
-            customerLinks.forEach(id => {
-                document.getElementById(id).style.display =
-                    "inline-block";
-            });
-        }
-
-        if (role === "Admin" || role === "Staff") {
-            adminBookingsLink.style.display = "inline-block";
-        }
-
-        if (role === "Admin") {
-            dashboardLink.style.display = "inline-block";
-        }
-
-    } catch (error) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "pages/login.html";
-    }
-
-} else {
-    loginLink.style.display = "inline-block";
-    logoutLink.style.display = "none";
-}
-
-// Đăng xuất
-logoutLink.addEventListener("click", function (event) {
-    event.preventDefault();
-
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("booking");
-
-    window.location.href = "pages/login.html";
-});
-</script>
+<script src="js/navbar.js"></script>
 </body>
 </html>

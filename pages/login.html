@@ -198,7 +198,10 @@
                         userName,
 
                     role:
-                        role
+                        role,
+
+                    customerId:
+                        data.customerId || null
 
                 };
 
@@ -236,54 +239,7 @@
     );
 
 </script>
-<script>
 
-    const token = localStorage.getItem("token");
-
-    const loginLink =
-        document.getElementById("loginLink");
-
-    const logoutLink =
-        document.getElementById("logoutLink");
-
-
-    // =========================
-    // Kiểm tra đăng nhập
-    // =========================
-
-    if (token) {
-
-        loginLink.style.display = "none";
-
-        logoutLink.style.display = "inline-block";
-
-    }
-    else {
-
-        loginLink.style.display = "inline-block";
-
-        logoutLink.style.display = "none";
-
-    }
-
-
-    // =========================
-    // Đăng xuất
-    // =========================
-
-    logoutLink.addEventListener("click", function (event) {
-
-        event.preventDefault();
-
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("booking");
-
-        window.location.href = "../index.html";
-
-    });
-
-</script>
 </body>
 
 </html>

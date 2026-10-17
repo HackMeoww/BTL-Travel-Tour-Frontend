@@ -15,35 +15,13 @@
     <!-- Header -->
     <header class="header">
         <div class="container navbar">
-
-            <div class="logo">
-                Travel Tour
-            </div>
+            <a href="../index.html" class="logo">Travel Tour</a>
 
             <nav class="menu">
-
-                <a href="../index.html">
-                    Trang chủ
-                </a>
-
-                <a href="tours.html">
-                    Tour
-                </a>
-
-                <a href="my-bookings.html">
-                    Đơn đặt tour
-                </a>
-
-                <a href="login.html" id="loginLink">
-                    Đăng nhập
-                </a>
-
-                <a href="#" id="logoutLink" style="display: none;">
-                    Đăng xuất
-                </a>
-
+                <a href="../index.html" data-nav="home">Trang chủ</a>
+                <a href="tours.html" data-nav="tours">Tour</a>
+                <a href="login.html" data-nav="login" id="loginLink">Đăng nhập</a>
             </nav>
-
         </div>
     </header>
 
@@ -386,6 +364,18 @@ const destination = tour
 
                     </div>
 
+                    <div class="summary-item">
+
+                        <span>
+                            Ngày đi
+                        </span>
+
+                        <strong>
+                            ${booking.departureDate ? formatDate(booking.departureDate) : "Chưa xác định"}
+                        </strong>
+
+                    </div>
+
 
                     <div class="summary-item">
 
@@ -428,14 +418,10 @@ const pdfButton = document.createElement("button");
 
 pdfButton.type = "button";
 pdfButton.className = "booking-button";
-pdfButton.textContent = "In hóa đơn";
+pdfButton.innerHTML = "🖨️ In hóa đơn";
 
 pdfButton.addEventListener("click", function () {
-    printBookingPDF({
-        ...booking,
-        tourName: tourName,
-        destination: destination
-    });
+    window.open(`invoice.html?bookingId=${booking.bookingId}`, "_blank");
 });
 
 bookingItem.appendChild(pdfButton);
@@ -515,43 +501,7 @@ function formatBookingStatus(status) {
     return statuses[status] || status;
 }
 
-        // =========================
-        // Đăng xuất
-        // =========================
 
-        const loginLink =
-            document.getElementById("loginLink");
-
-        const logoutLink =
-            document.getElementById("logoutLink");
-
-
-        if (token) {
-
-            loginLink.style.display =
-                "none";
-
-            logoutLink.style.display =
-                "inline-block";
-
-        }
-
-
-        logoutLink.addEventListener(
-            "click",
-            function (event) {
-
-                event.preventDefault();
-
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
-                localStorage.removeItem("booking");
-
-                window.location.href =
-                    "../index.html";
-
-            }
-        );
 
 
         // =========================
@@ -736,6 +686,7 @@ function printBookingPDF(booking) {
 
     </script>
 
+    <script src="../js/navbar.js"></script>
 </body>
 
 </html>

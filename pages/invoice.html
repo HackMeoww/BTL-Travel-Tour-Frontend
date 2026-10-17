@@ -3,43 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hóa đơn - Travel Tour</title>
+    <title>Hóa đơn thanh toán - Travel Tour</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    <header class="header">
+    <header class="header no-print">
         <div class="container navbar">
-            <div class="logo">Travel Tour</div>
+            <a href="../index.html" class="logo">Travel Tour</a>
 
             <nav class="menu">
-                <a href="../index.html">Trang chủ</a>
-                <a href="tours.html">Tour</a>
-                <a href="booking-history.html">Lịch sử đặt tour</a>
-                <a href="#" id="logoutLink">Đăng xuất</a>
+                <a href="../index.html" data-nav="home">Trang chủ</a>
+                <a href="tours.html" data-nav="tours">Tour</a>
+                <a href="my-bookings.html" data-nav="my-bookings">Đơn đặt tour</a>
+                <a href="login.html" data-nav="login" id="loginLink">Đăng nhập</a>
             </nav>
         </div>
     </header>
 
-    <main class="container invoice-page">
-        <div class="section-title">
-            <h1>Hóa đơn thanh toán</h1>
-            <p>Thông tin hóa đơn đặt tour của bạn</p>
+    <main class="invoice-page">
+        <!-- Thanh công cụ (Chỉ hiển thị trên màn hình, tự động ẩn khi bấm In) -->
+        <div class="invoice-toolbar no-print">
+            <div class="toolbar-left">
+                <a href="tours.html" class="btn-toolbar-link">
+                    ← Xem thêm Tour
+                </a>
+                <a href="my-bookings.html" class="btn-toolbar-link">
+                    📋 Đơn đặt của tôi
+                </a>
+            </div>
+
+            <div class="toolbar-right">
+                <button type="button" class="btn-print-invoice" onclick="window.print()">
+                    🖨️ In hóa đơn / Lưu PDF
+                </button>
+            </div>
         </div>
 
-        <section class="invoice-card">
-            <p>Đang tải thông tin hóa đơn...</p>
-        </section>
-
-        <div class="invoice-actions">
-            <button type="button" onclick="window.print()">
-                In hóa đơn
-            </button>
-
-            <a href="tours.html">Quay lại danh sách tour</a>
+        <!-- Khung hiển thị tờ hóa đơn du lịch A4 -->
+        <div class="invoice-sheet" id="invoiceSheet">
+            <div class="invoice-loading">
+                <p>Đang tải thông tin hóa đơn chi tiết...</p>
+            </div>
         </div>
     </main>
 
     <script src="../js/api.js"></script>
     <script src="../js/invoice.js"></script>
+    <script src="../js/navbar.js"></script>
 </body>
 </html>

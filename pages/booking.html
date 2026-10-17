@@ -15,31 +15,13 @@
     <!-- Header -->
     <header class="header">
         <div class="container navbar">
-
-            <div class="logo">
-                Travel Tour
-            </div>
+            <a href="../index.html" class="logo">Travel Tour</a>
 
             <nav class="menu">
-
-    <a href="../index.html">
-        Trang chủ
-    </a>
-
-    <a href="tours.html">
-        Tour
-    </a>
-
-    <a href="login.html" id="loginLink">
-        Đăng nhập
-    </a>
-
-    <a href="#" id="logoutLink" style="display: none;">
-        Đăng xuất
-    </a>
-
-</nav>
-
+                <a href="../index.html" data-nav="home">Trang chủ</a>
+                <a href="tours.html" data-nav="tours">Tour</a>
+                <a href="login.html" data-nav="login" id="loginLink">Đăng nhập</a>
+            </nav>
         </div>
     </header>
 
@@ -112,6 +94,19 @@
                                 type="text"
                                 id="address"
                                 placeholder="Nhập địa chỉ"
+                            >
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="departureDate">
+                                Ngày đi (Khởi hành)
+                            </label>
+
+                            <input
+                                type="date"
+                                id="departureDate"
+                                required
                             >
                         </div>
 
@@ -379,415 +374,185 @@
     // =========================
 
     async function continueBooking() {
-
         // Kiểm tra đăng nhập
-
-        const token =
-            localStorage.getItem("token");
-
-
+        const token = localStorage.getItem("token");
         if (!token) {
-
-            alert(
-                "Bạn cần đăng nhập trước khi đặt tour."
-            );
-
-            window.location.href =
-                "login.html";
-
+            alert("Bạn cần đăng nhập trước khi đặt tour.");
+            window.location.href = "login.html";
             return;
-
         }
-
 
         // Kiểm tra Tour
-
         if (!currentTour) {
-
-            alert(
-                "Chưa tải được thông tin tour."
-            );
-
+            alert("Chưa tải được thông tin tour.");
             return;
-
         }
 
-
-// =========================
-// Lấy thông tin User
-// =========================
-
-const userData =
-    localStorage.getItem("user");
-
-
-if (!userData) {
-
-    alert(
-        "Không tìm thấy thông tin tài khoản. Vui lòng đăng nhập lại."
-    );
-
-    window.location.href =
-        "login.html";
-
-    return;
-
-}
-
-
-const user =
-    JSON.parse(userData);
-
-
-// =========================
-// Lấy Customer theo UserId
-// =========================
-
-let customerId = null;
-
-
-try {
-
-    const customerResponse =
-    await fetch(
-        `${API_BASE_URL}/Customer`,
-        {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
+        // Lấy thông tin User
+        const userData = localStorage.getItem("user");
+        if (!userData) {
+            alert("Không tìm thấy thông tin tài khoản. Vui lòng đăng nhập lại.");
+            window.location.href = "login.html";
+            return;
         }
-    );
+        const user = JSON.parse(userData);
 
+        // Ngày đi (Khởi hành)
+        const departureDate = document.getElementById("departureDate").value;
+        if (!departureDate) {
+            alert("Vui lòng chọn ngày khởi hành.");
+            return;
+        }
 
-    if (!customerResponse.ok) {
-
-        throw new Error(
-            "Không thể lấy danh sách khách hàng"
-        );
-
-    }
-
-
-    const customers =
-        await customerResponse.json();
-
-
-    const customer =
-        customers.find(
-            c => Number(c.userId) === Number(user.userId)
-        );
-
-
-    if (!customer) {
-
-        alert(
-            "Không tìm thấy thông tin khách hàng tương ứng với tài khoản."
-        );
-
-        return;
-
-    }
-
-
-    // =========================
-    // Lấy CustomerId
-    // =========================
-
-    customerId =
-        customer.customerId;
-
-
-    // =========================
-    // Tự động điền thông tin
-    // =========================
-
-    document.getElementById("fullName").value =
-        customer.fullName;
-
-    document.getElementById("phone").value =
-        customer.phone;
-
-    document.getElementById("email").value =
-        customer.email;
-
-    document.getElementById("address").value =
-        customer.address;
-
-
-    // Lưu CustomerId vào user
-
-    user.customerId =
-        customerId;
-
-    localStorage.setItem(
-        "user",
-        JSON.stringify(user)
-    );
-
-}
-catch (error) {
-
-    console.error(error);
-
-    alert(
-        "Không thể lấy thông tin khách hàng từ Backend."
-    );
-
-    return;
-
-}
         // Số người
-
-        const numberOfPeople =
-            Number(
-                document.getElementById(
-                    "numberOfPeople"
-                ).value
-            );
-
-
+        const numberOfPeople = Number(document.getElementById("numberOfPeople").value);
         if (!numberOfPeople || numberOfPeople < 1) {
-
-            alert(
-                "Số lượng người phải lớn hơn 0."
-            );
-
+            alert("Số lượng người phải lớn hơn 0.");
             return;
-
         }
 
+        // Lấy Customer theo UserId
+        let customerId = user.customerId;
+        try {
+            const customerResponse = await fetch(`${API_BASE_URL}/Customer`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (!customerResponse.ok) {
+                throw new Error("Không thể lấy danh sách khách hàng");
+            }
+
+            const customers = await customerResponse.json();
+            const customer = customers.find(c => Number(c.userId) === Number(user.userId));
+
+            if (!customer) {
+                alert("Không tìm thấy thông tin khách hàng tương ứng với tài khoản.");
+                return;
+            }
+
+            customerId = customer.customerId;
+
+            // Lưu CustomerId vào user
+            user.customerId = customerId;
+            localStorage.setItem("user", JSON.stringify(user));
+        } catch (error) {
+            console.error(error);
+            alert("Không thể lấy thông tin khách hàng từ Backend.");
+            return;
+        }
 
         // Tổng tiền
-        // Backend cũng sẽ tự tính lại
-
-        const totalPrice =
-            currentTour.price *
-            numberOfPeople;
-
+        const totalPrice = currentTour.price * numberOfPeople;
 
         try {
+            const response = await fetch(`${API_BASE_URL}/Booking`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    bookingId: 0,
+                    tourId: Number(tourId),
+                    customerId: Number(customerId),
+                    bookingDate: new Date().toISOString(),
+                    departureDate: departureDate,
+                    numberOfPeople: numberOfPeople,
+                    totalPrice: totalPrice,
+                    status: "Pending"
+                })
+            });
 
-            const response = await fetch(
-    `${API_BASE_URL}/Booking`,
-    {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-            bookingId: 0,
-            tourId: Number(tourId),
-            customerId: Number(customerId),
-            bookingDate: new Date().toISOString(),
-            numberOfPeople: numberOfPeople,
-            totalPrice: totalPrice,
-            status: "Pending"
-        })
-    }
-);
-
-
-            const data =
-                await response.json();
-
+            const data = await response.json();
 
             if (!response.ok) {
-
-                alert(
-                    data.message ||
-                    "Đặt tour thất bại."
-                );
-
+                alert(data.message || "Đặt tour thất bại.");
                 return;
-
             }
 
-
             // Lưu Booking vừa tạo
-
             localStorage.setItem("booking", JSON.stringify(data));
-
-alert("Đặt tour thành công!");
-
-window.location.href =
-    `payment.html?bookingId=${data.bookingId}`;
-
-        }
-        catch (error) {
-
+            alert("Đặt tour thành công!");
+            window.location.href = `payment.html?bookingId=${data.bookingId}`;
+        } catch (error) {
             console.error(error);
+            alert("Không thể kết nối đến Backend.");
+        }
+    }
 
-            alert(
-                "Không thể kết nối đến Backend."
-            );
+    // =========================
+    // Tự động tải thông tin Customer
+    // =========================
 
+    async function loadCustomer() {
+        const token = localStorage.getItem("token");
+        const userData = localStorage.getItem("user");
+
+        if (!token || !userData) {
+            return;
         }
 
-    }
-// =========================
-// Tự động tải thông tin Customer
-// =========================
+        const user = JSON.parse(userData);
 
-async function loadCustomer() {
-
-    const token =
-        localStorage.getItem("token");
-
-    const userData =
-        localStorage.getItem("user");
-
-
-    if (!token || !userData) {
-
-        return;
-
-    }
-
-
-    const user =
-        JSON.parse(userData);
-
-
-    try {
-
-        const response =
-            await fetch(
-                `${API_BASE_URL}/Customer`,
-                {
-                    headers: {
-                        "Authorization":
-                            `Bearer ${token}`
-                    }
+        try {
+            const response = await fetch(`${API_BASE_URL}/Customer`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
                 }
-            );
+            });
 
+            if (!response.ok) {
+                console.error("Không lấy được danh sách Customer:", response.status);
+                return;
+            }
 
-        if (!response.ok) {
+            const customers = await response.json();
+            const customer = customers.find(c => Number(c.userId) === Number(user.userId));
 
-            console.error(
-                "Không lấy được danh sách Customer:",
-                response.status
-            );
+            if (!customer) {
+                console.error("Không tìm thấy Customer với UserId:", user.userId);
+                return;
+            }
 
-            return;
+            // Điền thông tin vào form
+            document.getElementById("fullName").value = customer.fullName || "";
+            document.getElementById("phone").value = customer.phone || "";
+            document.getElementById("email").value = customer.email || "";
+            document.getElementById("address").value = customer.address || "";
 
+            // Lưu CustomerId
+            user.customerId = customer.customerId;
+            localStorage.setItem("user", JSON.stringify(user));
+
+            console.log("Customer đã tải:", customer);
+        } catch (error) {
+            console.error("Lỗi tải Customer:", error);
         }
-
-
-        const customers =
-            await response.json();
-
-
-        const customer =
-            customers.find(
-                c =>
-                    Number(c.userId) ===
-                    Number(user.userId)
-            );
-
-
-        if (!customer) {
-
-            console.error(
-                "Không tìm thấy Customer với UserId:",
-                user.userId
-            );
-
-            return;
-
-        }
-
-
-        // Điền thông tin vào form
-
-        document.getElementById("fullName").value =
-            customer.fullName || "";
-
-        document.getElementById("phone").value =
-            customer.phone || "";
-
-        document.getElementById("email").value =
-            customer.email || "";
-
-        document.getElementById("address").value =
-            customer.address || "";
-
-
-        // Lưu CustomerId
-
-        user.customerId =
-            customer.customerId;
-
-
-        localStorage.setItem(
-            "user",
-            JSON.stringify(user)
-        );
-
-
-        console.log(
-            "Customer đã tải:",
-            customer
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-            "Lỗi tải Customer:",
-            error
-        );
-
     }
 
-}
-// =========================
-// Chạy khi mở trang
-// =========================
+    function initDepartureDate() {
+        const today = new Date();
+        today.setDate(today.getDate() + 1);
+        const dateStr = today.toISOString().split("T")[0];
+        const dateInput = document.getElementById("departureDate");
+        if (dateInput) {
+            dateInput.min = new Date().toISOString().split("T")[0];
+            dateInput.value = dateStr;
+        }
+    }
 
-loadTour();
-loadCustomer();
+    // =========================
+    // Chạy khi mở trang
+    // =========================
+
+    loadTour();
+    loadCustomer();
+    initDepartureDate();
 
 </script>
-<script>
-
-    const token = localStorage.getItem("token");
-
-    const loginLink =
-        document.getElementById("loginLink");
-
-    const logoutLink =
-        document.getElementById("logoutLink");
-
-
-    if (token) {
-
-        loginLink.style.display = "none";
-        logoutLink.style.display = "inline-block";
-
-    }
-    else {
-
-        loginLink.style.display = "inline-block";
-        logoutLink.style.display = "none";
-
-    }
-
-
-    logoutLink.addEventListener("click", function (event) {
-
-        event.preventDefault();
-
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("booking");
-
-        window.location.href = "../index.html";
-
-    });
-
-</script>
+<script src="../js/navbar.js"></script>
 </body>
 
 </html>

@@ -57,14 +57,12 @@
 <body>
     <header class="header">
         <div class="container navbar">
-            <div class="logo">Travel Tour</div>
+            <a href="../index.html" class="logo">Travel Tour</a>
 
             <nav class="menu">
-                <a href="../index.html">Trang chủ</a>
-                <a href="tours.html">Tour</a>
-                <a href="admin.html">Dashboard</a>
-                <a href="login.html" id="loginLink">Đăng nhập</a>
-                <a href="#" id="logoutLink" style="display: none;">Đăng xuất</a>
+                <a href="../index.html" data-nav="home">Trang chủ</a>
+                <a href="tours.html" data-nav="tours">Tour</a>
+                <a href="login.html" data-nav="login" id="loginLink">Đăng nhập</a>
             </nav>
         </div>
     </header>
@@ -105,24 +103,7 @@
 
     <script>
         const token = localStorage.getItem("token");
-
-        const loginLink = document.getElementById("loginLink");
-        const logoutLink = document.getElementById("logoutLink");
         const dashboardMessage = document.getElementById("dashboardMessage");
-
-        logoutLink.addEventListener("click", function (event) {
-            event.preventDefault();
-
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-
-            window.location.href = "login.html";
-        });
-
-        if (token) {
-            loginLink.style.display = "none";
-            logoutLink.style.display = "inline";
-        }
 
         async function loadDashboard() {
             if (!token) {
@@ -175,5 +156,7 @@
 
         loadDashboard();
     </script>
+
+    <script src="../js/navbar.js"></script>
 </body>
 </html>

@@ -15,31 +15,13 @@
     <!-- Header -->
     <header class="header">
         <div class="container navbar">
-
-            <div class="logo">
-                Travel Tour
-            </div>
+            <a href="../index.html" class="logo">Travel Tour</a>
 
             <nav class="menu">
-
-    <a href="../index.html">
-        Trang chủ
-    </a>
-
-    <a href="tours.html">
-        Tour
-    </a>
-
-    <a href="login.html" id="loginLink">
-        Đăng nhập
-    </a>
-
-    <a href="#" id="logoutLink" style="display: none;">
-        Đăng xuất
-    </a>
-
-</nav>
-
+                <a href="../index.html" data-nav="home">Trang chủ</a>
+                <a href="tours.html" data-nav="tours">Tour</a>
+                <a href="login.html" data-nav="login" id="loginLink">Đăng nhập</a>
+            </nav>
         </div>
     </header>
 
@@ -226,6 +208,12 @@
 
     }
 
+    function formatDate(dateStr) {
+        if (!dateStr) return "Chưa xác định";
+        const d = new Date(dateStr);
+        return d.toLocaleDateString("vi-VN");
+    }
+
 
     // =========================
     // Lấy Booking
@@ -288,12 +276,21 @@
             currentBooking =
                 await response.json();
 
-
             console.log(
                 "Booking:",
                 currentBooking
             );
 
+            let tourName = `Tour #${currentBooking.tourId}`;
+            try {
+                const tourRes = await fetch(`${API_BASE_URL}/Tour/${currentBooking.tourId}`);
+                if (tourRes.ok) {
+                    const tourData = await tourRes.json();
+                    tourName = tourData.tourName || tourName;
+                }
+            } catch (err) {
+                console.error("Không thể tải chi tiết tour:", err);
+            }
 
             // =========================
             // Hiển thị thông tin Booking
@@ -330,7 +327,20 @@
                     </span>
 
                     <strong>
-                        Tour #${currentBooking.tourId}
+                        ${tourName}
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Ngày khởi hành
+                    </span>
+
+                    <strong>
+                        ${formatDate(currentBooking.departureDate)}
                     </strong>
 
                 </div>
@@ -586,44 +596,7 @@ paymentButton.textContent = "Đang xử lý thanh toán...";
     loadBooking();
 
 </script>
-<script>
-
-    const token = localStorage.getItem("token");
-
-    const loginLink =
-        document.getElementById("loginLink");
-
-    const logoutLink =
-        document.getElementById("logoutLink");
-
-
-    if (token) {
-
-        loginLink.style.display = "none";
-        logoutLink.style.display = "inline-block";
-
-    }
-    else {
-
-        loginLink.style.display = "inline-block";
-        logoutLink.style.display = "none";
-
-    }
-
-
-    logoutLink.addEventListener("click", function (event) {
-
-        event.preventDefault();
-
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("booking");
-
-        window.location.href = "../index.html";
-
-    });
-
-</script>
+<script src="../js/navbar.js"></script>
 </body>
 
 </html>
