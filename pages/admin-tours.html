@@ -810,7 +810,7 @@
                                     <span style="background: #e2e8f0; color: #334155; padding: 1px 7px; border-radius: 4px; font-weight: 600;">
                                         ⏱️ ${duration} ngày
                                     </span>
-                                    <a href="tour-detail.html?id=${tid}" target="_blank" style="color: #0284c7; text-decoration: none; font-weight: 600;">
+                                    <a href="tour-detail.html?id=${tid}" style="color: #0284c7; text-decoration: none; font-weight: 600;">
                                         Xem trang khách ↗
                                     </a>
                                 </div>
@@ -1171,7 +1171,7 @@
                 `;
 
                 footerEl.innerHTML = `
-                    <a href="tour-detail.html?id=${tour.tourId}" target="_blank" class="btn-action-sm btn-view" style="padding: 9px 16px; font-size: 13px; text-decoration: none;">
+                    <a href="tour-detail.html?id=${tour.tourId}" class="btn-action-sm btn-view" style="padding: 9px 16px; font-size: 13px; text-decoration: none;">
                         🌐 Xem trang khách ↗
                     </a>
                     <button type="button" class="btn-action-sm btn-edit" onclick="closeTourDetailModal(); openEditTourModal(${tour.tourId});" style="padding: 9px 16px; font-size: 13px;">
