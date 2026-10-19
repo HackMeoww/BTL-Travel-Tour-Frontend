@@ -74,6 +74,10 @@
                             <span>🧭</span>
                             <span>Quản lý Tour</span>
                         </a>
+                        <a href="admin-users.html" class="btn-admin-hero btn-ghost" id="btnNavUsers">
+                            <span>👥</span>
+                            <span>Quản lý Tài khoản</span>
+                        </a>
                     </div>
                 </div>
 
@@ -230,6 +234,17 @@
                                 <span style="color: #0284c7; font-weight: 700;">Mở →</span>
                             </a>
 
+                            <a href="admin-users.html" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; text-decoration: none; color: inherit; transition: all 0.2s;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <span style="font-size: 22px;">👥</span>
+                                    <div>
+                                        <strong style="color: #0f172a; font-size: 14px;">Quản lý Tài khoản & Phân quyền</strong>
+                                        <div style="font-size: 12px; color: #64748b;">Thêm tài khoản, đổi thông tin, phân quyền Admin, Staff, Customer</div>
+                                    </div>
+                                </div>
+                                <span style="color: #0284c7; font-weight: 700;">Mở →</span>
+                            </a>
+
                             <a href="../index.html" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; text-decoration: none; color: inherit; transition: all 0.2s;">
                                 <div style="display: flex; align-items: center; gap: 12px;">
                                     <span style="font-size: 22px;">🌐</span>
@@ -313,29 +328,36 @@
             const dashboardMainSection = document.getElementById("dashboardMainSection");
 
             // ==========================================
-            // 1. KIỂM TRA BẢO MẬT & QUYỀN HẠN ADMIN
+            // 1. KIỂM TRA BẢO MẬT & QUYỀN HẠN (ADMIN & STAFF)
             // ==========================================
             if (!token || !user) {
                 accessDeniedSection.style.display = "block";
                 dashboardMainSection.style.display = "none";
-                accessDeniedMessage.innerHTML = "Bạn chưa đăng nhập vào hệ thống. Vui lòng đăng nhập bằng tài khoản <strong>Admin</strong> để tiếp tục.";
+                accessDeniedMessage.innerHTML = "Bạn chưa đăng nhập vào hệ thống. Vui lòng đăng nhập bằng tài khoản <strong>Admin</strong> hoặc <strong>Nhân viên (Staff)</strong> để tiếp tục.";
                 return;
             }
 
-            if (user.role !== "Admin") {
+            if (user.role !== "Admin" && user.role !== "Staff") {
                 accessDeniedSection.style.display = "block";
                 dashboardMainSection.style.display = "none";
-                accessDeniedMessage.innerHTML = `Tài khoản của bạn (<strong>${user.userName || user.name}</strong>) có vai trò là <strong>${user.role || 'Khách hàng'}</strong>, không có thẩm quyền truy cập Dashboard quản trị tối cao.`;
+                accessDeniedMessage.innerHTML = `Tài khoản của bạn (<strong>${user.userName || user.name}</strong>) có vai trò là <strong>${user.role || 'Khách hàng'}</strong>, không có thẩm quyền truy cập Dashboard.`;
                 return;
             }
 
-            // Đã xác thực thành công là Admin
+            // Đã xác thực thành công là Admin hoặc Staff
             accessDeniedSection.style.display = "none";
             dashboardMainSection.style.display = "block";
 
-            // Điền tên chào mừng
-            const greetingName = user.fullName || user.userName || "Quản trị viên";
+            // Điền tên chào mừng và tùy biến theo vai trò
+            const greetingName = user.fullName || user.userName || (user.role === "Staff" ? "Nhân viên" : "Quản trị viên");
             document.getElementById("adminGreetingName").textContent = greetingName;
+
+            if (user.role === "Staff") {
+                const tagEl = document.querySelector(".admin-role-badge-tag");
+                if (tagEl) tagEl.innerHTML = "👨‍💼 BÀN LÀM VIỆC ĐIỀU HÀNH · NHÂN VIÊN";
+                const btnNavUsers = document.getElementById("btnNavUsers");
+                if (btnNavUsers) btnNavUsers.style.display = "none";
+            }
 
             // ==========================================
             // 2. ĐỒNG HỒ THỜI GIAN THỰC

@@ -72,6 +72,10 @@
                             <span>🧭</span>
                             <span>Kho Tour</span>
                         </a>
+                        <a href="admin-users.html" class="btn-admin-hero btn-ghost" id="btnNavUsers">
+                            <span>👥</span>
+                            <span>Tài khoản</span>
+                        </a>
                     </div>
                 </div>
 
@@ -233,10 +237,13 @@
             accessDeniedSection.style.display = "none";
             bookingMainSection.style.display = "block";
 
-            // Nếu là Staff, ẩn nút Dashboard (chỉ Admin mới có quyền Dashboard)
-            if (user.role !== "Admin") {
-                const btnGoDashboard = document.getElementById("btnGoDashboard");
-                if (btnGoDashboard) btnGoDashboard.style.display = "none";
+            // Tùy biến giao diện phù hợp với Nhân viên (Staff)
+            if (user.role === "Staff") {
+                const badgeTag = document.querySelector(".admin-role-badge-tag");
+                if (badgeTag) badgeTag.innerHTML = `👨‍💼 CA TRỰC ĐIỀU HÀNH & BÁN VÉ · ${user.fullName || user.userName || 'Nhân viên'}`;
+                // Ẩn nút quản lý tài khoản vì chỉ Admin mới có quyền
+                const btnNavUsers = document.getElementById("btnNavUsers");
+                if (btnNavUsers) btnNavUsers.style.display = "none";
             }
 
             // Đồng hồ thời gian thực

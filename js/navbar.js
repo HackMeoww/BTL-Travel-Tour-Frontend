@@ -63,7 +63,7 @@
             roleLabel = "Admin";
             roleClass = "role-admin";
         } else if (role === "Staff") {
-            roleLabel = "Staff";
+            roleLabel = "Nhân viên (Staff)";
             roleClass = "role-staff";
         } else if (role === "Customer") {
             roleLabel = "Khách";
@@ -90,6 +90,10 @@
                     <span class="nav-item-icon">📑</span>
                     <span class="nav-item-text">Quản lý Booking</span>
                 </a>
+                <a href="${basePath}admin-users.html" data-nav="admin-users" class="nav-item">
+                    <span class="nav-item-icon">👥</span>
+                    <span class="nav-item-text">Quản lý Tài khoản</span>
+                </a>
                 <a href="${basePath}admin.html" data-nav="admin" class="nav-item">
                     <span class="nav-item-icon">📊</span>
                     <span class="nav-item-text">Dashboard</span>
@@ -97,13 +101,17 @@
             `;
         } else if (role === "Staff") {
             mainLinksHtml += `
-                <a href="${basePath}tours.html" data-nav="tours" class="nav-item">
-                    <span class="nav-item-icon">🧭</span>
-                    <span class="nav-item-text">Tour</span>
-                </a>
                 <a href="${basePath}admin-bookings.html" data-nav="admin-bookings" class="nav-item">
                     <span class="nav-item-icon">📑</span>
                     <span class="nav-item-text">Quản lý Booking</span>
+                </a>
+                <a href="${basePath}admin-tours.html" data-nav="admin-tours" class="nav-item">
+                    <span class="nav-item-icon">🧭</span>
+                    <span class="nav-item-text">Quản lý Tour</span>
+                </a>
+                <a href="${basePath}admin.html" data-nav="admin" class="nav-item">
+                    <span class="nav-item-icon">📊</span>
+                    <span class="nav-item-text">Dashboard</span>
                 </a>
             `;
         } else {
@@ -216,6 +224,8 @@
             currentNav = "admin-tours";
         } else if (filename === "admin-bookings.html") {
             currentNav = "admin-bookings";
+        } else if (filename === "admin-users.html") {
+            currentNav = "admin-users";
         } else if (filename === "admin.html") {
             currentNav = "admin";
         } else if (filename === "login.html") {

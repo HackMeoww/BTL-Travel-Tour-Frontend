@@ -4178,3 +4178,179 @@ body.invoice-modal-open {
         transform: translateX(0);
     }
 }
+
+/* ==========================================================================
+   ADMIN USER MANAGEMENT & ROLE ASSIGNMENT STYLES (Quản lý tài khoản & Phân quyền)
+   ========================================================================== */
+.user-mgmt-page {
+    background: #f8fafc;
+    min-height: calc(100vh - 70px);
+    padding: 30px 0 60px;
+}
+
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffffff;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.avatar-admin {
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+}
+
+.avatar-staff {
+    background: linear-gradient(135deg, #0284c7, #0891b2);
+}
+
+.avatar-customer {
+    background: linear-gradient(135deg, #059669, #10b981);
+}
+
+.user-info-text strong {
+    display: block;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+}
+
+.user-info-text small {
+    display: block;
+    font-size: 12px;
+    color: #64748b;
+    font-family: monospace;
+    margin-top: 2px;
+}
+
+/* Role Badges */
+.badge-role {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.badge-role.role-admin {
+    background: #f5f3ff;
+    color: #6d28d9;
+    border: 1px solid #ddd6fe;
+}
+
+.badge-role.role-staff {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+.badge-role.role-customer {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+/* Inline Role Selector in table */
+.role-select-inline {
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-size: 12.5px;
+    font-weight: 700;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.role-select-inline:hover {
+    border-color: #0284c7;
+}
+
+.role-select-inline:focus {
+    outline: none;
+    border-color: #0284c7;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+/* Role Selector Cards in Modal */
+.role-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.role-card-item {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.role-card-item:hover {
+    border-color: #93c5fd;
+    background: #f8fafc;
+}
+
+.role-card-item.selected {
+    border-color: #0284c7;
+    background: #f0f9ff;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+}
+
+.role-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.role-card-icon {
+    font-size: 20px;
+}
+
+.role-card-name {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.role-card-desc {
+    font-size: 11.5px;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.role-radio-hidden {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+@media (max-width: 680px) {
+    .role-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}

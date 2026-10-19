@@ -77,6 +77,10 @@
                             <span>📑</span>
                             <span>Quản lý Booking</span>
                         </a>
+                        <a href="admin-users.html" class="btn-admin-hero btn-ghost" id="btnNavUsers">
+                            <span>👥</span>
+                            <span>Quản lý Tài khoản</span>
+                        </a>
                     </div>
                 </div>
 
@@ -455,25 +459,33 @@
             const tourMainSection = document.getElementById("tourMainSection");
 
             // ==========================================
-            // 1. KIỂM SOÁT PHÂN QUYỀN (CHỈ DÀNH CHO ADMIN)
+            // 1. KIỂM SOÁT PHÂN QUYỀN (ADMIN VÀ STAFF)
             // ==========================================
             if (!token || !user) {
                 accessDeniedSection.style.display = "block";
                 tourMainSection.style.display = "none";
-                accessDeniedMessage.innerHTML = "Bạn chưa đăng nhập. Vui lòng đăng nhập bằng tài khoản <strong>Quản trị viên (Admin)</strong>.";
+                accessDeniedMessage.innerHTML = "Bạn chưa đăng nhập. Vui lòng đăng nhập bằng tài khoản <strong>Quản trị viên (Admin)</strong> hoặc <strong>Nhân viên (Staff)</strong>.";
                 return;
             }
 
-            if (user.role !== "Admin") {
+            if (user.role !== "Admin" && user.role !== "Staff") {
                 accessDeniedSection.style.display = "block";
                 tourMainSection.style.display = "none";
-                accessDeniedMessage.innerHTML = `Tài khoản của bạn (<strong>${user.userName || user.name}</strong>) có vai trò là <strong>${user.role || 'Khách hàng'}</strong>. Chức năng Thêm, Sửa, Xóa Tour yêu cầu quyền <strong>Admin</strong> cao nhất.`;
+                accessDeniedMessage.innerHTML = `Tài khoản của bạn (<strong>${user.userName || user.name}</strong>) có vai trò là <strong>${user.role || 'Khách hàng'}</strong>. Khu vực này chỉ dành cho <strong>Quản trị viên</strong> và <strong>Nhân viên điều hành</strong>.`;
                 return;
             }
 
             // Hợp lệ -> Hiển thị trang quản lý chính
             accessDeniedSection.style.display = "none";
             tourMainSection.style.display = "block";
+
+            // Tùy biến giao diện phù hợp với Nhân viên (Staff)
+            if (user.role === "Staff") {
+                const badgeTag = document.querySelector(".admin-role-badge-tag");
+                if (badgeTag) badgeTag.innerHTML = "👨‍💼 ĐIỀU HÀNH KHO TOUR · NHÂN VIÊN";
+                const btnNavUsers = document.getElementById("btnNavUsers");
+                if (btnNavUsers) btnNavUsers.style.display = "none";
+            }
 
             // Đồng hồ thời gian thực
             function updateClock() {
