@@ -3909,15 +3909,54 @@ body.invoice-modal-open {
     border-radius: 20px;
     box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4);
     overflow: hidden;
-    max-height: 92vh;
+    max-height: 90vh;
     display: flex;
     flex-direction: column;
     animation: invoiceModalFadeIn 0.22s ease-out;
 }
 
+.tour-modal-card form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    margin: 0;
+}
+
 .tour-form-body {
     padding: 24px;
     overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.tour-form-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tour-form-body::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.tour-form-body::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.tour-form-body::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.tour-modal-card .booking-modal-footer {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
 }
 
 .tour-form-grid {

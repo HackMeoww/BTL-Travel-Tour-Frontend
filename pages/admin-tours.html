@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Tour Du lịch - Travel Tour</title>
+    <title>Quản lý Tour Du lịch - HackMeoww - Travel Tour</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>
     <!-- Header đồng bộ tự động với navbar.js -->
-    <header class="header">
-        <div class="container navbar">
-            <a href="../index.html" class="logo">Travel Tour</a>
+    <header class="header header-admin">
+        <div class="container container-admin navbar">
+            <a href="../index.html" class="logo">HackMeoww - Travel Tour</a>
 
             <nav class="menu">
                 <a href="../index.html" data-nav="home">Trang chủ</a>
@@ -23,7 +23,7 @@
     </header>
 
     <main class="tour-mgmt-page">
-        <div class="container">
+        <div class="container container-admin">
 
             <!-- MÀN HÌNH CHẶN QUYỀN TRUY CẬP (NẾU KHÔNG PHẢI ADMIN) -->
             <div id="accessDeniedSection" class="admin-denied-container" style="display: none;">
@@ -251,8 +251,8 @@
                 <button type="button" class="btn-action-sm btn-detail" onclick="closeTourFormModal()" style="font-size: 16px; padding: 4px 10px;">✕</button>
             </div>
 
-            <form id="tourForm" onsubmit="handleTourFormSubmit(event)">
-                <div class="tour-form-body">
+            <form id="tourForm" onsubmit="handleTourFormSubmit(event)" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; margin: 0;">
+                <div class="tour-form-body" style="flex: 1; min-height: 0; overflow-y: auto;">
                     <!-- ID ẩn (0: thêm mới, > 0: sửa) -->
                     <input type="hidden" id="tourIdInput" value="0">
 
@@ -393,12 +393,12 @@
                     </div>
                 </div>
 
-                <div class="booking-modal-footer">
+                <div class="booking-modal-footer" style="flex-shrink: 0; background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 14px 24px; display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
                     <button type="button" class="btn-action-sm btn-detail" onclick="closeTourFormModal()" style="padding: 10px 18px; font-size: 13.5px;">
-                        Hủy bỏ
+                        ✕ Hủy bỏ
                     </button>
-                    <button type="submit" class="btn-action-sm btn-edit" id="btnSubmitTourForm" style="padding: 10px 22px; font-size: 13.5px; background: linear-gradient(135deg, #0284c7, #0369a1);">
-                        <span id="submitTourBtnText">💾 Lưu Tour</span>
+                    <button type="submit" class="btn-action-sm btn-edit" id="btnSubmitTourForm" style="padding: 10px 24px; font-size: 14px; font-weight: 700; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35); border: none; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        <span id="submitTourBtnText">✅ Xác nhận tạo tour</span>
                     </button>
                 </div>
             </form>
@@ -936,7 +936,7 @@
                 document.getElementById("tourIdInput").value = "0";
                 document.getElementById("formModalTitleIcon").textContent = "➕";
                 document.getElementById("formModalTitleText").textContent = "Thêm Tour du lịch mới";
-                document.getElementById("submitTourBtnText").textContent = "💾 Tạo Tour Mới";
+                document.getElementById("submitTourBtnText").textContent = "✅ Xác nhận tạo tour";
 
                 // Đặt mặc định
                 document.getElementById("tourDurationInput").value = "3";
@@ -965,7 +965,7 @@
                 document.getElementById("tourIdInput").value = tour.tourId;
                 document.getElementById("formModalTitleIcon").textContent = "✏️";
                 document.getElementById("formModalTitleText").textContent = `Chỉnh sửa Tour #TR-${String(tour.tourId).padStart(4, "0")}`;
-                document.getElementById("submitTourBtnText").textContent = "💾 Cập Nhật Tour";
+                document.getElementById("submitTourBtnText").textContent = "✅ Xác nhận cập nhật";
 
                 document.getElementById("tourNameInput").value = tour.tourName || "";
                 document.getElementById("tourDestinationInput").value = tour.destination || "";

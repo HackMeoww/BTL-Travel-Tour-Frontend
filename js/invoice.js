@@ -507,7 +507,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         `;
 
         // Đổi title tab trình duyệt theo hóa đơn
-        document.title = `Hóa đơn ${formattedInvoiceCode} - Travel Tour`;
+        document.title = `Hóa đơn ${formattedInvoiceCode} - HackMeoww - Travel Tour`;
 
     } catch (error) {
         console.error("Lỗi tải thông tin hóa đơn:", error);

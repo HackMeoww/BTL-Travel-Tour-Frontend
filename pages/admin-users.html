@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Tài khoản & Phân quyền - Travel Tour</title>
+    <title>Quản lý Tài khoản & Phân quyền - HackMeoww - Travel Tour</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>
     <!-- Header đồng bộ tự động với navbar.js -->
-    <header class="header">
-        <div class="container navbar">
-            <a href="../index.html" class="logo">Travel Tour</a>
+    <header class="header header-admin">
+        <div class="container container-admin navbar">
+            <a href="../index.html" class="logo">HackMeoww - Travel Tour</a>
 
             <nav class="menu">
                 <a href="../index.html" data-nav="home">Trang chủ</a>
@@ -24,7 +24,7 @@
     </header>
 
     <main class="user-mgmt-page">
-        <div class="container">
+        <div class="container container-admin">
 
             <!-- MÀN HÌNH CHẶN QUYỀN TRUY CẬP (NẾU KHÔNG PHẢI ADMIN) -->
             <div id="accessDeniedSection" class="admin-denied-container" style="display: none;">
@@ -222,8 +222,8 @@
                 <button type="button" class="btn-action-sm btn-detail" onclick="closeUserFormModal()" style="font-size: 16px; padding: 4px 10px;">✕</button>
             </div>
 
-            <form id="userForm" onsubmit="handleUserFormSubmit(event)">
-                <div class="tour-form-body">
+            <form id="userForm" onsubmit="handleUserFormSubmit(event)" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; margin: 0;">
+                <div class="tour-form-body" style="flex: 1; min-height: 0; overflow-y: auto;">
                     <!-- ID ẩn (0 = tạo mới, > 0 = sửa) -->
                     <input type="hidden" id="userIdInput" value="0">
 
@@ -374,7 +374,7 @@
                     </div>
                 </div>
 
-                <div class="booking-modal-footer">
+                <div class="booking-modal-footer" style="flex-shrink: 0; background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 14px 24px; display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
                     <button type="button" class="btn-action-sm btn-detail" onclick="closeUserFormModal()" style="padding: 10px 18px; font-size: 13.5px;">
                         Hủy bỏ
                     </button>

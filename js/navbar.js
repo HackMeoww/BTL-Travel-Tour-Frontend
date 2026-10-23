@@ -31,7 +31,7 @@
 
             logo.innerHTML = `
                 <span class="nav-logo-icon" aria-hidden="true">✈️</span>
-                <span class="nav-logo-text">Travel<span class="nav-logo-accent">Tour</span></span>
+                <span class="nav-logo-text">HackMeoww <span class="nav-logo-accent">Travel Tour</span></span>
             `;
         }
 

@@ -185,7 +185,7 @@
             <html lang="vi">
             <head>
                 <meta charset="UTF-8">
-                <title>Hóa đơn - Travel Tour</title>
+                <title>Hóa đơn - HackMeoww - Travel Tour</title>
                 <link rel="stylesheet" href="../css/style.css">
                 <style>
                     @page {
