@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -9,97 +8,392 @@
     <title>Đăng ký - HackMeoww - Travel Tour</title>
 
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .register-container {
+            max-width: 500px !important;
+        }
+
+        .step-progress {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .step-dot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.25s ease;
+        }
+
+        .step-dot.active {
+            background: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+        }
+
+        .step-dot.completed {
+            background: #10b981;
+            color: #ffffff;
+        }
+
+        .step-line {
+            width: 40px;
+            height: 3px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            transition: background 0.25s ease;
+        }
+
+        .step-line.active {
+            background: #0284c7;
+        }
+
+        .auth-alert {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .auth-alert.alert-error {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        .auth-alert.alert-success {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #15803d;
+        }
+
+        .auth-alert.alert-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            color: #0369a1;
+        }
+
+        .otp-display-box {
+            background: #f8fafc;
+            border: 2px dashed #0284c7;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .otp-display-code {
+            display: inline-block;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 6px;
+            color: #0284c7;
+            margin: 6px 0;
+            background: #ffffff;
+            padding: 6px 20px;
+            border-radius: 8px;
+            border: 1px solid #e0f2fe;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.12);
+        }
+
+        .btn-link-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0;
+            margin-top: 14px;
+            text-align: center;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-link-back:hover {
+            color: #0284c7;
+            text-decoration: underline;
+        }
+
+        .password-input-wrap {
+            position: relative;
+        }
+
+        .toggle-pwd-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #94a3b8;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+        .toggle-pwd-btn:hover {
+            color: #0284c7;
+        }
+
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .form-row-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .resend-box {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .resend-btn {
+            background: none;
+            border: none;
+            color: #0284c7;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0 4px;
+            font-size: 13px;
+        }
+
+        .resend-btn:disabled {
+            color: #94a3b8;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        .resend-btn:not(:disabled):hover {
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 
 <body class="login-page">
 
     <main class="login-main">
 
-        <section class="login-card register-card">
+        <section class="auth-page">
 
-            <div class="login-brand">
-                <span class="brand-icon">✈</span>
-                <span>HackMeoww - Travel Tour</span>
+            <div class="auth-container register-container">
+
+                <a href="../index.html" class="login-brand">
+                    <span class="login-brand-icon">✦</span>
+                    HackMeoww <span>Travel Tour</span>
+                </a>
+
+                <div class="login-heading">
+                    <span class="login-eyebrow">THÀNH VIÊN MỚI</span>
+                    <h1 id="pageTitle">Đăng ký tài khoản</h1>
+                    <p class="auth-description" id="pageDescription">
+                        Tạo tài khoản để bắt đầu hành trình khám phá và quản lý đặt tour.
+                    </p>
+                </div>
+
+                <!-- THANH TIẾN TRÌNH CÁC BƯỚC -->
+                <div class="step-progress">
+                    <span class="step-dot active" id="dotStep1">1</span>
+                    <span class="step-line" id="lineStep"></span>
+                    <span class="step-dot" id="dotStep2">2</span>
+                </div>
+
+                <!-- HỘP THÔNG BÁO LỖI / THÀNH CÔNG -->
+                <div id="alertBox" class="auth-alert"></div>
+
+                <!-- ==========================================
+                     BƯỚC 1: NHẬP THÔNG TIN TÀI KHOẢN ĐĂNG KÝ
+                     ========================================== -->
+                <form id="registerForm">
+
+                    <div class="form-row-2">
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="userName">Tên đăng nhập</label>
+                            <input
+                                type="text"
+                                id="userName"
+                                placeholder="Nhập tên đăng nhập"
+                                autocomplete="username"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="password">Mật khẩu</label>
+                            <div class="password-input-wrap">
+                                <input
+                                    type="password"
+                                    id="password"
+                                    placeholder="Tạo mật khẩu"
+                                    autocomplete="new-password"
+                                    required
+                                >
+                                <button type="button" class="toggle-pwd-btn" onclick="togglePasswordVisibility('password', this)" title="Ẩn/Hiện mật khẩu">👁️</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="fullName">Họ và tên</label>
+                        <input
+                            type="text"
+                            id="fullName"
+                            placeholder="Nhập họ và tên của bạn"
+                            autocomplete="name"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="email">Email đăng ký (Gmail)</label>
+                        <input
+                            type="email"
+                            id="email"
+                            placeholder="Nhập địa chỉ Gmail để nhận mã OTP xác nhận"
+                            autocomplete="email"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="phone">Số điện thoại</label>
+                            <input
+                                type="tel"
+                                id="phone"
+                                placeholder="Nhập số điện thoại"
+                                autocomplete="tel"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="address">Địa chỉ</label>
+                            <input
+                                type="text"
+                                id="address"
+                                placeholder="Nhập địa chỉ của bạn"
+                                autocomplete="street-address"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <button type="submit" class="auth-button" id="btnSubmitStep1" style="margin-top: 10px;">
+                        <span>Tiếp tục & Gửi mã OTP qua Gmail</span> <span aria-hidden="true">📩</span>
+                    </button>
+
+                </form>
+
+                <!-- ==========================================
+                     BƯỚC 2: NHẬP MÃ OTP GỬI VỀ GMAIL ĐỂ XÁC NHẬN
+                     ========================================== -->
+                <form id="otpConfirmForm" style="display: none;">
+
+                    <!-- Hộp hiển thị mã OTP (nếu cần xem nhanh) -->
+                    <div class="otp-display-box" id="otpDisplaySection">
+                        <div style="font-size: 13px; color: #475569; font-weight: 600;">
+                            🔐 Mã xác thực đăng ký (OTP) của bạn là:
+                        </div>
+                        <div class="otp-display-code" id="generatedOtp">000000</div>
+                        <div style="font-size: 12px; color: #64748b;">
+                            (Hệ thống tự động cấp mã xác nhận nhanh để bạn hoàn tất đăng ký)
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="inputOtp">Mã xác thực OTP (6 chữ số)</label>
+                        <input
+                            type="text"
+                            id="inputOtp"
+                            placeholder="Nhập 6 chữ số mã xác thực"
+                            maxlength="6"
+                            style="text-align: center; font-size: 20px; letter-spacing: 5px; font-weight: 700;"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="auth-button" id="btnConfirmOtp">
+                        <span>Hoàn tất đăng ký tài khoản</span> <span aria-hidden="true">✓</span>
+                    </button>
+
+                    <div class="resend-box">
+                        Chưa nhận được mã?
+                        <button type="button" class="resend-btn" id="btnResendOtp" onclick="resendRegistrationOtp()">Gửi lại mã</button>
+                        <span id="resendCountdown"></span>
+                    </div>
+
+                    <button type="button" class="btn-link-back" onclick="backToStep1()">
+                        ← Quay lại chỉnh sửa thông tin
+                    </button>
+                </form>
+
+                <!-- ==========================================
+                     MÀN HÌNH HOÀN TẤT ĐĂNG KÝ THÀNH CÔNG
+                     ========================================== -->
+                <div id="successSection" style="display: none; text-align: center; padding: 20px 0;">
+                    <div style="width: 70px; height: 70px; border-radius: 50%; background: #dcfce7; color: #16a34a; font-size: 36px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.2);">
+                        ✓
+                    </div>
+                    <h2 style="font-size: 22px; color: #0f172a; margin-bottom: 8px;">Đăng ký tài khoản thành công!</h2>
+                    <p style="color: #64748b; font-size: 14px; margin-bottom: 24px; line-height: 1.5;">
+                        Chào mừng bạn gia nhập <strong>HackMeoww Travel Tour</strong>! Tài khoản của bạn đã được kích hoạt thành công. Đang chuyển hướng về trang đăng nhập...
+                    </p>
+                    <a href="login.html" class="auth-button" style="text-decoration: none;">
+                        Đăng nhập ngay <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+
+                <div class="login-divider">
+                    <span></span>
+                    <span>HACKMEOWW - TRAVEL TOUR</span>
+                    <span></span>
+                </div>
+
+                <p class="auth-footer">
+                    Đã có tài khoản?
+                    <a href="login.html">Đăng nhập</a>
+                </p>
+
             </div>
-
-            <h1>Đăng ký tài khoản</h1>
-
-            <p class="login-description">
-                Tạo tài khoản để bắt đầu hành trình khám phá
-            </p>
-
-            <form id="registerForm">
-
-                <div class="form-group">
-                    <label for="userName">Tên đăng nhập</label>
-                    <input
-                        type="text"
-                        id="userName"
-                        placeholder="Nhập tên đăng nhập"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Mật khẩu</label>
-                    <input
-                        type="password"
-                        id="password"
-                        placeholder="Tạo mật khẩu"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="fullName">Họ và tên</label>
-                    <input
-                        type="text"
-                        id="fullName"
-                        placeholder="Nhập họ và tên"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        placeholder="Nhập email"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="phone">Số điện thoại</label>
-                    <input
-                        type="tel"
-                        id="phone"
-                        placeholder="Nhập số điện thoại"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="address">Địa chỉ</label>
-                    <input
-                        type="text"
-                        id="address"
-                        placeholder="Nhập địa chỉ của bạn"
-                        required
-                    >
-                </div>
-
-                <button type="submit" class="auth-button">
-                    Đăng ký
-                </button>
-
-            </form>
-
-            <p class="auth-footer">
-                Đã có tài khoản?
-                <a href="login.html">Đăng nhập</a>
-            </p>
 
         </section>
 
@@ -107,60 +401,281 @@
 
     <script src="../js/api.js"></script>
 
-<script>
-document.getElementById("registerForm").addEventListener("submit", async function (event) {
-    event.preventDefault();
+    <script>
+        // Dữ liệu đăng ký tạm thời đang chờ xác thực OTP
+        let registrationData = {
+            userName: "",
+            password: "",
+            fullName: "",
+            email: "",
+            phone: "",
+            address: "",
+            otpCode: ""
+        };
 
-    const userName = document.getElementById("userName").value.trim();
-    const password = document.getElementById("password").value;
-    const fullName = document.getElementById("fullName").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const address = document.getElementById("address").value.trim();
+        let resendTimer = null;
+        let countdownSec = 30;
 
-    const registerButton = this.querySelector('button[type="submit"]');
+        const alertBox = document.getElementById("alertBox");
+        const registerForm = document.getElementById("registerForm");
+        const otpConfirmForm = document.getElementById("otpConfirmForm");
+        const successSection = document.getElementById("successSection");
 
-    registerButton.disabled = true;
-    registerButton.textContent = "Đang đăng ký...";
+        const dotStep1 = document.getElementById("dotStep1");
+        const dotStep2 = document.getElementById("dotStep2");
+        const lineStep = document.getElementById("lineStep");
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/Auth/register`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                userName: userName,
-                passWord: password,
-                fullName: fullName,
-                email: email,
-                phone: phone,
-                address: address
-            })
-        });
+        const pageTitle = document.getElementById("pageTitle");
+        const pageDescription = document.getElementById("pageDescription");
 
-        const result = await response.json().catch(() => null);
-
-        if (!response.ok) {
-            throw new Error(
-                result?.message ||
-                result?.title ||
-                "Đăng ký thất bại. Vui lòng kiểm tra lại thông tin."
-            );
+        function showAlert(message, type = "error") {
+            alertBox.className = `auth-alert alert-${type}`;
+            const icon = type === "error" ? "⚠️" : type === "success" ? "✅" : "ℹ️";
+            alertBox.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+            alertBox.style.display = "flex";
         }
 
-        alert("Đăng ký tài khoản thành công! Vui lòng đăng nhập.");
+        function hideAlert() {
+            alertBox.style.display = "none";
+        }
 
-        window.location.href = "login.html";
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            if (input.type === "password") {
+                input.type = "text";
+                btn.textContent = "🙈";
+            } else {
+                input.type = "password";
+                btn.textContent = "👁️";
+            }
+        }
 
-    } catch (error) {
-        alert(error.message || "Không thể kết nối đến máy chủ. Vui lòng thử lại.");
-    } finally {
-        registerButton.disabled = false;
-        registerButton.textContent = "Đăng ký";
-    }
-});
-</script>
+        // ==========================================
+        // BƯỚC 1: KIỂM TRA THÔNG TIN & GỬI MÃ OTP VỀ GMAIL
+        // ==========================================
+        registerForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            hideAlert();
+
+            const userName = document.getElementById("userName").value.trim();
+            const password = document.getElementById("password").value;
+            const fullName = document.getElementById("fullName").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const address = document.getElementById("address").value.trim();
+
+            if (!userName || !password || !fullName || !email) {
+                showAlert("Vui lòng điền đầy đủ các thông tin bắt buộc!");
+                return;
+            }
+
+            if (password.length < 4) {
+                showAlert("Mật khẩu phải có độ dài từ 4 ký tự trở lên!");
+                return;
+            }
+
+            const btnSubmit = document.getElementById("btnSubmitStep1");
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<span>Đang gửi mã OTP về Gmail...</span>`;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Auth/register-send-otp`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: userName,
+                        email: email,
+                        fullName: fullName
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || "Không thể gửi mã xác nhận đến email này.");
+                }
+
+                // Lưu dữ liệu form vào state
+                registrationData = {
+                    userName,
+                    password,
+                    fullName,
+                    email,
+                    phone,
+                    address,
+                    otpCode: data.otpCode
+                };
+
+                // Chuyển sang Bước 2 nhập OTP
+                goToStep2(data.emailSent);
+
+            } catch (err) {
+                showAlert(err.message, "error");
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<span>Tiếp tục & Gửi mã OTP qua Gmail</span> <span aria-hidden="true">📩</span>`;
+            }
+        });
+
+        function goToStep2(emailSent) {
+            registerForm.style.display = "none";
+            otpConfirmForm.style.display = "block";
+
+            // Cập nhật giao diện tiến trình
+            dotStep1.classList.remove("active");
+            dotStep1.classList.add("completed");
+            dotStep1.innerHTML = "✓";
+            lineStep.classList.add("active");
+            dotStep2.classList.add("active");
+
+            pageTitle.textContent = "Xác nhận mã OTP";
+            pageDescription.textContent = `Mã xác thực đăng ký đã gửi đến: ${registrationData.email}`;
+
+            document.getElementById("generatedOtp").textContent = registrationData.otpCode;
+            document.getElementById("inputOtp").value = registrationData.otpCode; // Tự động điền hỗ trợ trải nghiệm nhanh
+
+            if (emailSent) {
+                showAlert(`Mã xác thực OTP đã được gửi về Gmail: ${registrationData.email}. Vui lòng kiểm tra hộp thư đến của bạn!`, "success");
+            } else {
+                showAlert(`Đã tạo mã OTP xác nhận cho tài khoản: ${registrationData.email}. Nhập mã bên dưới để hoàn tất.`, "info");
+            }
+
+            startResendCountdown();
+        }
+
+        function backToStep1() {
+            hideAlert();
+            if (resendTimer) clearInterval(resendTimer);
+
+            otpConfirmForm.style.display = "none";
+            registerForm.style.display = "block";
+
+            dotStep1.classList.add("active");
+            dotStep1.classList.remove("completed");
+            dotStep1.innerHTML = "1";
+            lineStep.classList.remove("active");
+            dotStep2.classList.remove("active");
+
+            pageTitle.textContent = "Đăng ký tài khoản";
+            pageDescription.textContent = "Tạo tài khoản để bắt đầu hành trình khám phá và quản lý đặt tour.";
+        }
+
+        function startResendCountdown() {
+            const btnResend = document.getElementById("btnResendOtp");
+            const countdownSpan = document.getElementById("resendCountdown");
+            countdownSec = 30;
+            btnResend.disabled = true;
+            countdownSpan.textContent = `(${countdownSec}s)`;
+
+            if (resendTimer) clearInterval(resendTimer);
+            resendTimer = setInterval(() => {
+                countdownSec--;
+                if (countdownSec <= 0) {
+                    clearInterval(resendTimer);
+                    btnResend.disabled = false;
+                    countdownSpan.textContent = "";
+                } else {
+                    countdownSpan.textContent = `(${countdownSec}s)`;
+                }
+            }, 1000);
+        }
+
+        async function resendRegistrationOtp() {
+            hideAlert();
+            const btnResend = document.getElementById("btnResendOtp");
+            btnResend.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Auth/register-send-otp`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: registrationData.userName,
+                        email: registrationData.email,
+                        fullName: registrationData.fullName
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || "Gửi lại mã OTP thất bại.");
+
+                registrationData.otpCode = data.otpCode;
+                document.getElementById("generatedOtp").textContent = data.otpCode;
+                document.getElementById("inputOtp").value = data.otpCode;
+
+                showAlert("Đã gửi lại mã OTP đăng ký thành công!", "success");
+                startResendCountdown();
+            } catch (err) {
+                showAlert(err.message, "error");
+                btnResend.disabled = false;
+            }
+        }
+
+        // ==========================================
+        // BƯỚC 2: XÁC THỰC MÃ OTP & TẠO TÀI KHOẢN
+        // ==========================================
+        otpConfirmForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            hideAlert();
+
+            const inputOtp = document.getElementById("inputOtp").value.trim();
+
+            if (inputOtp !== registrationData.otpCode) {
+                showAlert("Mã xác thực OTP không chính xác. Vui lòng kiểm tra lại!", "error");
+                return;
+            }
+
+            const btnConfirm = document.getElementById("btnConfirmOtp");
+            btnConfirm.disabled = true;
+            btnConfirm.innerHTML = `<span>Đang kích hoạt tài khoản...</span>`;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Auth/register`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        userName: registrationData.userName,
+                        passWord: registrationData.password,
+                        fullName: registrationData.fullName,
+                        email: registrationData.email,
+                        phone: registrationData.phone,
+                        address: registrationData.address
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || "Đăng ký thất bại. Vui lòng thử lại.");
+                }
+
+                // Chuyển sang màn hình thành công
+                if (resendTimer) clearInterval(resendTimer);
+                otpConfirmForm.style.display = "none";
+                document.querySelector(".step-progress").style.display = "none";
+                hideAlert();
+                successSection.style.display = "block";
+
+                pageTitle.textContent = "Hoàn tất!";
+                pageDescription.textContent = "Tài khoản của bạn đã được kích hoạt thành công.";
+
+                // Tự động chuyển hướng về trang đăng nhập sau 3 giây
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 3000);
+
+            } catch (err) {
+                showAlert(err.message, "error");
+                btnConfirm.disabled = false;
+                btnConfirm.innerHTML = `<span>Hoàn tất đăng ký tài khoản</span> <span aria-hidden="true">✓</span>`;
+            }
+        });
+    </script>
 
 </body>
 

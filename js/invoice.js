@@ -329,10 +329,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                 <div class="company-branding">
                     <div class="company-logo">
                         <span>✈️</span>
-                        <span>Travel Tour</span>
+                        <span>HackMeoww - Travel Tour</span>
                     </div>
                     <div class="company-name">
-                        Công ty TNHH Dịch vụ và Du lịch Travel Tour
+                        Công ty TNHH Dịch vụ và Du lịch HackMeoww - Travel Tour
                     </div>
                     <div class="company-details">
                         <p>📍 <strong>Trụ sở chính:</strong> Tầng 6, Tòa nhà Travel Tour, Cầu Giấy, Hà Nội</p>
@@ -483,7 +483,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                     <!-- Bên công ty -->
                     <div class="signature-box">
-                        <h4>ĐẠI DIỆN TRAVEL TOUR</h4>
+                        <h4>ĐẠI DIỆN HACKMEOWW - TRAVEL TOUR</h4>
                         <span>(Ký tên, đóng dấu xác nhận)</span>
                         ${isPaid ? `
                             <div class="paid-stamp">
@@ -500,7 +500,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     <p>📌 <strong>Lưu ý quan trọng:</strong> Quý khách vui lòng có mặt tại điểm đón trước <strong>30 phút</strong> so với giờ khởi hành và xuất trình hóa đơn này kèm theo CCCD/Hộ chiếu bản gốc.</p>
                     <p>Mọi thắc mắc về lịch trình, dịch vụ vui lòng liên hệ Tổng đài <strong>1900 6868</strong> để được hướng dẫn nhanh nhất.</p>
                     <p style="margin-top: 10px; font-style: italic; color: #087db5; font-weight: 600;">
-                        Cảm ơn Quý khách đã tin tưởng đồng hành cùng Travel Tour! Chúc Quý khách có một hành trình trọn vẹn và ý nghĩa!
+                        Cảm ơn Quý khách đã tin tưởng đồng hành cùng HackMeoww - Travel Tour! Chúc Quý khách có một hành trình trọn vẹn và ý nghĩa!
                     </p>
                 </div>
             </div>

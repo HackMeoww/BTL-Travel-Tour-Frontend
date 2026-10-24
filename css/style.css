@@ -1796,6 +1796,11 @@ body.login-page {
     text-decoration: underline;
 }
 
+.forgot-link:hover {
+    text-decoration: underline !important;
+    color: #0284c7 !important;
+}
+
 .login-back {
     display: block;
     margin-top: 24px;
@@ -3351,6 +3356,110 @@ body.login-page {
         width: 100%;
         justify-content: center;
     }
+}
+
+/* ====================================================
+   ADMIN LAYOUT WIDE (Mở rộng sang 2 bên để chứa đủ thông tin bảng biểu)
+   ==================================================== */
+main.booking-mgmt-page,
+main.tour-mgmt-page,
+main.user-mgmt-page,
+main.admin-dashboard-page {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 24px 0 60px !important;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+.container-admin,
+.container-wide,
+.booking-mgmt-page .container,
+.tour-mgmt-page .container,
+.user-mgmt-page .container,
+.admin-dashboard-page .container {
+    width: 96% !important;
+    max-width: 1850px !important;
+    margin: 0 auto !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    box-sizing: border-box;
+}
+
+/* Đồng bộ độ rộng thanh navbar trên các trang quản trị */
+body:has(.booking-mgmt-page, .tour-mgmt-page, .user-mgmt-page, .admin-dashboard-page) .header .container,
+.header.header-admin .container,
+.header.header-wide .container {
+    width: 96% !important;
+    max-width: 1850px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    box-sizing: border-box;
+}
+
+/* Đảm bảo bảng danh sách và card quản trị mở rộng tối đa */
+.booking-mgmt-page .admin-card,
+.tour-mgmt-page .admin-card,
+.user-mgmt-page .admin-card,
+.admin-dashboard-page .admin-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+}
+
+.admin-table-container,
+.admin-table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.admin-table-container::-webkit-scrollbar,
+.admin-table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.admin-table-container::-webkit-scrollbar-track,
+.admin-table-wrapper::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.admin-table-container::-webkit-scrollbar-thumb,
+.admin-table-wrapper::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.admin-table-container::-webkit-scrollbar-thumb:hover,
+.admin-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.admin-data-table,
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    text-align: left;
+    min-width: 1280px;
+}
+
+/* Thanh tìm kiếm mở rộng thoáng hơn */
+.booking-mgmt-page .search-input-wrapper {
+    max-width: 600px;
+}
+
+.btn-action-sm.btn-print {
+    background: #0284c7;
+    color: #ffffff;
+}
+
+.btn-action-sm.btn-print:hover {
+    background: #0369a1;
+    transform: translateY(-1px);
 }
 
 /* ====================================================

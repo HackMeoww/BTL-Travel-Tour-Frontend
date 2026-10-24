@@ -83,10 +83,8 @@
 
 
 
-    ```html
-<script src="../js/api.js"></script>
+    <script src="../js/api.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-```
 
 
 
@@ -400,65 +398,25 @@ voucherPayment = payment;
         // Header đăng nhập
         // =========================
 
-        const loginLink =
-            document.getElementById(
-                "loginLink"
-            );
-
-
-        const logoutLink =
-            document.getElementById(
-                "logoutLink"
-            );
-
-
-        if (token) {
-
-            loginLink.style.display =
-                "none";
-
-            logoutLink.style.display =
-                "inline-block";
-
-        }
-        else {
-
-            loginLink.style.display =
-                "inline-block";
-
-            logoutLink.style.display =
-                "none";
-
-        }
-
-
-        logoutLink.addEventListener(
-            "click",
-            function (event) {
-
-                event.preventDefault();
-
-                localStorage.removeItem(
-                    "token"
-                );
-
-                localStorage.removeItem(
-                    "user"
-                );
-
-                localStorage.removeItem(
-                    "booking"
-                );
-
-                localStorage.removeItem(
-                    "payment"
-                );
-
-                window.location.href =
-                    "../index.html";
-
+        const loginLink = document.getElementById("loginLink");
+        const logoutLink = document.getElementById("logoutLink");
+        if (loginLink && logoutLink) {
+            if (token) {
+                loginLink.style.display = "none";
+                logoutLink.style.display = "inline-block";
+            } else {
+                loginLink.style.display = "inline-block";
+                logoutLink.style.display = "none";
             }
-        );
+            logoutLink.addEventListener("click", function (event) {
+                event.preventDefault();
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                localStorage.removeItem("booking");
+                localStorage.removeItem("payment");
+                window.location.href = "../index.html";
+            });
+        }
 
 
 

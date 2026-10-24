@@ -138,8 +138,8 @@
                         </div>
                     </div>
 
-                    <div class="admin-table-container" style="border: none; border-radius: 0;">
-                        <table class="admin-data-table">
+                    <div class="admin-table-container" style="border: none; border-radius: 0; overflow-x: auto; width: 100%;">
+                        <table class="admin-data-table" style="width: 100%; min-width: 1280px;">
                             <thead>
                                 <tr>
                                     <th style="width: 110px;">Mã Booking</th>
@@ -614,7 +614,7 @@
                             <td style="text-align: right; font-weight: 800; color: #087db5; font-size: 14.5px; white-space: nowrap;">
                                 ${formatVND(b.totalPrice)}
                             </td>
-                            <td style="text-align: center;">
+                            <td style="text-align: center; white-space: nowrap;">
                                 ${statusBadge}
                             </td>
                             <td style="text-align: center; white-space: nowrap;">
